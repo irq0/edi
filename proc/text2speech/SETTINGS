@@ -1,0 +1,5 @@
+#!/bin/bash
+
+URL="amqp://localhost"
+CONSUME_QUEUE="tts"
+PUBLISH_QUEUE="say"
