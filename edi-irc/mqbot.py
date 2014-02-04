@@ -74,7 +74,10 @@ class MQ(Thread):
     def run(self):
         self.running = True
         while self.running:
-            self.chan.wait()
+            try:
+                self.chan.wait()
+            except Exception:
+                time.sleep(5)
 
     def close(self):
         self.running = False
