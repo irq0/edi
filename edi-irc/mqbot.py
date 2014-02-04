@@ -1,13 +1,19 @@
+#!/usr/bin/env python
+
+#
+# Simple IRC<->AMQP bot
+#
+
 from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol, ssl
 from twisted.python import log
 
 from threading import Thread
 
+from amqplib import client_0_8 as amqp
+
 import time
 import sys
-
-import pika
 import json
 
 network = {
@@ -20,30 +26,33 @@ network = {
 class MQ(Thread):
     def __init__(self, bot):
         Thread.__init__(self)
-
-
         self.daemon = True
         self.bot = bot
 
-        self.conn = pika.BlockingConnection(pika.ConnectionParameters("localhost"))
+
+        self.conn = amqp.Connection(host="localhost")
         self.chan = self.conn.channel()
         self.exchange = "msg"
 
         self.chan.exchange_declare(exchange=self.exchange,
+                                   durable=False,
+                                   auto_delete=False,
                                    type="topic")
 
         result = self.chan.queue_declare(exclusive=True)
-        self.send_queue_name = result.method.queue
+        self.send_queue_name = result[0]
 
         self.chan.queue_bind(exchange=self.exchange,
                              queue=self.send_queue_name,
                              routing_key="irc.send.raw")
 
-        self.chan.basic_consume(self.send,
+        self.chan.basic_consume(callback=self.send,
                                 queue=self.send_queue_name)
 
-    def send(self, ch, method, props, body):
-        self.bot.msg("#c3pb.sh", body)
+
+    def send(self, msg):
+        print msg.body
+        self.bot.msg("#c3pb.sh", msg.body)
 
     def msg(self, user, msg, chan, type):
         jmsg = json.dumps({
@@ -53,17 +62,22 @@ class MQ(Thread):
             "type" : type,
         })
 
+        amsg = amqp.Message(jmsg)
+        amsg.properties["content_type"] = "application/json"
+        amsg.properties["delivery_mode"] = 2
+        amsg.properties["app_id"] = "edi-irc"
+
         self.chan.basic_publish(exchange=self.exchange,
                                 routing_key="irc.recv.raw",
-                                properties=pika.BasicProperties(app_id="edi-irc",
-                                                                content_type="application/json"),
-                                body=jmsg)
+                                msg=amsg)
 
     def run(self):
-        self.chan.start_consuming()
+        self.running = True
+        while self.running:
+            self.chan.wait()
 
     def close(self):
-        self.chan.stop_consuming()
+        self.running = False
         self.conn.close()
 
 
@@ -121,14 +135,14 @@ if __name__ == '__main__':
 
     factory = BotFactory()
 
-    reactor.connectTCP("irc.hackint.org",
-                       6666,
-                       factory)
+#    reactor.connectTCP("irc.hackint.org",
+#                       6666,
+#                       factory)
 
-#    reactor.connectSSL(network["host"],
-#                       network["port"],
-#                       factory,
-#                       ssl.ClientContextFactory())
+    reactor.connectSSL(network["host"],
+                       network["port"],
+                       factory,
+                       ssl.ClientContextFactory())
 
     # run bot
     reactor.run()
