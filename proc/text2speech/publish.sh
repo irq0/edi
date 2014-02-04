@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source "$(dirname $0)/SETTINGS"
-
 tts() {
     msg=$(cat -)
 
@@ -16,9 +14,9 @@ tts() {
 
 publish() {
     amqp-publish \
-	--url=$URL \
-	--exchange="$PUBLISH_EXCHANGE" \
-	--routing-key="" \
+	--url="amqp://localhost" \
+	--exchange="notify" \
+	--routing-key="audio" \
 	--content-type="audio/vorbis"
 }
 
