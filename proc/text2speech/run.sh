@@ -4,6 +4,7 @@ source "$(dirname $0)/SETTINGS"
 
 amqp-consume \
     --url=$URL \
-    --queue=$CONSUME_QUEUE \
-    --declare \
+    --exchange="$CONSUME_EXCHANGE" \
+    --routing-key="tts" \
+    --queue="tts" \
     ./publish.sh

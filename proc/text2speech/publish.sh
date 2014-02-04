@@ -17,7 +17,8 @@ tts() {
 publish() {
     amqp-publish \
 	--url=$URL \
-	--routing-key=$PUBLISH_QUEUE \
+	--exchange="$PUBLISH_EXCHANGE" \
+	--routing-key="" \
 	--content-type="audio/vorbis"
 }
 

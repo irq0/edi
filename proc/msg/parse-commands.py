@@ -28,7 +28,7 @@ def callback(ch, method, props, body):
         msg = json.loads(body)
 
         if re.match(r"^!tts", msg["msg"]):
-            chan.basic_publish(exchange="",
+            chan.basic_publish(exchange="tts_worker",
                                routing_key="tts",
                                body=msg["msg"][len("!tts "):])
 

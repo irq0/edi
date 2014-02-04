@@ -2,4 +2,5 @@
 
 URL="amqp://localhost"
 CONSUME_QUEUE="tts"
-PUBLISH_QUEUE="say"
+CONSUME_EXCHANGE="tts_worker"
+PUBLISH_EXCHANGE="say"

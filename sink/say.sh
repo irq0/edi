@@ -1,2 +1,2 @@
 #!/bin/bash
-amqp-consume --url="amqp://localhost" --queue=say --declare  mplayer -
+amqp-consume --url="amqp://localhost" --exchange=say mplayer -
