@@ -1,0 +1,11 @@
+* Dependencies
+** rabbitmq
+#+BEGIN_SRC sh
+sudo docker run -p :5672 -p :15672 -v /scratch/docker-data/rabbitmq:/var/lib/rabbitmq/mnesia f04150b0661e
+sudo docker build github.com/mikaelhg/docker-rabbitmq.git
+#+END_SRC
+
+** debian packages
+- python-pika
+- python-amqplib
+- amqp-tools
