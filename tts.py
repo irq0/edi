@@ -3,6 +3,7 @@
 from __future__ import print_function
 
 import sys
+import argparse
 import anydbm
 import random
 import re
@@ -116,24 +117,102 @@ def tts(voice, text, pitch=DEFAULT_PITCH, speed=DEFAULT_SPEED, meta=None):
 
             if success:
                 cache_put(key, filename, meta)
-                return filename
+                return sample_path(filename)
 
-def print_cache():
+def list_cache():
+    result = []
     if len(CACHE) > 0:
-        print("{:<40}\t{:<40}\t{:<10}".format("UUID",
+        result.append("{:<40}\t{:<40}\t{:<10}".format("UUID",
                                               "Cache Key",
                                               "Metadata"))
         for k, v in CACHE.iteritems():
             key = json.loads(k)
             uuid, meta = json.loads(v)
 
-            print("{:<40}\t{:<40}\t{:<10}".format(uuid,
+            result.append("{:<40}\t{:<40}\t{:<10}".format(uuid,
                                                          ",".join(map(str,key)),
-                                                         meta),
-                  file=sys.stderr)
-        print()
+                                                         meta))
+    return "\n".join(result)
+
+class ArgumentParserError(Exception):
+    pass
+
+class ThrowingArgumentParser(argparse.ArgumentParser):
+    def error(self, message):
+        raise ArgumentParserError(message)
+
+def parse_args(args=None):
+      parser = ThrowingArgumentParser(
+          add_help=False)
+
+
+      parser.add_argument("--voice",
+                          choices=DEFAULT_VOICES,
+                          default=DEFAULT_VOICE,
+                          help="Voice to use. List supported voices and languages with '--list-voices'")
+      parser.add_argument("--pitch",
+                          type=int,
+                          default=DEFAULT_PITCH,
+                          help="Pitch (Default: {})".format(DEFAULT_PITCH))
+      parser.add_argument("--speed",
+                          type=int,
+                          default=DEFAULT_SPEED,
+                          help="Speed (Default: {})".format(DEFAULT_SPEED))
+
+      group = parser.add_mutually_exclusive_group(required=True)
+
+      group.add_argument("--list-voices",
+                          default=False,
+                          action="store_true",
+                          help="List all available voices. Fetch from server")
+      group.add_argument("--list-cache",
+                          default=False,
+                          action="store_true",
+                          help="List cache entries")
+      group.add_argument("--text",
+                          help="Text",
+                          nargs="+")
+      group.add_argument("--help",
+                         default=False,
+                         action="store_true",
+                         help="Help message")
+
+      result = parser.parse_args(args)
+      result.help_message = parser.format_help()
+      return result
+
+def with_args(args=None, meta="cli"):
+    args = parse_args(args)
+    result = None
+
+    if args.list_voices:
+        import voices
+        result = ("voices", "\n".join(("{}: {}".format(lang, ", ".join(voices))
+                                       for lang, voices in voices.voices().iteritems())))
+    elif args.list_cache:
+        result = ("cache", list_cache())
+
+    elif args.help:
+        result = ("help", args.help_message)
+
+    else:
+        d = vars(args)
+        d["meta"] = meta
+        d["text"] = " ".join(d["text"])
+        del d["list_voices"]
+        del d["list_cache"]
+        del d["help"]
+        del d["help_message"]
+
+        result = ("filename", tts(**d))
+
+    return result
 
 if __name__ == "__main__":
-    print_cache()
-    print(tts("lucy", " ".join(sys.argv[1:]), meta="cli"))
-    CACHE.close()
+    try:
+        print(with_args()[1])
+    except ArgumentParserError, e:
+        print(e)
+        sys.exit(1)
+
+    print()
