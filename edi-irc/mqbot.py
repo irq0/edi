@@ -35,7 +35,7 @@ class MQ(Thread):
         self.exchange = "msg"
 
         self.chan.exchange_declare(exchange=self.exchange,
-                                   durable=False,
+                                   durable=True,
                                    auto_delete=False,
                                    type="topic")
 
@@ -52,7 +52,11 @@ class MQ(Thread):
 
     def send(self, msg):
         print msg.body
-        self.bot.msg("#c3pb.sh", msg.body)
+
+	lines = msg.body.split("\n")
+	for line in lines:
+	        self.bot.msg("#c3pb.sh", line)
+		time.sleep(0.5)
 
     def msg(self, user, msg, chan, type):
         jmsg = json.dumps({
