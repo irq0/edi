@@ -16,10 +16,11 @@ import requests
 
 SCRIPTPATH = os.path.realpath(os.path.dirname(__file__))
 SAMPLE_PATH = os.path.join(SCRIPTPATH, "samples")
-CACHE = anydbm.open(os.path.join(SCRIPTPATH, "cache.dat"), "c")
+CACHE_FILENAME = os.path.join(SCRIPTPATH, "cache.dat"), "c"
 
-DEFAULT_VOICES = [ s.lower() for s in
+DEFAULT_VOICES = [ s.strip().lower() for s in
                    open(os.path.join(SCRIPTPATH, "default_voices")).read().split(",") ]
+DEFAULT_VOICE = "julia"
 
 DEFAULT_PITCH = 100
 DEFAULT_SPEED = 180
@@ -79,31 +80,38 @@ def sample_path(filename):
 
 def cache_get(*args):
     key = json.dumps(args)
+    filename = None
+    hit = None
 
-    try:
-        filename = json.loads(CACHE[key])[0]
-    except KeyError:
-        filename = mkfilename()
+    with anydbm.open(CACHE_FILENAME, "c") as cache:
+        try:
+            filename = json.loads(CACHE[key])[0]
+        except KeyError:
+            filename = mkfilename()
 
-    hit = os.path.isfile(sample_path(filename))
+            hit = os.path.isfile(sample_path(filename))
+
 
     return (key, filename, hit)
 
 def cache_put(key, filename, meta=None):
-    CACHE[key] = json.dumps([filename, meta])
+    with anydbm.open(CACHE_FILENAME, "c") as cache:
+        CACHE[key] = json.dumps([filename, meta])
 
 def tts(voice, text, pitch=DEFAULT_PITCH, speed=DEFAULT_SPEED, meta=None):
     if voice in DEFAULT_VOICES:
         voice = '%s22k' % voice.lower()
     else:
-        voice = "%s22k" % DEFAULT_VOICES[0].lower()
+        voice = "%s22k" % DEFAULT_VOICE.lower()
 
-    print("Voice", voice, file=sys.stderr)
+    print("Voice:", voice, file=sys.stderr)
 
     if not text.endswith("."):
         text += "."
 
     key, filename, hit = cache_get(voice, text, pitch, speed)
+
+    print("Text:", text, file=sys.stderr)
 
     if hit:
         print("TTS is cached", file=sys.stderr)
