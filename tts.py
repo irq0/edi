@@ -4,11 +4,9 @@ from __future__ import print_function
 
 import sys
 import anydbm
-import urllib
 import random
 import re
 import os
-import time
 import uuid
 import os.path
 import json
