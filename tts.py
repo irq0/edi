@@ -83,7 +83,7 @@ def cache_get(*args):
 
     global CACHE_FILENAME
     filename = None
-    hit = None
+    hit = True
 
     cache = anydbm.open(CACHE_FILENAME, "c")
 
@@ -91,7 +91,6 @@ def cache_get(*args):
         filename = json.loads(cache[key])[0]
     except KeyError:
         filename = mkfilename()
-
         hit = os.path.isfile(sample_path(filename))
 
     cache.close()
@@ -119,7 +118,7 @@ def tts(voice, text, pitch=DEFAULT_PITCH, speed=DEFAULT_SPEED, meta=None):
     print("Text:", text, file=sys.stderr)
 
     if hit:
-        print("TTS is cached", file=sys.stderr)
+        print("Returning cached tts", file=sys.stderr)
         return sample_path(filename)
     else:
         textparam = '\\vct=%d\\ \\spd=%d\\ %s' % (pitch, speed, text)
