@@ -3,8 +3,7 @@
 tts() {
     msg=$(cat -)
 
-    lang="$(echo "$msg" | langid -l "en,de" | awk '/de/ { print "de-DE" } /en/ { print "en-GB" }')"
-    echo "Detected language: $lang"
+    lang="$(echo "$msg" | ./langid -l "en,de,es" | awk '/de/ { print "de-DE" } /en/ { print "en-GB" } /es/ { print "es-ES" } ')"
     tmpdir="$(mktemp -dt "tts.XXXXXXXXXX")"
     tmp="$tmpdir/pico2wave.wav"
     pico2wave -l"$lang" -w"$tmp" "$msg"
