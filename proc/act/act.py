@@ -67,7 +67,7 @@ def callback(ch, method, props, body):
     if props.content_type == "application/json":
         d = json.loads(body)
 
-        args = d["args"]
+        args = d["args"].split()
 
         if len(args) < 2:
             error(d, "USAGE: <thing> <on|off>")

@@ -23,6 +23,7 @@ result = chan.queue_declare(exclusive=True)
 queue_name = result.method.queue
 
 chan.exchange_declare(exchange="msg",
+                      durable=True,
                       type="topic")
 
 chan.queue_bind(exchange="msg",
@@ -56,7 +57,7 @@ def recv(ch, method, props, body):
             publish(cmd,
                     json.dumps({
                         "cmd" : cmd,
-                        "args" : args.split(),
+                        "args" : args,
                         "user" : msg["user"],
                         "src" : method.routing_key,}))
 
