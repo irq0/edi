@@ -16,7 +16,7 @@ import requests
 
 SCRIPTPATH = os.path.realpath(os.path.dirname(__file__))
 SAMPLE_PATH = os.path.join(SCRIPTPATH, "samples")
-CACHE_FILENAME = os.path.join(SCRIPTPATH, "cache.dat"), "c"
+CACHE_FILENAME = os.path.join(SCRIPTPATH, "cache.dat")
 
 DEFAULT_VOICES = [ s.strip().lower() for s in
                    open(os.path.join(SCRIPTPATH, "default_voices")).read().split(",") ]
@@ -80,23 +80,28 @@ def sample_path(filename):
 
 def cache_get(*args):
     key = json.dumps(args)
+
+    global CACHE_FILENAME
     filename = None
     hit = None
 
-    with anydbm.open(CACHE_FILENAME, "c") as cache:
-        try:
-            filename = json.loads(CACHE[key])[0]
-        except KeyError:
-            filename = mkfilename()
+    cache = anydbm.open(CACHE_FILENAME, "c")
 
-            hit = os.path.isfile(sample_path(filename))
+    try:
+        filename = json.loads(cache[key])[0]
+    except KeyError:
+        filename = mkfilename()
 
+        hit = os.path.isfile(sample_path(filename))
 
+    cache.close()
     return (key, filename, hit)
 
 def cache_put(key, filename, meta=None):
-    with anydbm.open(CACHE_FILENAME, "c") as cache:
-        CACHE[key] = json.dumps([filename, meta])
+    global CACHE_FILENAME
+    cache = anydbm.open(CACHE_FILENAME, "c")
+    cache[key] = json.dumps([filename, meta])
+    cache.close()
 
 def tts(voice, text, pitch=DEFAULT_PITCH, speed=DEFAULT_SPEED, meta=None):
     if voice in DEFAULT_VOICES:
@@ -129,17 +134,22 @@ def tts(voice, text, pitch=DEFAULT_PITCH, speed=DEFAULT_SPEED, meta=None):
 
 def list_cache():
     result = []
-    if len(CACHE) > 0:
+
+    global CACHE_FILENAME
+    cache = anydbm.open(CACHE_FILENAME, "c")
+    if len(cache) > 0:
         result.append("{:<40}\t{:<40}\t{:<10}".format("UUID",
-                                              "Cache Key",
-                                              "Metadata"))
-        for k, v in CACHE.iteritems():
+                                                      "Cache Key",
+                                                      "Metadata"))
+        for k, v in cache.iteritems():
             key = json.loads(k)
             uuid, meta = json.loads(v)
 
             result.append("{:<40}\t{:<40}\t{:<10}".format(uuid,
                                                          ",".join(map(str,key)),
                                                          meta))
+
+    cache.close()
     return "\n".join(result)
 
 class ArgumentParserError(Exception):
