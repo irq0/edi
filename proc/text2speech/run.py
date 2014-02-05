@@ -1,4 +1,5 @@
 #!/bin/env python
+# -*- coding: utf-8 -*-
 
 import subprocess
 import pika
@@ -34,7 +35,7 @@ def callback(ch, method, props, body):
         d = json.loads(body)
         msg = "Message from %s: %s" % (d["user"], " ".join(d["args"]))
 
-        success = call_tts(msg)
+        success = call_tts(msg.encode('utf-8'))
         if success:
             print "---> [?] return=%s" % (success)
             chan.basic_ack(delivery_tag = method.delivery_tag)
