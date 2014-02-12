@@ -144,8 +144,8 @@ def list_cache():
             key = json.loads(k)
             uuid, meta = json.loads(v)
 
-            result.append("{:<40}\t{:<40}\t{:<10}".format(uuid,
-                                                         ",".join(map(str,key)),
+            result.append(u"{:<40}\t{:<40}\t{:<10}".format(uuid,
+                                                         ",".join(map(unicode,key)),
                                                          meta))
 
     cache.close()

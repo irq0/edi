@@ -75,7 +75,7 @@ def say_callback(ch, method, props, body):
             print(e)
 
 def fortune():
-    p = subprocess.Popen(["fortune"], stdout=subprocess.PIPE)
+    p = subprocess.Popen(["fortune", "-s", "-o"], stdout=subprocess.PIPE)
     stdout, stderr = p.communicate()
     return stdout.encode("UTF-8")
 
