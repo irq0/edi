@@ -1,4 +1,5 @@
-PATH=~/shouts
+PATH=/home/bernd/shouts:/usr/bin:/bin
+
 # m h dom m dow command
 0 0 * * * play.sh 00.mp3
 0 1 * * * play.sh 01.mp3
