@@ -1,11 +1,78 @@
 * Dependencies
 ** rabbitmq
+For development docker seemes a good choice:
 #+BEGIN_SRC sh
 sudo docker run -p :5672 -p :15672 -v /scratch/docker-data/rabbitmq:/var/lib/rabbitmq/mnesia f04150b0661e
 sudo docker build github.com/mikaelhg/docker-rabbitmq.git
 #+END_SRC
 
+Note that the exchanges are configured by hand..
+
+Use =mopp=, running on the dell netbook.
+
 ** debian packages
 - python-pika
 - python-amqplib
 - amqp-tools
+
+* Ideas, Todos
+** pizza                                                              :c3po:
+** scheduled messages
+- hourly audio messages
+- web gui?
+- clojure + quarz scheduler?
+** guess commands                                                     :c3po:
+- see =thomas.py=, =pr.py=
+** hubelmeter                                                         :c3po:
+** shutdown/startup
+** user authentication
+- irc nick <-> subraum LDAP?
+- bot: only answer to users having op?
+** jabber bot
+- user same msg exchange as irc bot
+** dmx actor                                                           :c3po:
+See =cube:/var/git/c3po/dmx=. DMX is connected to the serial port.
+
+Example code:
+#+BEGIN_EXAMPLE
+[2014-02-06 13:45:04] less dmx-disable.py
+
+ #!/usr/bin/python
+
+ import sys
+ import serial
+
+ ser = serial.Serial('/dev/dmx', 38400, timeout=1)
+
+ ser.write("B1")
+
+ ser.close()
+#+END_EXAMPLE
+
+There is also a dmx jsonrpc server:
+=cube:/var/git/c3po/jsonrpcdmx=
+
+
+** actor service
+currently a simple python script to map things like 'act bulb on' to
+messages on the =act_433_mhz= queue
+
+Idealy something with a rule engine:
+- First user logged in: initiate startup sequence.
+- Last user log out initiate
+
+
+In the basic incarnation:
+Map 'act' messages to actors. /act/ messages are something a user
+can grasp, e.g /act venti on/. actors are something specific having
+their own actor exchanges, e.g /act_433_mhz/ where messages contain
+the commands for the sender as payload.
+** openhab integration                                            :snowball:
+** irc reader
+*** assign voices to each participant
+**** parameters
+- speed
+- pitch
+- voice: lea, julia, kenny...
+*** participants can change voices
+***
