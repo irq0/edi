@@ -8,7 +8,8 @@
             [clojure.string    :as str]
             [taoensso.timbre :as timbre]
             [clojurewerkz.serialism.core :as s]
-            [thehonestbookoftruth.state :as state]))
+            [thehonestbookoftruth.state :as state])
+  (:gen-class))
 
 (timbre/refer-timbre)
 
