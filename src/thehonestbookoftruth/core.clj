@@ -14,24 +14,25 @@
 
 (defn reply [ch msg reply]
   (let [dst (str/replace (:src msg) #"recv" "send")]
-    (info (format "[reply] To message \"%s\": %s" msg reply))
-    (lb/publish ch "msg" dst (str reply))))
+    (info (format "---> Handler reply orig_msg=%s key=%s: %s" msg dst reply))
+    (lb/publish ch "msg" dst (str reply) :content-type "text/plain")))
 
-(defn message-handler [ch {:keys [content-type delivery-tag type] :as meta} ^bytes payload]
-  (info (format "[consumer] Received a message: %s, delivery tag: %d, content type: %s, type: %s"
-             (String. payload "UTF-8") delivery-tag content-type type))
+(defn message-handler [ch {:keys [content-type delivery-tag] :as meta} ^bytes payload]
+  (info (format "<--- Received message: %s, content type: %s"
+          (String. payload "UTF-8") content-type))
 
   (when (= content-type "application/json")
     (try
       (let [msg (s/deserialize payload :json)]
         (reply ch msg (handler msg)))
       (catch com.fasterxml.jackson.core.JsonParseException e
-        (error "json decode failed :("))))
+        (error "[HANDLER] json decode failed :("))))
   (lb/ack ch delivery-tag))
 
 
 (defn -main [& args]
-  (let [conn  (rmq/connect)
+  (let [url   (or (first args) (System/getenv "AMQP_URL") "amqp://localhost")
+        conn  (rmq/connect {:uri url})
         ch    (lch/open conn)
         keys  ["login" "logout" "ul" "eta" "uneta" "help" "list"]
         ex    "cmd"
@@ -41,14 +42,14 @@
     (state/init-from-file!)
     (state/init-watches)
 
-    (info (format "[main] Connected. Channel id: %d" (.getChannelNumber ch)))
+    (info (format "[MAIN] Connected. Channel id: %d" (.getChannelNumber ch)))
 
     (doseq [k keys]
       (lq/bind ch qname ex :routing-key k))
 
     (lc/blocking-subscribe ch qname message-handler)
 
-    (info "[main] Disconnecting...")
+    (info "[MAIN] Disconnecting...")
 
     (rmq/close ch)
     (rmq/close conn)))
