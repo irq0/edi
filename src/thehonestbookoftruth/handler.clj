@@ -35,7 +35,7 @@
   [{:keys [user]}]
 
   (if (state/logged-in? user)
-    (state/logout! user)
+    (and (state/logout! user) (str "Cya " user))
     "Hmm, you are not logged in. So no logout ;)"))
 
 (defmethod handler :eta
