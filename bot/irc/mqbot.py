@@ -36,6 +36,8 @@ class MQ(Thread):
         self.chan = self.conn.channel()
         self.exchange = "msg"
 
+        self.consumer_tags = []
+
         self.chan.exchange_declare(exchange=self.exchange,
                                    durable=True,
                                    auto_delete=False,
@@ -48,9 +50,15 @@ class MQ(Thread):
                              queue=self.send_queue_name,
                              routing_key="irc.send.raw")
 
-        self.chan.basic_consume(callback=self.send,
-                                queue=self.send_queue_name)
+        self.add_consumer()
 
+    def add_consumer(self):
+        self.consumer_tags.append(self.chan.basic_consume(callback=self.send,
+                                                          queue=self.send_queue_name))
+
+    def remove_consumer(self):
+        for tag in self.consumer_tags:
+            self.chan.basic_cancel(tag)
 
     def send(self, msg):
         print msg.body
@@ -78,15 +86,14 @@ class MQ(Thread):
                                 msg=amsg)
 
     def run(self):
-        self.running = True
-        while self.running:
+        while self.chan.callbacks:
             try:
                 self.chan.wait()
             except Exception:
                 time.sleep(5)
 
     def close(self):
-        self.running = False
+        self.remove_consumer()
         self.conn.close()
 
 
@@ -116,6 +123,7 @@ class MQBot(irc.IRCClient):
             self.join(chan)
 
     def privmsg(self, user, chan, msg):
+        print "privmsg:", user, chan
         user = user.split('!', 1)[0]
 
         print "<%s> %s" % (user, msg)
