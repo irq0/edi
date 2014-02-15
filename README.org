@@ -27,7 +27,19 @@ Use =mopp=, running on the dell netbook.
 
 * Ideas, Todos
 ** Features
-*** OPEN pizza                                                       :c3po:
+*** OPEN User Notifications
+- Im LDAP gibt es eine liste mit wegen einen user zu notifien
+  - IRC nick
+  - jabber id
+  - twitter account (@foo)
+  - email
+- Notifications werden "reliable" zugestellt. Irgendwo kommt die
+  notification an
+- Message exchange und consumer sagen nack, wenn nicht zustellbar.
+  Z.B. IRC offline
+- Aehlich wie die notify exchange, audio fuer shouts in den subraum
+-
+*** ASSIGNED pizza / essen / f00d                               :@hej:c3po:
 *** DONE scheduled messages                                         :@irq0:
 - hourly audio messages
 - web gui?
@@ -55,8 +67,11 @@ Implemented: [[proc/thehonestbookoftruth]]
 *** OPEN shutdown/startup
 *** user authentication
 - irc nick <-> subraum LDAP?
+- ueberhaupt noetig?
 **** ASSIGNED irc bot antwortet nur auf op                         :@irq0:
 - bot: only answer to users having op? (TODO)
+*** OPEN big red button
+- hardware button loest 'bigredbutton' command aus?
 *** DONE text to speech command                                     :@irq0:
 - listen for tts, say, fortune commands
 - text to speech messages
@@ -93,6 +108,11 @@ Idea: Play media URIs in messages. Sinilar to the mplayer listener on cube.
 - user same msg exchange as irc bot
 
 - Possible routing keys: "jabber.recv.raw" "jabber.send.raw"
+
+*** OPEN mail bot
+- wie jabber bot nur ueber email
+- nuetzlich auch fuer den notify: user service
+- unauthenticated mail?!
 
 *** OPEN dmx actor                                                     :c3po:
 See =cube:/var/git/c3po/dmx=. DMX is connected to the serial port.
@@ -139,7 +159,7 @@ the commands for the sender as payload.
 - pitch
 - voice: lea, julia, kenny...
 **** participants can change voices
-***
+
 
 ** Architecture Changes
 *** OPEN list, help messages for 'cmd' exchange
@@ -154,6 +174,7 @@ Everyone on the cmd exchange should consume list and help messages.
 #+BEGIN_SRC clojure
 (str/replace (:src msg) #"recv" "send")
 #+END_SRC
+
 *** IDEA state change exchange?
 Ohne globalen state müssen state veränderungen irgendwie kommuniziert
 werden. Beispiel: user loggt sich ein.
