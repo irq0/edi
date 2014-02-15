@@ -14,6 +14,7 @@ from amqplib import client_0_8 as amqp
 
 import time
 import sys
+import os
 import json
 
 network = {
@@ -23,14 +24,15 @@ network = {
         "#c3pb.sh"),
 }
 
+AMQP_SERVER = os.getenv("AMQP_SERVER") or "localhost"
+
 class MQ(Thread):
     def __init__(self, bot):
         Thread.__init__(self)
         self.daemon = True
         self.bot = bot
 
-
-        self.conn = amqp.Connection(host="localhost")
+        self.conn = amqp.Connection(host=AMQP_SERVER)
         self.chan = self.conn.channel()
         self.exchange = "msg"
 
