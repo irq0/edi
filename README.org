@@ -64,7 +64,32 @@ Implemented: [[proc/thehonestbookoftruth]]
 - In etwa "mach mal licht an" -> "cmd bulb on"
 
 *** OPEN hubelmeter                                                    :c3po:
-*** OPEN shutdown/startup
+*** DONE shutdown/startup                                           :@irq0:
+Veralgemeinert implementiert: Init mit runlevels.
+
+Reagiert auf Commands:
+- telinit ::  Runlevel ändern
+- runlevel :: Aktuelles runlevel zurückgeben
+
+
+Emitiert Messages auf in der =subinit= Exchange.
+Format: =rc.RUNLEVEL.ACTION=
+
+
+Runleveländerungen (z.B 0 -> 4) generieren Events: 1 start, 2 start, 3
+start, 4 start.
+
+Runlevels sind dazu gedacht, um den Subraum auch nur "halb"
+anzuschalten zu können. Beispielsweise ohne Mamestation.
+
+**** Tool: subinit-rc
+Tool um für subinit Messages Scripts zu starten. Aufgebaut wie rc*.d
+runlevel scripts.
+
+Skripts werden mit run-parts gestartet und bekommen die ACTION als
+ersten Parameter
+
+*** OPEN subraum init/shutdown auf subinitd migrieren
 *** user authentication
 - irc nick <-> subraum LDAP?
 - ueberhaupt noetig?
@@ -74,7 +99,7 @@ Implemented: [[proc/thehonestbookoftruth]]
 - hardware button loest 'bigredbutton' command aus?
 
 - Oder: Es können ja durchaus mehrere dinge einen big red button gebrauchen
-
+p
 - Vielleich ein button exchange einrichten auf dem verschiedene dienste
   lauschen können?
 - Mehrere Buttons?
@@ -189,21 +214,21 @@ the commands for the sender as payload.
     - event sagt "an", state sagt "aus" -> an aktion generieren
     - event sagt "an", state sagt "an" -> nop
 
-  - EVENT -> OLD STATE -> STATE CHANGE -> NEW STATE
+      #+BEGIN_EXAMPLE
+EVENT -> OLD STATE -> STATE CHANGE -> NEW STATE
                        -> ACTIONS
 
-  - EVENT -> OLD STATE -> STATE CHANGE -> NEW STATE
-                                       -> DIFFERENCE OLD NEW
-                                       -> ACTIONS
+EVENT -> OLD STATE -> STATE CHANGE -> NEW STATE
+                                   -> DIFFERENCE OLD NEW
+                                   -> ACTIONS
+
+      #+END_EXAMPLE
 - Fakten, konfiguration
   - aktor name zu triggernes foo
   - 'act bulb on' -> msg =11111 1 on= an =act_433mhz= exchange.
-  -
 
 - =(state-change old)=
 
-**** Stories
--
 *** ASSIGNED openhab integration                                  :@snowball:
 *** OPEN irc reader
 **** assign voices to each participant

@@ -74,7 +74,33 @@ Implemented:
 
 ### OPEN hubelmeter     :c3po:
 
-### OPEN shutdown/startup
+### DONE shutdown/startup     :@irq0:
+
+Veralgemeinert implementiert: Init mit runlevels.
+
+Reagiert auf Commands:
+
+-   **telinit:** Runlevel ändern
+-   **runlevel:** Aktuelles runlevel zurückgeben
+
+Emitiert Messages auf in der `subinit` Exchange.
+Format: `rc.RUNLEVEL.ACTION`
+
+Runleveländerungen (z.B 0 -> 4) generieren Events: 1 start, 2 start, 3
+start, 4 start.
+
+Runlevels sind dazu gedacht, um den Subraum auch nur "halb"
+anzuschalten zu können. Beispielsweise ohne Mamestation.
+
+1.  Tool: subinit-rc
+
+    Tool um für subinit Messages Scripts zu starten. Aufgebaut wie rc\*.d
+    runlevel scripts.
+
+    Skripts werden mit run-parts gestartet und bekommen die ACTION als
+    ersten Parameter
+
+### OPEN subraum init/shutdown auf subinitd migrieren
 
 ### user authentication
 
@@ -88,6 +114,24 @@ Implemented:
 ### OPEN big red button
 
 -   hardware button loest 'bigredbutton' command aus?
+
+-   Oder: Es können ja durchaus mehrere dinge einen big red button gebrauchen
+
+p
+
+-   Vielleich ein button exchange einrichten auf dem verschiedene dienste
+    lauschen können?
+-   Mehrere Buttons?
+-   Prototyp: Button exchange, Button an raspberry pie?
+
+1.  Story
+
+    Pizza Bestellung endet in 5 minuten. Countdown läuft. Stoppen? Drück
+    den button irgendwo im Raum. Zahlenkombination eingeben? Button an der
+    Decke?
+    -   Bei der Pizza Bestellung angeben? Nur stoppbar durch eingeben von
+        31337 auf'm PIN Pad?
+        -   Pizza daemon wartet auf button 31337 messages..
 
 ### DONE text to speech command     :@irq0:
 
@@ -167,7 +211,7 @@ Example code:
 There is also a dmx jsonrpc server:
 `cube:/var/git/c3po/jsonrpcdmx`
 
-### ASSIGNED actor service     :@irq0:
+### ASSIGNED actor service / rule engine     :@irq0:
 
 currently a simple python script to map things like 'act bulb on' to
 messages on the `act_433_mhz` queue
@@ -183,6 +227,39 @@ can grasp, e.g *act venti on*. actors are something specific having
 their own actor exchanges, e.g *act<sub>433</sub><sub>mhz</sub>* where messages contain
 the commands for the sender as payload.
 
+1.  Idee
+
+    -   Jedes event transformiert den aktuellen system state in einen neuen
+        (clojure swap! semantik)
+    -   Ändern des systemstates stösst die rule engine an
+    -   Regeln verändern den state nicht (direkt). Können aber events
+        emiten.
+    -   State änderungen sind atomar. Ein event verändert. Andere events
+        warten die änderungen ab. Änderungen sind ganz oder garnicht.
+    -   Rule engine ausführungen immer auf neuen state. Rule engine
+        ausführungen sind unabhängig voneinander
+    -   Was ist mit aktoren?
+        -   State änderung muss irgendwie auch aktoren triggern können..
+        -   Hm.
+        -   State change funktionen für bestimmte events?
+            -   führen auch aktionen aus?
+
+        -   should-be relation:
+            -   event sagt "an", state sagt "aus" -> an aktion generieren
+            -   event sagt "an", state sagt "an" -> nop
+
+                    EVENT -> OLD STATE -> STATE CHANGE -> NEW STATE
+                                           -> ACTIONS
+
+                    EVENT -> OLD STATE -> STATE CHANGE -> NEW STATE
+                                                       -> DIFFERENCE OLD NEW
+                                                       -> ACTIONS
+    -   Fakten, konfiguration
+        -   aktor name zu triggernes foo
+        -   'act bulb on' -> msg `11111 1 on` an `act_433mhz` exchange.
+
+    -   `(state-change old)`
+
 ### ASSIGNED openhab integration     :@snowball:
 
 ### OPEN irc reader
@@ -196,6 +273,13 @@ the commands for the sender as payload.
         -   voice: lea, julia, kenny&#x2026;
 
 2.  participants can change voices
+
+### OPEN music player daemon     :c3po:
+
+-   mpd commands als messages
+-   Story: Ein EDI MQ command kann verschiedene music player daemons steuern
+-   Probleme
+    -   Mehrere mpds unterstützen; gleichzeitig steuern?
 
 ## Architecture Changes
 
