@@ -38,6 +38,11 @@
     (and (state/logout! user) (str "Cya " user))
     "Hmm, you are not logged in. So no logout ;)"))
 
+(defmethod handler :logout-all
+  [_]
+  (and (state/logout-all!)
+    "Na, kuchen backen?"))
+
 (defmethod handler :eta
   [{:keys [user args]}]
 

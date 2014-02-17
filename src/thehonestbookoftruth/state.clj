@@ -40,6 +40,10 @@
   (info (str "[STATE] Logout: " user))
   (swap! *db* (fn [old] (dissoc old user))))
 
+(defn logout-all! []
+  (info (str "[STATE] Logout: ALL"))
+  (swap! *db* #(into {} (filter (complement (fn [[_ data]] (:ts data))) %))))
+
 (defn login! [user]
   (info (str "[STATE] Login: " user))
   (swap! *db* (fn [old]
