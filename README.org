@@ -72,6 +72,24 @@ Implemented: [[proc/thehonestbookoftruth]]
 - bot: only answer to users having op? (TODO)
 *** OPEN big red button
 - hardware button loest 'bigredbutton' command aus?
+
+- Oder: Es können ja durchaus mehrere dinge einen big red button gebrauchen
+
+- Vielleich ein button exchange einrichten auf dem verschiedene dienste
+  lauschen können?
+- Mehrere Buttons?
+- Prototyp: Button exchange, Button an raspberry pie?
+
+**** Story
+Pizza Bestellung endet in 5 minuten. Countdown läuft. Stoppen? Drück
+den button irgendwo im Raum. Zahlenkombination eingeben? Button an der
+Decke?
+
+  - Bei der Pizza Bestellung angeben? Nur stoppbar durch eingeben von
+    31337 auf'm PIN Pad?
+    - Pizza daemon wartet auf button 31337 messages..
+
+
 *** DONE text to speech command                                     :@irq0:
 - listen for tts, say, fortune commands
 - text to speech messages
