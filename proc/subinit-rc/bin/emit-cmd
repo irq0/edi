@@ -1,0 +1,15 @@
+#!/bin/bash -x
+
+command="$1"
+args="${@:2}"
+json="{\"cmd\":\"${command}\",\"args\":\"${args}\",\"user\":\"subinit-rc\",\"src\":\"subinit-rc\",\"runlevel\":\"${SUBINIT_LEVEL}\",\"action\":\"${SUBINIT_ACTION}\"}"
+
+
+if [[ -z $command ]]; then
+    echo "USAGE: $0 <command> [args]"
+    exit 1
+fi
+
+amqp-publish -u 'amqp://localhost' -e cmd -r "$command" \
+	     --content-type="application/json" \
+	     -b "${json}"
