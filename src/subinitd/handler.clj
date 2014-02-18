@@ -4,7 +4,7 @@
 
 (timbre/refer-timbre)
 
-(def help "subinitd: telinit runlevel")
+(def help "subinit: telinit runlevel")
 (def listtxt "subinit: Subraum initd - sysvinit like")
 
 (defmulti handler
@@ -16,7 +16,7 @@
 (defmethod handler :help
   [{:keys [args]}]
 
-  (when (= args "subinitd")
+  (when (= args "subinit")
     help))
 
 
