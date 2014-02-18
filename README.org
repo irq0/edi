@@ -243,7 +243,25 @@ EVENT -> OLD STATE -> STATE CHANGE -> NEW STATE
 - Story: Ein EDI MQ command kann verschiedene music player daemons steuern
 - Probleme
   - Mehrere mpds unterstützen; gleichzeitig steuern?
+*** OPEN calendar integration - ics?
+- Repeadedly parse calendar files. Idealy ics. Load from caldav?
+  google calendar?
 
+**** Variants
+***** Calendar Commands
+- Im Kallender stehen edi commands. Diese zu den eingestellten Zeiten
+  injecten.
+
+Quasi alternative zu CRON.
+
+irq0: Damit koennte ich mir meinen Wecker bauen..
+
+
+***** Events
+- Event :: Something is going to happen at a point in time. Wie das
+           digitale Zeitalter..
+
+Per TTS, Text notification, IRC, Jabber whatever hinweisen
 ** Architecture Changes
 *** OPEN list, help messages for 'cmd' exchange
 Everyone on the cmd exchange should consume list and help messages.
@@ -257,7 +275,6 @@ Everyone on the cmd exchange should consume list and help messages.
 #+BEGIN_SRC clojure
 (str/replace (:src msg) #"recv" "send")
 #+END_SRC
-
 *** IDEA state change exchange?
 Ohne globalen state müssen state veränderungen irgendwie kommuniziert
 werden. Beispiel: user loggt sich ein.

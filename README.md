@@ -281,6 +281,29 @@ the commands for the sender as payload.
 -   Probleme
     -   Mehrere mpds unterstützen; gleichzeitig steuern?
 
+### OPEN calendar integration - ics?
+
+-   Repeadedly parse calendar files. Idealy ics. Load from caldav?
+    google calendar?
+
+1.  Variants
+
+    1.  Calendar Commands
+
+        -   Im Kallender stehen edi commands. Diese zu den eingestellten Zeiten
+            injecten.
+
+        Quasi alternative zu CRON.
+
+        irq0: Damit koennte ich mir meinen Wecker bauen..
+
+    2.  Events
+
+        -   **Event:** Something is going to happen at a point in time. Wie das
+            digitale Zeitalter..
+
+        Per TTS, Text notification, IRC, Jabber whatever hinweisen
+
 ## Architecture Changes
 
 ### OPEN list, help messages for 'cmd' exchange
