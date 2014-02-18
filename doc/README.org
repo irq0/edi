@@ -1,4 +1,11 @@
+#+TITLE: EDI
+#+OPTIONS: creator:nil author:nil H:6 toc:2 num:2
 #+SEQ_TODO: OPEN IDEA ASSIGNED TEST | DONE
+#+HTML_HEAD: <link href="css/bootstrap.css" rel="stylesheet">
+#+HTML_HEAD: <link href="css/bootstrap-responsive.css" rel="stylesheet">
+#+HTML_HEAD: <link href="css/jquery.tocify.css" rel="stylesheet">
+#+HTML_HEAD: <link href="css/custom.css" rel="stylesheet" media="screen">
+
 
 * Ideas, Todos
 ** Features
@@ -74,7 +81,6 @@ ersten Parameter
 - hardware button loest 'bigredbutton' command aus?
 
 - Oder: Es können ja durchaus mehrere dinge einen big red button gebrauchen
-p
 - Vielleich ein button exchange einrichten auf dem verschiedene dienste
   lauschen können?
 - Mehrere Buttons?
@@ -136,9 +142,7 @@ Idea: Play media URIs in messages. Sinilar to the mplayer listener on cube.
 See =cube:/var/git/c3po/dmx=. DMX is connected to the serial port.
 
 Example code:
-#+BEGIN_EXAMPLE
-[2014-02-06 13:45:04] less dmx-disable.py
-
+#+BEGIN_SRC python
  #!/usr/bin/python
 
  import sys
@@ -149,7 +153,7 @@ Example code:
  ser.write("B1")
 
  ser.close()
-#+END_EXAMPLE
+#+END_SRC
 
 There is also a dmx jsonrpc server:
 =cube:/var/git/c3po/jsonrpcdmx=
@@ -474,3 +478,11 @@ Have something to add? Let me pull your repo!
 
 **** Clojure
 - langohr :: http://clojurerabbitmq.info/ Excellent library.
+
+#+BEGIN_HTML
+<script src="js/jquery.js"></script>
+<script src="js/jquery-ui.js"></script>
+<script src="js/jquery.tocify.js"></script>
+<script src="js/bootstrap.js"></script>
+<script src="js/custom.js"></script>
+#+END_HTML
