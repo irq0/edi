@@ -17,11 +17,10 @@ import sys
 import os
 import json
 
-network = {
-    "host" : "irc.hackint.eu",
+config = {
+    "host" : "spaceboyz.net",
     "port" : 9999,
-    "autojoin" : (
-        "#c3pb.sh"),
+    "channel" : "#/dev/subraum",
 }
 
 AMQP_SERVER = os.getenv("AMQP_SERVER") or "localhost"
@@ -31,7 +30,10 @@ class MQ(Thread):
         Thread.__init__(self)
         self.daemon = True
         self.bot = bot
+        self.init_connection()
 
+
+    def init_connection(self):
         self.conn = amqp.Connection(host=AMQP_SERVER)
         self.chan = self.conn.channel()
         self.exchange = "msg"
@@ -48,32 +50,82 @@ class MQ(Thread):
 
         self.chan.queue_bind(exchange=self.exchange,
                              queue=self.send_queue_name,
-                             routing_key="irc.send.raw")
+                             routing_key=".".join(("irc", self.bot.nickname, "send", "*")))
+
+        self.chan.queue_bind(exchange=self.exchange,
+                             queue=self.send_queue_name,
+                             routing_key=".".join(("irc", self.bot.nickname, "presence")))
 
         self.add_consumer()
 
     def add_consumer(self):
-        self.consumer_tags.append(self.chan.basic_consume(callback=self.send,
+        self.consumer_tags.append(self.chan.basic_consume(callback=self.handle_consume,
                                                           queue=self.send_queue_name))
+
+    def handle_consume(self, raw_msg):
+        try:
+            print dir(raw_msg)
+            print raw_msg.properties
+            key = raw_msg.delivery_info["routing_key"].split(".")
+
+            if raw_msg.properties["content_type"] == "application/json":
+                self.handle_json_message(key, json.loads(raw_msg))
+            elif raw_msg.properties["content_type"] == "text/plain":
+                self.handle_plain_message(key, raw_msg.body)
+            else:
+                print "Message with unknown content type:", raw_msg
+
+        except Exception, e:
+            print "Exception in consume handler:", e
+
+    def handle_json_message(self, key, msg):
+        if key[2] == "presence":
+            self.irc_presence(msg["status"], msg["msg"])
+        elif key[2] == "send":
+            self.irc_send(key[3], msg["user"], msg["msg"])
+        else:
+            print "Unknown message type:", key[2], msg
+
+    def handle_plain_message(self, key, msg):
+        if key[2] == "presence":
+            self.irc_presence(msg, u"")
+        elif key[2] == "send":
+            self.irc_send(key[3], key[3], unicode(msg))
+        else:
+            print "Unknown message type:", key[2], msg
 
     def remove_consumer(self):
         for tag in self.consumer_tags:
             self.chan.basic_cancel(tag)
 
-    def send(self, msg):
-        print msg.body
+    def irc_presence(self, status, msg):
+        print "PRESENCE:", status, msg
 
-	lines = msg.body.split("\n")
-	for line in lines:
-	        self.bot.msg("#c3pb.sh", line)
-		time.sleep(0.5)
+        if status == "away":
+            self.bot.away(msg)
+        elif status == "online":
+            self.bot.back()
+        else:
+            print "Received unknown status:", status
 
-    def msg(self, user, msg, chan, type):
+    def irc_send(self, chan, user, msg):
+        print "SEND:", chan, user, msg
+
+        if chan == config["channel"] and user != config["channel"]:
+            msg = user + u": " + msg
+
+        self.bot.msg(chan.encode("UTF-8"), msg.encode("UTF-8"))
+
+
+    def irc_recvd(self, user, msg, chan, type):
+        """Called whenever something was received from irc"""
+
         jmsg = json.dumps({
             "user" : user,
             "msg" : msg,
             "chan" : chan,
             "type" : type,
+            "bot" : self.bot.nickname,
         })
 
         amsg = amqp.Message(jmsg)
@@ -81,9 +133,12 @@ class MQ(Thread):
         amsg.properties["delivery_mode"] = 2
         amsg.properties["app_id"] = "edi-irc"
 
-        self.chan.basic_publish(exchange=self.exchange,
-                                routing_key="irc.recv.raw",
-                                msg=amsg)
+        try:
+            self.chan.basic_publish(exchange=self.exchange,
+                                    routing_key=".".join(("irc", self.bot.nickname, "recv", chan)),
+                                    msg=amsg)
+        except Exception, e:
+            print "Exception while publishing message:", e
 
     def run(self):
         while self.chan.callbacks:
@@ -93,15 +148,19 @@ class MQ(Thread):
                 time.sleep(5)
 
     def close(self):
-        self.remove_consumer()
+#        self.remove_consumer()
         self.conn.close()
 
 
 class MQBot(irc.IRCClient):
-    nickname = "EDI"
+    """http://twistedmatrix.com/documents/8.2.0/api/twisted.words.protocols.irc.IRCClient.html"""
+
+    nickname = "ESI"
     realname = "Enhanced Subraum Intelligence"
     username = "ESI"
     password = "***REMOVED***"
+    lineRate = 0.1
+
 
     def connectionMade(self):
         print "connection made"
@@ -118,32 +177,32 @@ class MQBot(irc.IRCClient):
 
         self.msg("NickServ", "IDENTIFY {}".format(self.password))
 
-        for chan in ("#c3pb.sh", ):
-            print "join chan: ", chan
-            self.join(chan)
+        print "join chan: ", config["channel"]
+        self.join(config["channel"])
 
     def privmsg(self, user, chan, msg):
         print "privmsg:", user, chan
         user = user.split('!', 1)[0]
 
         print "<%s> %s" % (user, msg)
-        self.pub.msg(user, msg, chan, "privmsg")
+        self.pub.irc_recvd(user, msg, chan, "privmsg")
 
-    def action(self, user, channel, msg):
+    def action(self, user, chan, msg):
         user = user.split('!', 1)[0]
 
         print "* %s %s" % (user, msg)
-        self.pub.msg(user, msg, "action")
+        self.pub.irc_recvd(user, msg, chan, "action")
 
 class BotFactory(protocol.ClientFactory):
     protocol = MQBot
 
     def clientConnectionLost(self, connector, reason):
-        print "connection lost.. reconnecting"
+        print "connection lost:", connector, reason
+        print "reconnecting.."
         connector.connect()
 
     def clientConnectionFailed(self, connector, reason):
-        print "connection failed:", reason
+        print "connection failed:", connector, reason
         reactor.stop()
 
 
@@ -156,8 +215,8 @@ if __name__ == '__main__':
 #                       6666,
 #                       factory)
 
-    reactor.connectSSL(network["host"],
-                       network["port"],
+    reactor.connectSSL(config["host"],
+                       config["port"],
                        factory,
                        ssl.ClientContextFactory())
 
