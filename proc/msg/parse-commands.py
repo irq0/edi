@@ -28,7 +28,7 @@ chan.exchange_declare(exchange="msg",
 
 chan.queue_bind(exchange="msg",
                 queue=queue_name,
-                routing_key="#.recv.raw")
+                routing_key="#.recv.*")
 
 print "---- Using queue:", queue_name
 print "---- Waiting for messages:"
