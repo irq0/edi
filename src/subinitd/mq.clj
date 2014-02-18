@@ -14,12 +14,11 @@
 
 
 
-
-(defn- cmd-reply [ch msg reply]
-  (let [dst (str/replace (:src msg) #"recv" "send")]
-    (when-not (nil? msg)
-      (info (format "---> Handler reply orig_msg=%s key=%s: %s" msg dst reply))
-      (lb/publish ch "msg" dst (str reply) :content-type "text/plain"))))
+(defn- cmd-reply [ch orig reply]
+  (let [dst (str/replace (:src orig) #"recv" "send")
+        msg (s/serialize {:user (:user orig) :msg reply} :json)]
+    (info (format "---> Handler reply orig_msg=%s key=%s: %s" msg dst msg))
+    (lb/publish ch "msg" dst msg :content-type "application/json")))
 
 (defn cmd-message-handler [ch {:keys [content-type delivery-tag] :as meta} ^bytes payload]
   (info (format "<--- Received message: %s, content type: %s"
