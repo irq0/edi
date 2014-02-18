@@ -1,30 +1,5 @@
 #+SEQ_TODO: OPEN IDEA ASSIGNED TEST | DONE
 
-* Dependencies
-** rabbitmq
-For development docker seemes a good choice:
-#+BEGIN_SRC sh
-sudo docker run -p :5672 -p :15672 -v /scratch/docker-data/rabbitmq:/var/lib/rabbitmq/mnesia f04150b0661e
-sudo docker build github.com/mikaelhg/docker-rabbitmq.git
-#+END_SRC
-
-Note that the exchanges are configured by hand..
-
-Use =mopp=, running on the dell netbook.
-
-** useful debian packages
-- python-pika
-- python-amqplib
-- amqp-tools
-
-* Repository Organization
-- src :: Tools that only *publish* messages
-- sink :: Tools that only *consume* messages
-- proc :: Tools that *consume* and *publish* with some kind of
-          processing going on
-- bot :: Adapter to other protocols like IRC. *publisher* and *consumer*
-- demo :: Useful stuff for testing, reference, whatever
-
 * Ideas, Todos
 ** Features
 *** OPEN User Notifications
@@ -256,14 +231,13 @@ Quasi alternative zu CRON.
 
 irq0: Damit koennte ich mir meinen Wecker bauen..
 
-
 ***** Events
 - Event :: Something is going to happen at a point in time. Wie das
            digitale Zeitalter..
 
 Per TTS, Text notification, IRC, Jabber whatever hinweisen
 ** Architecture Changes
-*** OPEN list, help messages for 'cmd' exchange
+*** ASSIGNED list, help messages for 'cmd' exchange                 :@irq0:
 Everyone on the cmd exchange should consume list and help messages.
 
 **** Replies
@@ -275,6 +249,10 @@ Everyone on the cmd exchange should consume list and help messages.
 #+BEGIN_SRC clojure
 (str/replace (:src msg) #"recv" "send")
 #+END_SRC
+
+**** Status
+- The newer commands have this build in. Works fine.
+
 *** IDEA state change exchange?
 Ohne globalen state müssen state veränderungen irgendwie kommuniziert
 werden. Beispiel: user loggt sich ein.
@@ -292,3 +270,207 @@ oder so an den exchange.
 Ein event->tts consumer generiert tts commands wenn nötig
 
 Die rule engine verändert ihren systemzustand und wertet rules neu aus.
+** Project Name
+- EDI :: ++
+- ESI :: Enhanced Subraum Intelligence?
+*** Subtitle?
+- The hacker (friendly) space automation?
+* Documentation
+The core of the architecture is the rabbitmq amqp message server.
+Every pice of code connects in some way to it.
+
+Most services share a couple of well defined exchanges. See the
+[[Well-defined Exchanges]] for a description.
+
+** Glossary
+- source :: Apps that only/mainly produce messages
+- sink :: Apps that only/mainly consume messages
+- processor :: Apps that transform messages. Consume -> Produce.
+- bot :: Consumer/Producer that add external/foreign interfaces to the
+         system. Like IRC.
+
+** Well-defined Exchanges
+https://git.c3pb.de/c3pb/subraum-automatisierung/blob/master/doc/exchanges.jpeg
+
+*** msg
+Raw messages received from somewhere. This should be something that
+can be parsed to a command.
+
+Type: topic
+
+**** Routing Keys
+In general: protocol.bot-name.{send,recv,presence}.channel
+
+ * irc.EDI.recv.#c3pb.sh
+ * irc.EDI.send.#c3pb.sh
+ * irc.EDI.presence
+**** Messages
+***** #.send.*
+Content-Type: application/json
+
+- msg :: Message body
+- user :: Destination user
+
+Content-Type: text/plain
+body: Message
+***** #.recv.*
+Content-Type: application/json
+- msg :: Message body
+- user :: Message sender
+**** Processors
+***** parse-commands.py
+Transform =!<command>= to *cmd* Messages. (See *cmd* Exchange)
+
+**** Bots
+***** IRC Bot - mqbot.py
+IRC -> MQ, MQ -> IRC
+
+**** Sinks
+
+**** Sources
+
+*** cmd
+Messages that do something :)
+
+Type: topic
+
+**** Known routing Keys
+
+***** TTS
+- tts
+- say
+- forune
+***** Actor Service
+- act
+***** subinit
+- telinit
+- runlevel
+***** thehonestbookoftruth
+- login
+- logout
+- logout-all
+- ul
+- eta
+- uneta
+***** What every command should implement:
+- list
+- help
+
+**** Messages
+Content-Type: application/json
+
+- cmd :: Usually the same as the routing key when parsed from *msg*
+         Messages. Could be different. Not sure why I include it. The
+         clojure tools use the to dispatch handlers..
+- args :: Argument string.
+- user :: User that send the command. The command may use this to log.
+- src :: Command origin. Replies will be send here with the word
+         /recv/ replaced by /send/. If the src is invalid replies will
+         just vanish :)
+
+**** Sources
+**** Sinks
+**** Processors
+***** tts
+Transform /tts/ *cmd* Messages to notification audio messages.
+
+Text -> Audio file.
+
+***** Simple Actor Service - act.py
+Map /act/ commands to actors.
+
+Example:
+venti on => 433Mhz sender, payload 11111 1 1
+
+See =act_433mhz= exchange for the 433Mhz actor implementation.
+
+*** notify
+*Sink* exchage for notifications.
+
+**** Routing Keys
+- audio
+- text
+
+**** Sinks
+***** mplayer one-liner
+#+BEGIN_SRC sh
+amqp-consume --url="amqp://mopp" --exchange="notify" --routing-key="audio" mplayer -
+#+END_SRC
+
+**** Messages
+Content-Type depending on exchange keys. Should be directly usable by
+the sink (e.g mp3 file to hand over to mplayer).
+
+*** =act_433mhz=                                                  :private:
+*Sink* exchange to signal 433mhz transmitter.
+
+Type: fanout
+
+**** Messages
+Commandline arguments for `rcswitch-pi`.
+
+**** Sinks
+*** subinit                                                       :private:
+*Sink* exchange for subinit messages
+
+Type: topic
+**** Messages
+Content-type: text/plain
+
+Must always contain the same as the routing key.
+**** Sinks
+***** subinit-rc
+Launch scripts on subinit messages consumed. Feel similar to sysvinit
+scripts and runlevels
+
+** Software, Libs, etc.
+*** Debian packages
+- rabbitmq-server (debian testing ist aktuell genug)
+- python-pika
+- python-amqplib
+- amqp-tools
+
+*** docker
+For development docker seemes a good choice:
+#+BEGIN_SRC sh
+sudo docker run -p :5672 -p :15672 -v /scratch/docker-data/rabbitmq:/var/lib/rabbitmq/mnesia f04150b0661e
+sudo docker build github.com/mikaelhg/docker-rabbitmq.git
+#+END_SRC
+
+Note that the exchanges are configured by hand..
+
+Use =mopp=, running on the dell netbook.
+*** Useful libraries
+
+** Development
+Install requirements. Setup exchanges in rabbitmq. The web interfaces
+comes in handy here ;)
+
+*** Repository Organization
+- src :: Tools that only *publish* messages
+- sink :: Tools that only *consume* messages
+- proc :: Tools that *consume* and *publish* with some kind of
+          processing going on
+- bot :: Adapter to other protocols like IRC. *publisher* and *consumer*
+- demo :: Useful stuff for testing, reference, whatever
+
+Most larger tools are subtree merged from elsewhere. This repo is kind
+of the collected deployment branch.
+
+Have something to add? Let me pull your repo!
+
+*** External Documentation
+- [[http://www.rabbitmq.com/getstarted.html][Must read rabbitmq tutorial - covers all the basic use cases]]
+
+*** Libraries
+**** Python
+- pika :: http://pika.readthedocs.org/en/latest/ Documented, Async lib
+- amqplib :: simpler non-threaded library; documentation shipped in
+             the .py files. Which are quite readable ;)
+
+**** Commandline
+- amqp-tools :: Make sure you get the recent ones. Debian testing
+                works quite well. Debian stable not so.
+
+**** Clojure
+- langohr :: http://clojurerabbitmq.info/ Excellent library.

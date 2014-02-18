@@ -1,30 +1,80 @@
-# Dependencies
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Ideas, Todos</a>
+<ul>
+<li><a href="#sec-1-1">1.1. Features</a>
+<ul>
+<li><a href="#sec-1-1-1">1.1.1. <span class="todo OPEN">OPEN</span> User Notifications</a></li>
+<li><a href="#sec-1-1-2">1.1.2. <span class="todo ASSIGNED">ASSIGNED</span> pizza / essen / f00d&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_hej">@hej</span>&#xa0;<span class="c3po">c3po</span></span></a></li>
+<li><a href="#sec-1-1-3">1.1.3. <span class="done DONE">DONE</span> scheduled messages&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></a></li>
+<li><a href="#sec-1-1-4">1.1.4. <span class="todo TEST">TEST</span> presence: eta login&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></a></li>
+<li><a href="#sec-1-1-5">1.1.5. <span class="todo OPEN">OPEN</span> guess commands&#xa0;&#xa0;&#xa0;<span class="tag"><span class="c3po">c3po</span></span></a></li>
+<li><a href="#sec-1-1-6">1.1.6. <span class="todo OPEN">OPEN</span> hubelmeter&#xa0;&#xa0;&#xa0;<span class="tag"><span class="c3po">c3po</span></span></a></li>
+<li><a href="#sec-1-1-7">1.1.7. <span class="done DONE">DONE</span> shutdown/startup&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></a></li>
+<li><a href="#sec-1-1-8">1.1.8. <span class="todo OPEN">OPEN</span> subraum init/shutdown auf subinitd migrieren</a></li>
+<li><a href="#sec-1-1-9">1.1.9. user authentication</a></li>
+<li><a href="#sec-1-1-10">1.1.10. <span class="todo OPEN">OPEN</span> big red button</a></li>
+<li><a href="#sec-1-1-11">1.1.11. <span class="done DONE">DONE</span> text to speech command&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></a></li>
+<li><a href="#sec-1-1-12">1.1.12. <span class="done DONE">DONE</span> irc bot&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></a></li>
+<li><a href="#sec-1-1-13">1.1.13. Notify sink</a></li>
+<li><a href="#sec-1-1-14">1.1.14. <span class="done DONE">DONE</span> 433MHz actor&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></a></li>
+<li><a href="#sec-1-1-15">1.1.15. <span class="todo OPEN">OPEN</span> jabber bot</a></li>
+<li><a href="#sec-1-1-16">1.1.16. <span class="todo OPEN">OPEN</span> mail bot</a></li>
+<li><a href="#sec-1-1-17">1.1.17. <span class="todo OPEN">OPEN</span> dmx actor&#xa0;&#xa0;&#xa0;<span class="tag"><span class="c3po">c3po</span></span></a></li>
+<li><a href="#sec-1-1-18">1.1.18. <span class="todo ASSIGNED">ASSIGNED</span> actor service / rule engine&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></a></li>
+<li><a href="#sec-1-1-19">1.1.19. <span class="todo ASSIGNED">ASSIGNED</span> openhab integration&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_snowball">@snowball</span></span></a></li>
+<li><a href="#sec-1-1-20">1.1.20. <span class="todo OPEN">OPEN</span> irc reader</a></li>
+<li><a href="#sec-1-1-21">1.1.21. <span class="todo OPEN">OPEN</span> music player daemon&#xa0;&#xa0;&#xa0;<span class="tag"><span class="c3po">c3po</span></span></a></li>
+<li><a href="#sec-1-1-22">1.1.22. <span class="todo OPEN">OPEN</span> calendar integration - ics?</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2">1.2. Architecture Changes</a>
+<ul>
+<li><a href="#sec-1-2-1">1.2.1. <span class="todo ASSIGNED">ASSIGNED</span> list, help messages for 'cmd' exchange&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></a></li>
+<li><a href="#sec-1-2-2">1.2.2. <span class="todo IDEA">IDEA</span> state change exchange?</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-3">1.3. Project Name</a>
+<ul>
+<li><a href="#sec-1-3-1">1.3.1. Subtitle?</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2">2. Documentation</a>
+<ul>
+<li><a href="#sec-2-1">2.1. Glossary</a></li>
+<li><a href="#sec-2-2">2.2. Well-defined Exchanges</a>
+<ul>
+<li><a href="#sec-2-2-1">2.2.1. msg</a></li>
+<li><a href="#sec-2-2-2">2.2.2. cmd</a></li>
+<li><a href="#sec-2-2-3">2.2.3. notify</a></li>
+<li><a href="#sec-2-2-4">2.2.4. <code>act_433mhz</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="private">private</span></span></a></li>
+<li><a href="#sec-2-2-5">2.2.5. subinit&#xa0;&#xa0;&#xa0;<span class="tag"><span class="private">private</span></span></a></li>
+</ul>
+</li>
+<li><a href="#sec-2-3">2.3. Software, Libs, etc.</a>
+<ul>
+<li><a href="#sec-2-3-1">2.3.1. Debian packages</a></li>
+<li><a href="#sec-2-3-2">2.3.2. docker</a></li>
+<li><a href="#sec-2-3-3">2.3.3. Useful libraries</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-4">2.4. Development</a>
+<ul>
+<li><a href="#sec-2-4-1">2.4.1. Repository Organization</a></li>
+<li><a href="#sec-2-4-2">2.4.2. External Documentation</a></li>
+<li><a href="#sec-2-4-3">2.4.3. Libraries</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
 
-## rabbitmq
-
-For development docker seemes a good choice:
-
-    sudo docker run -p :5672 -p :15672 -v /scratch/docker-data/rabbitmq:/var/lib/rabbitmq/mnesia f04150b0661e
-    sudo docker build github.com/mikaelhg/docker-rabbitmq.git
-
-Note that the exchanges are configured by hand..
-
-Use `mopp`, running on the dell netbook.
-
-## useful debian packages
-
--   python-pika
--   python-amqplib
--   amqp-tools
-
-# Repository Organization
-
--   **src:** Tools that only **publish** messages
--   **sink:** Tools that only **consume** messages
--   **proc:** Tools that **consume** and **publish** with some kind of
-    processing going on
--   **bot:** Adapter to other protocols like IRC. **publisher** and **consumer**
--   **demo:** Useful stuff for testing, reference, whatever
 
 # Ideas, Todos
 
@@ -306,7 +356,7 @@ the commands for the sender as payload.
 
 ## Architecture Changes
 
-### OPEN list, help messages for 'cmd' exchange
+### ASSIGNED list, help messages for 'cmd' exchange     :@irq0:
 
 Everyone on the cmd exchange should consume list and help messages.
 
@@ -318,6 +368,10 @@ Everyone on the cmd exchange should consume list and help messages.
 2.  Destination
 
         (str/replace (:src msg) #"recv" "send")
+
+3.  Status
+
+    -   The newer commands have this build in. Works fine.
 
 ### IDEA state change exchange?
 
@@ -337,3 +391,262 @@ oder so an den exchange.
 Ein event->tts consumer generiert tts commands wenn nötig
 
 Die rule engine verändert ihren systemzustand und wertet rules neu aus.
+
+## Project Name
+
+-   **EDI:** ++
+-   **ESI:** Enhanced Subraum Intelligence?
+
+### Subtitle?
+
+-   The hacker (friendly) space automation?
+
+# Documentation
+
+The core of the architecture is the rabbitmq amqp message server.
+Every pice of code connects in some way to it.
+
+Most services share a couple of well defined exchanges. See the
+2.2 for a description.
+
+## Glossary
+
+-   **source:** Apps that only/mainly produce messages
+-   **sink:** Apps that only/mainly consume messages
+-   **processor:** Apps that transform messages. Consume -> Produce.
+-   **bot:** Consumer/Producer that add external/foreign interfaces to the
+    system. Like IRC.
+
+## Well-defined Exchanges
+
+![img](//git.c3pb.de/c3pb/subraum-automatisierung/blob/master/doc/exchanges.jpeg)
+
+### msg
+
+Raw messages received from somewhere. This should be something that
+can be parsed to a command.
+
+Type: topic
+
+1.  Routing Keys
+
+    In general: protocol.bot-name.{send,recv,presence}.channel
+    -   irc.EDI.recv.#c3pb.sh
+    -   irc.EDI.send.#c3pb.sh
+    -   irc.EDI.presence
+
+2.  Messages
+
+    1.  #.send.\*
+
+        Content-Type: application/json
+        -   **msg:** Message body
+        -   **user:** Destination user
+
+        Content-Type: text/plain
+        body: Message
+
+    2.  #.recv.\*
+
+        Content-Type: application/json
+        -   **msg:** Message body
+        -   **user:** Message sender
+
+3.  Processors
+
+    1.  parse-commands.py
+
+        Transform `!<command>` to **cmd** Messages. (See **cmd** Exchange)
+
+4.  Bots
+
+    1.  IRC Bot - mqbot.py
+
+        IRC -> MQ, MQ -> IRC
+
+5.  Sinks
+
+6.  Sources
+
+### cmd
+
+Messages that do something :)
+
+Type: topic
+
+1.  Known routing Keys
+
+    1.  TTS
+
+        -   tts
+        -   say
+        -   forune
+
+    2.  Actor Service
+
+        -   act
+
+    3.  subinit
+
+        -   telinit
+        -   runlevel
+
+    4.  thehonestbookoftruth
+
+        -   login
+        -   logout
+        -   logout-all
+        -   ul
+        -   eta
+        -   uneta
+
+    5.  What every command should implement:
+
+        -   list
+        -   help
+
+2.  Messages
+
+    Content-Type: application/json
+    -   **cmd:** Usually the same as the routing key when parsed from **msg**
+        Messages. Could be different. Not sure why I include it. The
+        clojure tools use the to dispatch handlers..
+    -   **args:** Argument string.
+    -   **user:** User that send the command. The command may use this to log.
+    -   **src:** Command origin. Replies will be send here with the word
+        *recv* replaced by *send*. If the src is invalid replies will
+        just vanish :)
+
+3.  Sources
+
+4.  Sinks
+
+5.  Processors
+
+    1.  tts
+
+        Transform *tts* **cmd** Messages to notification audio messages.
+
+        Text -> Audio file.
+
+    2.  Simple Actor Service - act.py
+
+        Map *act* commands to actors.
+
+        Example:
+        venti on => 433Mhz sender, payload 11111 1 1
+
+        See `act_433mhz` exchange for the 433Mhz actor implementation.
+
+### notify
+
+**Sink** exchage for notifications.
+
+1.  Routing Keys
+
+    -   audio
+    -   text
+
+2.  Sinks
+
+    1.  mplayer one-liner
+
+            amqp-consume --url="amqp://mopp" --exchange="notify" --routing-key="audio" mplayer -
+
+3.  Messages
+
+    Content-Type depending on exchange keys. Should be directly usable by
+    the sink (e.g mp3 file to hand over to mplayer).
+
+### `act_433mhz`     :private:
+
+**Sink** exchange to signal 433mhz transmitter.
+
+Type: fanout
+
+1.  Messages
+
+    Commandline arguments for \`rcswitch-pi\`.
+
+2.  Sinks
+
+### subinit     :private:
+
+**Sink** exchange for subinit messages
+
+Type: topic
+
+1.  Messages
+
+    Content-type: text/plain
+
+    Must always contain the same as the routing key.
+
+2.  Sinks
+
+    1.  subinit-rc
+
+        Launch scripts on subinit messages consumed. Feel similar to sysvinit
+        scripts and runlevels
+
+## Software, Libs, etc.
+
+### Debian packages
+
+-   rabbitmq-server (debian testing ist aktuell genug)
+-   python-pika
+-   python-amqplib
+-   amqp-tools
+
+### docker
+
+For development docker seemes a good choice:
+
+    sudo docker run -p :5672 -p :15672 -v /scratch/docker-data/rabbitmq:/var/lib/rabbitmq/mnesia f04150b0661e
+    sudo docker build github.com/mikaelhg/docker-rabbitmq.git
+
+Note that the exchanges are configured by hand..
+
+Use `mopp`, running on the dell netbook.
+
+### Useful libraries
+
+## Development
+
+Install requirements. Setup exchanges in rabbitmq. The web interfaces
+comes in handy here ;)
+
+### Repository Organization
+
+-   **src:** Tools that only **publish** messages
+-   **sink:** Tools that only **consume** messages
+-   **proc:** Tools that **consume** and **publish** with some kind of
+    processing going on
+-   **bot:** Adapter to other protocols like IRC. **publisher** and **consumer**
+-   **demo:** Useful stuff for testing, reference, whatever
+
+Most larger tools are subtree merged from elsewhere. This repo is kind
+of the collected deployment branch.
+
+Have something to add? Let me pull your repo!
+
+### External Documentation
+
+-   [Must read rabbitmq tutorial - covers all the basic use cases](http://www.rabbitmq.com/getstarted.html)
+
+### Libraries
+
+1.  Python
+
+    -   **pika:** <http://pika.readthedocs.org/en/latest/> Documented, Async lib
+    -   **amqplib:** simpler non-threaded library; documentation shipped in
+        the .py files. Which are quite readable ;)
+
+2.  Commandline
+
+    -   **amqp-tools:** Make sure you get the recent ones. Debian testing
+        works quite well. Debian stable not so.
+
+3.  Clojure
+
+    -   **langohr:** <http://clojurerabbitmq.info/> Excellent library.
