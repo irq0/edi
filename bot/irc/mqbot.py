@@ -115,6 +115,7 @@ class MQ(Thread):
 
         # long message with user intended for channel -> msg user
         if len(msg) > 120 and dest == config["channel"] and user != config["channel"]:
+            self.bot.msg(dest, "{}: Lots of data.. Sending you a msg".format(user))
             dest = user
         # message for channel with known user -> prefix with 'user:'
         elif dest == config["channel"] and user != config["channel"]:
@@ -166,7 +167,7 @@ class MQBot(irc.IRCClient):
     realname = "Enhanced Subraum Intelligence"
     username = "ESI"
     password = "***REMOVED***"
-    lineRate = 0.1
+    lineRate = 0.5
 
 
     def connectionMade(self):
