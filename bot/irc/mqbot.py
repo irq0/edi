@@ -64,12 +64,10 @@ class MQ(Thread):
 
     def handle_consume(self, raw_msg):
         try:
-            print dir(raw_msg)
-            print raw_msg.properties
             key = raw_msg.delivery_info["routing_key"].split(".")
 
             if raw_msg.properties["content_type"] == "application/json":
-                self.handle_json_message(key, json.loads(raw_msg))
+                self.handle_json_message(key, json.loads(raw_msg.body))
             elif raw_msg.properties["content_type"] == "text/plain":
                 self.handle_plain_message(key, raw_msg.body)
             else:
@@ -90,7 +88,7 @@ class MQ(Thread):
         if key[2] == "presence":
             self.irc_presence(msg, u"")
         elif key[2] == "send":
-            self.irc_send(key[3], key[3], unicode(msg))
+            self.irc_send(key[3], key[3], msg)
         else:
             print "Unknown message type:", key[2], msg
 
@@ -102,29 +100,37 @@ class MQ(Thread):
         print "PRESENCE:", status, msg
 
         if status == "away":
-            self.bot.away(msg)
+            self.bot.away(msg.encode("UTF-8"))
         elif status == "online":
             self.bot.back()
         else:
             print "Received unknown status:", status
 
-    def irc_send(self, chan, user, msg):
-        print "SEND:", chan, user, msg
+    def irc_send(self, dest, user, msg):
+        print "SEND:", dest, user, msg
 
-        if chan == config["channel"] and user != config["channel"]:
-            msg = user + u": " + msg
+        user = user.encode("UTF-8")
+        msg = msg.encode("UTF-8")
+        dest = dest.encode("UTF-8")
 
-        self.bot.msg(chan.encode("UTF-8"), msg.encode("UTF-8"))
+        # long message with user intended for channel -> msg user
+        if len(msg) > 120 and dest == config["channel"] and user != config["channel"]:
+            dest = user
+        # message for channel with known user -> prefix with 'user:'
+        elif dest == config["channel"] and user != config["channel"]:
+            msg = user + ": " + msg
+
+        self.bot.msg(dest, msg)
 
 
     def irc_recvd(self, user, msg, chan, type):
         """Called whenever something was received from irc"""
 
         jmsg = json.dumps({
-            "user" : user,
-            "msg" : msg,
-            "chan" : chan,
-            "type" : type,
+            "user" : user.decode("UTF-8"),
+            "msg" : msg.decode("UTF-8"),
+            "chan" : chan.decode("UTF-8"),
+            "type" : type.decode("UTF-8"),
             "bot" : self.bot.nickname,
         })
 
