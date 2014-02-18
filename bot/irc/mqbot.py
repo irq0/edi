@@ -154,9 +154,10 @@ class MQ(Thread):
                 time.sleep(5)
 
     def close(self):
-#        self.remove_consumer()
-        self.conn.close()
-
+        try:
+            self.conn.close()
+        except IOError, e:
+            print "Error while closing amqp connection:", e
 
 class MQBot(irc.IRCClient):
     """http://twistedmatrix.com/documents/8.2.0/api/twisted.words.protocols.irc.IRCClient.html"""
