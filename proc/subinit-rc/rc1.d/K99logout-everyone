@@ -1,9 +1,0 @@
-#!/bin/bash
-
-case "$1" in
-
-    stop)
-	emit-cmd logout-all
-	;;
-
-esac
