@@ -34,7 +34,10 @@ chan.queue_bind(exchange=e,
 
 def error(cmd, error):
     key = cmd["src"].replace("recv", "send")
-    msg = "%s: %s" % (cmd["user"], error)
+    msg = json.dumps({
+        "user" : cmd["user"],
+        "msg" : error
+    })
 
     print("---> [%r] %r" % (key, msg))
 
@@ -42,7 +45,7 @@ def error(cmd, error):
                        routing_key=key,
                        body=msg,
                        properties=pika.BasicProperties(
-                           content_type="text/plain",
+                           content_type="application/json",
                            delivery_mode=2))
 
 def notify_audio(payload, content_type):
