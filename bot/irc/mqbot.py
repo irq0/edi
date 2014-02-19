@@ -123,6 +123,7 @@ class MQ(Thread):
 
 
         dest = dest.replace("_channel_", config["channel"])
+        print "SEND: Transformed:", dest, msg
 
         self.bot.msg(dest, msg)
 
@@ -143,13 +144,17 @@ class MQ(Thread):
         amsg.properties["delivery_mode"] = 2
         amsg.properties["app_id"] = "edi-irc"
 
+        key = ".".join(("irc",
+                        self.bot.nickname,
+                        "recv",
+                        chan.replace(config["channel"],"_channel_")))
+
+        print "RECV:", user, chan, msg
+        print "RECV: Publish to", key
 
         try:
             self.chan.basic_publish(exchange=self.exchange,
-                                    routing_key=".".join(("irc",
-                                                          self.bot.nickname,
-                                                          "recv",
-                                                          chan.replace(config["channel"],"_channel_"))),
+                                    routing_key=key,
                                     msg=amsg)
         except Exception, e:
             print "Exception while publishing message:", e
