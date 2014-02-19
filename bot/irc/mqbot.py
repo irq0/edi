@@ -20,7 +20,7 @@ import json
 config = {
     "host" : "spaceboyz.net",
     "port" : 9999,
-    "channel" : "#/dev/subraum",
+    "channel" : "#c3pb.sh",
 }
 
 AMQP_SERVER = os.getenv("AMQP_SERVER") or "localhost"
@@ -121,6 +121,10 @@ class MQ(Thread):
         elif dest == config["channel"] and user != config["channel"]:
             msg = user + ": " + msg
 
+
+        dest = dest.replace("_channel_", config["channel"])
+        print "SEND: Transformed:", dest, msg
+
         self.bot.msg(dest, msg)
 
 
@@ -140,9 +144,17 @@ class MQ(Thread):
         amsg.properties["delivery_mode"] = 2
         amsg.properties["app_id"] = "edi-irc"
 
+        key = ".".join(("irc",
+                        self.bot.nickname,
+                        "recv",
+                        chan.replace(config["channel"],"_channel_")))
+
+        print "RECV:", user, chan, msg
+        print "RECV: Publish to", key
+
         try:
             self.chan.basic_publish(exchange=self.exchange,
-                                    routing_key=".".join(("irc", self.bot.nickname, "recv", chan)),
+                                    routing_key=key,
                                     msg=amsg)
         except Exception, e:
             print "Exception while publishing message:", e
@@ -163,9 +175,9 @@ class MQ(Thread):
 class MQBot(irc.IRCClient):
     """http://twistedmatrix.com/documents/8.2.0/api/twisted.words.protocols.irc.IRCClient.html"""
 
-    nickname = "ESI"
+    nickname = "EDI"
     realname = "Enhanced Subraum Intelligence"
-    username = "ESI"
+    username = "EDI"
     password = "***REMOVED***"
     lineRate = 0.5
 
