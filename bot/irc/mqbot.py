@@ -20,7 +20,7 @@ import json
 config = {
     "host" : "spaceboyz.net",
     "port" : 9999,
-    "channel" : "#/dev/subraum",
+    "channel" : "#c3pb.sh",
 }
 
 AMQP_SERVER = os.getenv("AMQP_SERVER") or "localhost"
@@ -163,9 +163,9 @@ class MQ(Thread):
 class MQBot(irc.IRCClient):
     """http://twistedmatrix.com/documents/8.2.0/api/twisted.words.protocols.irc.IRCClient.html"""
 
-    nickname = "ESI"
+    nickname = "EDI"
     realname = "Enhanced Subraum Intelligence"
-    username = "ESI"
+    username = "EDI"
     password = "***REMOVED***"
     lineRate = 0.5
 
