@@ -121,6 +121,9 @@ class MQ(Thread):
         elif dest == config["channel"] and user != config["channel"]:
             msg = user + ": " + msg
 
+
+        dest = dest.replace("_channel_", config["channel"])
+
         self.bot.msg(dest, msg)
 
 
@@ -140,9 +143,13 @@ class MQ(Thread):
         amsg.properties["delivery_mode"] = 2
         amsg.properties["app_id"] = "edi-irc"
 
+
         try:
             self.chan.basic_publish(exchange=self.exchange,
-                                    routing_key=".".join(("irc", self.bot.nickname, "recv", chan)),
+                                    routing_key=".".join(("irc",
+                                                          self.bot.nickname,
+                                                          "recv",
+                                                          chan.replace(config["channel"],"_channel_"))),
                                     msg=amsg)
         except Exception, e:
             print "Exception while publishing message:", e
