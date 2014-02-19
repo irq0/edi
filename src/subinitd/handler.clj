@@ -31,7 +31,7 @@
         (format "SUBINIT: unchanged")
         (format "SUBINIT: %s->%s" from to)))
 
-    (catch Exception e
+    (catch NumberFormatException e
       (format "SUBINIT: \"%s\" not a number :(" args))))
 
 
