@@ -66,6 +66,8 @@ class MQ(Thread):
         try:
             key = raw_msg.delivery_info["routing_key"].split(".")
 
+            print "CONSUME: routing_key=%s properties=%s body=%s" % (key, raw_msg.properties, raw_msg.body)
+
             if raw_msg.properties["content_type"] == "application/json":
                 self.handle_json_message(key, json.loads(raw_msg.body))
             elif raw_msg.properties["content_type"] == "text/plain":
@@ -107,8 +109,6 @@ class MQ(Thread):
             print "Received unknown status:", status
 
     def irc_send(self, dest, user, msg):
-        print "SEND:", dest, user, msg
-
         user = user.encode("UTF-8")
         msg = msg.encode("UTF-8")
         dest = dest.encode("UTF-8")
@@ -121,9 +121,17 @@ class MQ(Thread):
         elif dest == config["channel"] and user != config["channel"]:
             msg = user + ": " + msg
 
+        # dest is bot (irc recv from /msg) -> map to user
+        elif dest == self.bot.nickname and user != self.bot.nickname:
+            dest = user
+
+        # fallback to channel
+        else:
+            dest = config["channel"]
+
 
         dest = dest.replace("_channel_", config["channel"])
-        print "SEND: Transformed:", dest, msg
+        print "SEND: dest=%s msg=%s" % (dest, msg)
 
         self.bot.msg(dest, msg)
 
@@ -139,6 +147,8 @@ class MQ(Thread):
             "bot" : self.bot.nickname,
         })
 
+        print "RECV: user=%s chan=%s msg=%s jmsg=%s" % (user, chan, msg, jmsg)
+
         amsg = amqp.Message(jmsg)
         amsg.properties["content_type"] = "application/json"
         amsg.properties["delivery_mode"] = 2
@@ -149,10 +159,10 @@ class MQ(Thread):
                         "recv",
                         chan.replace(config["channel"],"_channel_")))
 
-        print "RECV:", user, chan, msg
-        print "RECV: Publish to", key
 
         try:
+            print "PUBLISH: routing_key=%s msg=%s" % (key, amsg)
+
             self.chan.basic_publish(exchange=self.exchange,
                                     routing_key=key,
                                     msg=amsg)
@@ -193,36 +203,36 @@ class MQBot(irc.IRCClient):
         self.pub.close()
 
     def signedOn(self):
-        print "Signed on"
+        print "IRC: Signed on"
 
         self.msg("NickServ", "IDENTIFY {}".format(self.password))
 
-        print "join chan: ", config["channel"]
+        print "IRC: join chan: ", config["channel"]
         self.join(config["channel"])
 
     def privmsg(self, user, chan, msg):
         print "privmsg:", user, chan
         user = user.split('!', 1)[0]
 
-        print "<%s> %s" % (user, msg)
+        print "IRC RECV: <%s> %s" % (user, msg)
         self.pub.irc_recvd(user, msg, chan, "privmsg")
 
     def action(self, user, chan, msg):
         user = user.split('!', 1)[0]
 
-        print "* %s %s" % (user, msg)
+        print "IRC RECV:* %s %s" % (user, msg)
         self.pub.irc_recvd(user, msg, chan, "action")
 
 class BotFactory(protocol.ClientFactory):
     protocol = MQBot
 
     def clientConnectionLost(self, connector, reason):
-        print "connection lost:", connector, reason
-        print "reconnecting.."
+        print "IRC: connection lost:", connector, reason
+        print "IRC: reconnecting.."
         connector.connect()
 
     def clientConnectionFailed(self, connector, reason):
-        print "connection failed:", connector, reason
+        print "IRC: connection failed:", connector, reason
         reactor.stop()
 
 
