@@ -8,4 +8,7 @@ export SUBINIT_ACTION="$action"
 
 echo "[x] RUNLEVEL ${level} ${action}"
 
-run-parts --verbose --arg="$action" "rc${level}.d"
+(
+	cd $(dirname $0)/../
+	run-parts --verbose --arg="$action" "rc${level}.d"
+)
