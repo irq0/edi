@@ -1,17 +1,6 @@
 #!/usr/bin/env ruby 
 # encoding: UTF-8
 
-#Programme: 0 = background, 1 = testprogram, 42 = alarm
-
-#        self.alarmval += self.alarmstep
-#        if self.alarmval >= 300:
-#            self.alarmstep *= -1
-#        elif self.alarmval <= 0:
-#            self.alarmstep *= -1
-#        rgb(self.alarmval, 0, 0)
-#        time.sleep(0.01)
-
-
 #TODO Farbprogramme
 #TODO testen, ob enabled/disabled state auch regelmäßig aufs dmx geschrieben werden muss
 
