@@ -5,7 +5,9 @@
 #TODO testen, ob enabled/disabled state auch regelmäßig aufs dmx geschrieben werden muss
 
 #key dmx.lamp.subraum.control, body ~= (on|off)
-#key dmx.lamp.subraum.0, body ~= \d,\d,\d
+#key dmx.lamp.subraum.0, body ~= (\d,\d,\d|html-farbe|programmname)
+
+#Lampenids: 8, 24, 96
 
 #config
 $subsystem = "subraum"
