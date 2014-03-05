@@ -19,19 +19,19 @@ require "serialport"
 require "thread"
 require "json"
 
-class SerialDummy
-  def initialize(dev, bauds)
-    puts "Opened #{dev}@#{bauds}"
-  end
-  def write(s)
-    puts "Serial write: #{s}"
-  end
-end
+#class SerialDummy
+#  def initialize(dev, bauds)
+#    puts "Opened #{dev}@#{bauds}"
+#  end
+#  def write(s)
+#    puts "Serial write: #{s}"
+#  end
+#end
 
 class DmxControl
   def initialize
-#    @serial = SerialPort.new("/dev/dmx", 38400)
-    @serial = SerialDummy.new("/dev/dmx", 38400)
+    @serial = SerialPort.new("/dev/dmx", 38400)
+#    @serial = SerialDummy.new("/dev/dmx", 38400)
     @sema = Mutex.new #semaphore die @serial schützt
     @channels = {}
     @programs = {}
