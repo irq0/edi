@@ -13,7 +13,6 @@
 $subsystem = "subraum"
 $program_path = './programs/'
 $channel_write_interval = 0.1
-$program_step_ratio = 10
 #/config
 
 require "bunny"
@@ -64,12 +63,10 @@ class DmxControl
   end
 
   def loop
-    i=0
     while true
       sleep($channel_write_interval)
       next unless @enabled
-      i = (i + 1) % $program_step_ratio
-      advanceprograms if i == 0 
+      advanceprograms
       @sema.synchronize {
         @channels.each_pair do |channel, value|
           @serial.write(sprintf("C%03dL%03d", channel, value))
@@ -82,7 +79,7 @@ class DmxControl
   
   def advanceprograms
     @programs.each_pair do |channel, color|
-      channel.next
+      color.next
     end
     setchannels
   end
@@ -100,7 +97,6 @@ class DmxControl
     g = 0 if g < 0
     b = 255 if b > 255
     b = 0 if b < 0
-    puts "setrgb, #{channel}, #{r}, #{g}, #{b}"
     setchannel(channel-1, 0)
     setchannel(channel+0, r)
     setchannel(channel+1, g)
@@ -115,10 +111,9 @@ class Color
 
   def self.resolve(color)
     col = simple_resolve(color)
-    puts col
     return Color.new([col]) if col
-    program = File.join($program_path,color)
-    return Color.new(program) if File.exist?(program)
+    p = File.join($program_path,color)
+    return Color.new(p) if File.exist?(p) && p.start_with?($program_path)
     fail "Unbekannte Farbe: #{color}"
   end
   def self.simple_resolve(color)
@@ -145,6 +140,7 @@ class Color
         c = Color.simple_resolve(line.strip)
         @colors << c if c
       end
+      puts "loaded Program #{colors} with #{@colors.length} lines"
     else
       @colors = colors.map { |l| l.map { |e| e.to_i } }
       @index = 0
@@ -159,6 +155,7 @@ class Color
   end
 end
 
+$program_path = File.realpath($program_path)
 Color.load_colors
 
 if __FILE__ == $0
