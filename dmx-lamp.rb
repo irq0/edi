@@ -5,7 +5,9 @@
 #TODO testen, ob enabled/disabled state auch regelmäßig aufs dmx geschrieben werden muss
 
 #key dmx.lamp.subraum.control, body ~= (on|off)
-#key dmx.lamp.subraum.0, body ~= \d,\d,\d
+#key dmx.lamp.subraum.0, body ~= (\d,\d,\d|html-farbe|programmname)
+
+#Lampenids: 8, 24, 96
 
 #config
 $subsystem = "subraum"
@@ -131,7 +133,7 @@ class Color
   def self.load_colors
     @@colors = Hash[File.open('colors.txt').each_line.map do |line|
       m = /([^ ]+)\s+(#[a-fA-F0-9]{6})/.match(line)
-      [m[1], simple_resolve(m[2])] if m
+      [m[1].downcase, simple_resolve(m[2])] if m
     end.compact]
   end
 
