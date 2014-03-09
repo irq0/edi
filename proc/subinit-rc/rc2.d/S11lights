@@ -1,0 +1,13 @@
+#!/bin/bash
+
+case "$1" in
+
+    start)
+	emit-cmd act bulb on
+	;;
+
+    stop)
+	emit-cmd act bulb off
+	;;
+
+esac
