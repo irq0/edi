@@ -1,0 +1,5 @@
+#!/bin/sh
+
+exec 2>&1
+
+exec python "${APPDIR}/proc/act/act.py"
