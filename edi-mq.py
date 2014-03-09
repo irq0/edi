@@ -5,6 +5,7 @@ from __future__ import print_function
 import subprocess
 import pika
 import json
+import os
 
 import tts
 
