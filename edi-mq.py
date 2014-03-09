@@ -10,7 +10,9 @@ import tts
 
 from StringIO import StringIO
 
-conn = pika.BlockingConnection(pika.ConnectionParameters("10.23.1.23"))
+amqp_server = os.getenv("AMQP_SERVER") or "localhost"
+
+conn = pika.BlockingConnection(pika.ConnectionParameters(amqp_server))
 chan = conn.channel()
 
 e = "cmd"
