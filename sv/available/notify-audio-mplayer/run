@@ -1,0 +1,5 @@
+#!/bin/sh
+
+exec 2>&1
+
+exec amqp-consume --url="amqp://${AMQP_SERVER:-localhost}" --exchange="notify" --queue="audio2" --routing-key="audio" mplayer -
