@@ -1,0 +1,6 @@
+#!/bin/bash
+
+filename="$1"
+destination="${2:-audio}"
+
+amqp-publish -u "amqp://${AMQP_SERVER:-localhost}" -e notify -r "${destination}" <  "${filename}"

@@ -21,24 +21,6 @@
   Z.B. IRC offline
 - Aehlich wie die notify exchange, audio fuer shouts in den subraum
 -
-*** ASSIGNED pizza / essen / f00d                               :@hej:c3po:
-*** DONE scheduled messages                                         :@irq0:
-- hourly audio messages
-- web gui?
-- clojure + quarz scheduler?
-
-Implementation: [[src/shouts]]
-cronjob + amqp-tools + mp3 files
-
-mp3 files found on cube..
-*** TEST presence: eta login                                        :@irq0:
-Commands: !ul, !eta, !login, !logout
-
-- cmd exchange consumer/producer
-- store login, eta state somewhere
-
-Implemented: [[proc/thehonestbookoftruth]]
-
 *** OPEN guess commands                                                :c3po:
 - see =thomas.py=, =pr.py= auf cube
 
@@ -46,38 +28,7 @@ Implemented: [[proc/thehonestbookoftruth]]
 - In etwa "mach mal licht an" -> "cmd bulb on"
 
 *** OPEN hubelmeter                                                    :c3po:
-*** DONE shutdown/startup                                           :@irq0:
-Veralgemeinert implementiert: Init mit runlevels.
-
-Reagiert auf Commands:
-- telinit ::  Runlevel ändern
-- runlevel :: Aktuelles runlevel zurückgeben
-
-
-Emitiert Messages auf in der =subinit= Exchange.
-Format: =rc.RUNLEVEL.ACTION=
-
-
-Runleveländerungen (z.B 0 -> 4) generieren Events: 1 start, 2 start, 3
-start, 4 start.
-
-Runlevels sind dazu gedacht, um den Subraum auch nur "halb"
-anzuschalten zu können. Beispielsweise ohne Mamestation.
-
-**** Tool: subinit-rc
-Tool um für subinit Messages Scripts zu starten. Aufgebaut wie rc*.d
-runlevel scripts.
-
-Skripts werden mit run-parts gestartet und bekommen die ACTION als
-ersten Parameter
-
-*** OPEN subraum init/shutdown auf subinitd migrieren
-*** user authentication
-- irc nick <-> subraum LDAP?
-- ueberhaupt noetig?
-**** ASSIGNED irc bot antwortet nur auf op                         :@irq0:
-- bot: only answer to users having op? (TODO)
-*** OPEN big red button
+*** OPEN big red button / klotz
 - hardware button loest 'bigredbutton' command aus?
 
 - Oder: Es können ja durchaus mehrere dinge einen big red button gebrauchen
@@ -95,39 +46,6 @@ Decke?
     31337 auf'm PIN Pad?
     - Pizza daemon wartet auf button 31337 messages..
 
-
-*** DONE text to speech command                                     :@irq0:
-- listen for tts, say, fortune commands
-- text to speech messages
-- put mp3 files in notify exchange with key audio
-
-Actually two implementations. One pico2wave in the EDI repo and one
-based on the old acapella-group web scripting.
-*** DONE irc bot                                                    :@irq0:
-- IRC receive -> msg exchange with key irc.recv.raw
-- msg exchange with key irc.send.raw -> IRC send
-*** Notify sink
-
-**** text
-=routing_key=text= messages.
-
-***** DONE libnotify sink                                         :@irq0:
-***** OPEN text notifications on projector
-**** audio
-=routing_key=audio= messages.
-
-***** DONE mplayer sink                                           :@irq0:
-shell one-liner with amqp-tools
-**** OPEN uri
-=routing_key=uri= messages.
-
-Idea: Play media URIs in messages. Sinilar to the mplayer listener on cube.
-*** DONE 433MHz actor                                               :@irq0:
-=act_433mhz= exchange
-
-- consumer on raspberrypi
-- message payload = commandline arguments to rcswitch tool
-
 *** OPEN jabber bot
 - user same msg exchange as irc bot
 
@@ -138,26 +56,33 @@ Idea: Play media URIs in messages. Sinilar to the mplayer listener on cube.
 - nuetzlich auch fuer den notify: user service
 - unauthenticated mail?!
 
-*** OPEN dmx actor                                                     :c3po:
-See =cube:/var/git/c3po/dmx=. DMX is connected to the serial port.
+*** OPEN irc reader
+**** assign voices to each participant
+***** parameters
+- speed
+- pitch
+- voice: lea, julia, kenny...
+**** participants can change voices
 
-Example code:
-#+BEGIN_SRC python
- #!/usr/bin/python
+*** OPEN calendar integration - ics?
+- Repeadedly parse calendar files. Idealy ics. Load from caldav?
+  google calendar?
 
- import sys
- import serial
+**** Variants
+***** Calendar Commands
+- Im Kallender stehen edi commands. Diese zu den eingestellten Zeiten
+  injecten.
 
- ser = serial.Serial('/dev/dmx', 38400, timeout=1)
+Quasi alternative zu CRON.
 
- ser.write("B1")
+irq0: Damit koennte ich mir meinen Wecker bauen..
 
- ser.close()
-#+END_SRC
+***** Events
+- Event :: Something is going to happen at a point in time. Wie das
+           digitale Zeitalter..
 
-There is also a dmx jsonrpc server:
-=cube:/var/git/c3po/jsonrpcdmx=
-
+Per TTS, Text notification, IRC, Jabber whatever hinweisen
+*** ASSIGNED pizza / essen / f00d                               :@hej:c3po:
 *** ASSIGNED actor service / rule engine                              :@irq0:
 
 currently a simple python script to map things like 'act bulb on' to
@@ -209,37 +134,128 @@ EVENT -> OLD STATE -> STATE CHANGE -> NEW STATE
 - =(state-change old)=
 
 *** ASSIGNED openhab integration                                  :@snowball:
-*** OPEN irc reader
-**** assign voices to each participant
-***** parameters
-- speed
-- pitch
-- voice: lea, julia, kenny...
-**** participants can change voices
-
-*** OPEN music player daemon                                         :c3po:
+*** ASSIGNED music player daemon                           :@snowball:c3po:
 - mpd commands als messages
 - Story: Ein EDI MQ command kann verschiedene music player daemons steuern
 - Probleme
   - Mehrere mpds unterstützen; gleichzeitig steuern?
-*** OPEN calendar integration - ics?
-- Repeadedly parse calendar files. Idealy ics. Load from caldav?
-  google calendar?
+*** TEST presence: eta login                                        :@irq0:
+Commands: !ul, !eta, !login, !logout
 
-**** Variants
-***** Calendar Commands
-- Im Kallender stehen edi commands. Diese zu den eingestellten Zeiten
-  injecten.
+- cmd exchange consumer/producer
+- store login, eta state somewhere
 
-Quasi alternative zu CRON.
+Implemented: [[proc/thehonestbookoftruth]]
 
-irq0: Damit koennte ich mir meinen Wecker bauen..
+*** TEST dmx actor                                        :@grollicus:c3po:
+See =cube:/var/git/c3po/dmx=. DMX is connected to the serial port.
 
-***** Events
-- Event :: Something is going to happen at a point in time. Wie das
-           digitale Zeitalter..
+Example code:
+#+BEGIN_SRC python
+ #!/usr/bin/python
 
-Per TTS, Text notification, IRC, Jabber whatever hinweisen
+ import sys
+ import serial
+
+ ser = serial.Serial('/dev/dmx', 38400, timeout=1)
+
+ ser.write("B1")
+
+ ser.close()
+#+END_SRC
+
+There is also a dmx jsonrpc server:
+=cube:/var/git/c3po/jsonrpcdmx=
+
+*** DONE scheduled messages                                         :@irq0:
+- hourly audio messages
+- web gui?
+- clojure + quarz scheduler?
+
+Implementation: [[src/shouts]]
+cronjob + amqp-tools + mp3 files
+
+mp3 files found on cube..
+*** DONE shutdown/startup                                           :@irq0:
+Veralgemeinert implementiert: Init mit runlevels.
+
+Reagiert auf Commands:
+- telinit ::  Runlevel ändern
+- runlevel :: Aktuelles runlevel zurückgeben
+
+
+Emitiert Messages auf in der =subinit= Exchange.
+Format: =rc.RUNLEVEL.ACTION=
+
+
+Runleveländerungen (z.B 0 -> 4) generieren Events: 1 start, 2 start, 3
+start, 4 start.
+
+Runlevels sind dazu gedacht, um den Subraum auch nur "halb"
+anzuschalten zu können. Beispielsweise ohne Mamestation.
+
+**** Tool: subinit-rc
+Tool um für subinit Messages Scripts zu starten. Aufgebaut wie rc*.d
+runlevel scripts.
+
+Skripts werden mit run-parts gestartet und bekommen die ACTION als
+ersten Parameter
+
+*** DONE text to speech command                                     :@irq0:
+- listen for tts, say, fortune commands
+- text to speech messages
+- put mp3 files in notify exchange with key audio
+
+Actually two implementations. One pico2wave in the EDI repo and one
+based on the old acapella-group web scripting.
+*** DONE irc bot                                                    :@irq0:
+- IRC receive -> msg exchange with key irc.recv.raw
+- msg exchange with key irc.send.raw -> IRC send
+*** DONE 433MHz actor                                               :@irq0:
+=act_433mhz= exchange
+
+- consumer on raspberrypi
+- message payload = commandline arguments to rcswitch tool
+
+*** User Authentication
+- irc nick <-> subraum LDAP?
+- ueberhaupt noetig?
+**** ASSIGNED irc bot antwortet nur auf op                         :@irq0:
+- bot: only answer to users having op? (TODO)
+*** Notify sink
+
+**** text
+=routing_key=text= messages.
+
+***** DONE libnotify sink                                         :@irq0:
+***** OPEN text notifications on projector
+**** audio
+=routing_key=audio= messages.
+
+***** DONE mplayer sink                                           :@irq0:
+shell one-liner with amqp-tools
+**** OPEN uri
+=routing_key=uri= messages.
+
+Idea: Play media URIs in messages. Sinilar to the mplayer listener on cube.
+**** OPEN user
+Get a message to a specific user. Configure means to reach the user
+somewhere. Have fallbacks. Like "IRC->Jabber->Email->SMS".
+*** Telephony
+**** TEST asterisk prove of concept                                   :@irq0:
+- Integrate telephony
+- Read chat messages
+- Add notifications
+
+- (OPEN) SMS -> IRC
+**** OPEN integrate SMS
+SMS -> IRC
+SMS -> TTS
+
+IRC -> SMS?
+*** OPEN speech to text
+Integrate speech to text engine
+
 ** Architecture Changes
 *** ASSIGNED list, help messages for 'cmd' exchange                 :@irq0:
 Everyone on the cmd exchange should consume list and help messages.
@@ -267,13 +283,21 @@ Beispiel:
 - rule engine wertet systemzustand aus
 
 
-Mögliche umsetzung
+Mögliche Umsetzung
 /st/ exchange. User presence manager sendet message mit "userloggedin"
 oder so an den exchange.
 
 Ein event->tts consumer generiert tts commands wenn nötig
 
 Die rule engine verändert ihren systemzustand und wertet rules neu aus.
+** Janitor Tasks
+*** DONE integrate daemon supervisor                                :@irq0:
+runit. See =sv/{available, enabled}=
+*** ASSIGNED put asterisk container somewhere                       :@irq0:
+Running on janelane. Put on some server. Keep sipgate credentials
+private.
+*** ASSIGNED plan first release
+
 ** Project Name
 - EDI :: ++
 - ESI :: Enhanced Subraum Intelligence?
@@ -371,6 +395,8 @@ Content-Type: application/json
 - src :: Command origin. Replies will be send here with the word
          /recv/ replaced by /send/. If the src is invalid replies will
          just vanish :)
+- dst :: Where to put the result. This option is strictly optional.
+         Implement a same default like reply based on =src= or default destination.
 
 **** Sources
 **** Sinks
@@ -456,7 +482,12 @@ comes in handy here ;)
 - proc :: Tools that *consume* and *publish* with some kind of
           processing going on
 - bot :: Adapter to other protocols like IRC. *publisher* and *consumer*
-- demo :: Useful stuff for testing, reference, whatever
+- misc :: Useful stuff for testing, reference, whatever. Configuration
+          files for external tools like asterisk
+- sv :: Contains =available= and =enabled= directories. When EDI is
+        started with the =run= script, start subsystems linked to
+        =enabled= directory.
+- log :: Log output for =sv/enabled= daemons.
 
 Most larger tools are subtree merged from elsewhere. This repo is kind
 of the collected deployment branch.
