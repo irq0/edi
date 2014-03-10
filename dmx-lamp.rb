@@ -13,6 +13,11 @@
 $subsystem = "subraum"
 $program_path = './programs/'
 $channel_write_interval = 0.1
+$lamps = {
+  8  => "background",
+  24 => "background",
+  96 => "background"
+}
 #/config
 
 require "bunny"
@@ -41,6 +46,9 @@ class DmxControl
 
   def on
     @sema.synchronize {
+      $lamps.each_pair { |lampid, default| 
+        setprogram(lampid, default) 
+      }
       @enabled = true
       @serial.write('B0')
     }
@@ -58,6 +66,7 @@ class DmxControl
   end
 
   def setprogram(channel, color)
+    return unless $lamps.include? channel
     @programs[channel] = color
     setchannels
   end
