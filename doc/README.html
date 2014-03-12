@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>EDI</title>
-<!-- 2014-03-10 Mo 01:25 -->
+<!-- 2014-03-12 Mi 17:07 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <link href="css/bootstrap.css" rel="stylesheet">
@@ -75,16 +75,16 @@ for the JavaScript code in this tag.
 </li>
 <li><a href="#sec-2">2. Documentation</a>
 <ul>
-<li><a href="#sec-2-1">2.1. Glossary</a></li>
-<li><a href="#sec-2-2">2.2. Well-defined Exchanges</a></li>
-<li><a href="#sec-2-3">2.3. Software, Libs, etc.</a></li>
-<li><a href="#sec-2-4">2.4. Development</a></li>
+<li><a href="#sec-2-1">2.1. Setup</a></li>
+<li><a href="#sec-2-2">2.2. Glossary</a></li>
+<li><a href="#sec-2-3">2.3. Well-defined Exchanges</a></li>
+<li><a href="#sec-2-4">2.4. Software, Libs, etc.</a></li>
+<li><a href="#sec-2-5">2.5. Development</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-
 
 <div id="outline-container-sec-1" class="outline-2">
 <h2 id="sec-1"><span class="section-number-2">1</span> Ideas, Todos</h2>
@@ -93,7 +93,7 @@ for the JavaScript code in this tag.
 <h3 id="sec-1-1"><span class="section-number-3">1.1</span> Features</h3>
 <div class="outline-text-3" id="text-1-1">
 </div><div id="outline-container-sec-1-1-1" class="outline-4">
-<h4 id="sec-1-1-1"><span class="todo OPEN">OPEN</span> User Notifications</h4>
+<h4 id="sec-1-1-1"><span class="todo OPEN">OPEN</span> User Notifications&#xa0;&#xa0;&#xa0;<span class="tag"><span class="r1">r1</span></span></h4>
 <div class="outline-text-4" id="text-1-1-1">
 <ul class="org-ul">
 <li>Im LDAP gibt es eine liste mit wegen einen user zu notifien
@@ -116,11 +116,9 @@ Z.B. IRC offline
 </li>
 <li>Aehlich wie die notify exchange, audio fuer shouts in den subraum
 </li>
-<li></li>
 </ul>
 </div>
 </div>
-
 <div id="outline-container-sec-1-1-2" class="outline-4">
 <h4 id="sec-1-1-2"><span class="todo OPEN">OPEN</span> guess commands&#xa0;&#xa0;&#xa0;<span class="tag"><span class="c3po">c3po</span></span></h4>
 <div class="outline-text-4" id="text-1-1-2">
@@ -179,7 +177,7 @@ Decke?
 </div>
 </div>
 <div id="outline-container-sec-1-1-5" class="outline-4">
-<h4 id="sec-1-1-5"><span class="todo OPEN">OPEN</span> jabber bot</h4>
+<h4 id="sec-1-1-5"><span class="todo OPEN">OPEN</span> jabber bot&#xa0;&#xa0;&#xa0;<span class="tag"><span class="r1">r1</span></span></h4>
 <div class="outline-text-4" id="text-1-1-5">
 <ul class="org-ul">
 <li>user same msg exchange as irc bot
@@ -191,7 +189,7 @@ Decke?
 </div>
 </div>
 <div id="outline-container-sec-1-1-6" class="outline-4">
-<h4 id="sec-1-1-6"><span class="todo OPEN">OPEN</span> mail bot</h4>
+<h4 id="sec-1-1-6"><span class="todo OPEN">OPEN</span> mail bot&#xa0;&#xa0;&#xa0;<span class="tag"><span class="r1">r1</span></span></h4>
 <div class="outline-text-4" id="text-1-1-6">
 <ul class="org-ul">
 <li>wie jabber bot nur ueber email
@@ -206,12 +204,15 @@ Decke?
 <div id="outline-container-sec-1-1-7" class="outline-4">
 <h4 id="sec-1-1-7"><span class="todo OPEN">OPEN</span> irc reader</h4>
 <div class="outline-text-4" id="text-1-1-7">
-</div><div id="outline-container-sec-1-1-7-1" class="outline-5">
+<p>
+In simpler implementiert. Siehe <i>misc/read_msg.py</i>. Keine verschiedenen Stimmen.
+</p>
+</div>
+
+<div id="outline-container-sec-1-1-7-1" class="outline-5">
 <h5 id="sec-1-1-7-1">assign voices to each participant</h5>
 <div class="outline-text-5" id="text-1-1-7-1">
-</div><div id="outline-container-sec-1-1-7-1-1" class="outline-6">
-<h6 id="sec-1-1-7-1-1">parameters</h6>
-<div class="outline-text-6" id="text-1-1-7-1-1">
+</div><ul class="org-ul"><li>parameters<br  /><div class="outline-text-6" id="text-1-1-7-1-1">
 <ul class="org-ul">
 <li>speed
 </li>
@@ -221,7 +222,7 @@ Decke?
 </li>
 </ul>
 </div>
-</div>
+</li></ul>
 </div>
 
 <div id="outline-container-sec-1-1-7-2" class="outline-5">
@@ -229,7 +230,7 @@ Decke?
 </div>
 </div>
 <div id="outline-container-sec-1-1-8" class="outline-4">
-<h4 id="sec-1-1-8"><span class="todo OPEN">OPEN</span> calendar integration - ics?</h4>
+<h4 id="sec-1-1-8"><span class="todo OPEN">OPEN</span> calendar integration - ics?&#xa0;&#xa0;&#xa0;<span class="tag"><span class="r1">r1</span></span></h4>
 <div class="outline-text-4" id="text-1-1-8">
 <ul class="org-ul">
 <li>Repeadedly parse calendar files. Idealy ics. Load from caldav?
@@ -241,9 +242,7 @@ google calendar?
 <div id="outline-container-sec-1-1-8-1" class="outline-5">
 <h5 id="sec-1-1-8-1">Variants</h5>
 <div class="outline-text-5" id="text-1-1-8-1">
-</div><div id="outline-container-sec-1-1-8-1-1" class="outline-6">
-<h6 id="sec-1-1-8-1-1">Calendar Commands</h6>
-<div class="outline-text-6" id="text-1-1-8-1-1">
+</div><ul class="org-ul"><li>Calendar Commands<br  /><div class="outline-text-6" id="text-1-1-8-1-1">
 <ul class="org-ul">
 <li>Im Kallender stehen edi commands. Diese zu den eingestellten Zeiten
 injecten.
@@ -258,10 +257,8 @@ Quasi alternative zu CRON.
 irq0: Damit koennte ich mir meinen Wecker bauen..
 </p>
 </div>
-</div>
-<div id="outline-container-sec-1-1-8-1-2" class="outline-6">
-<h6 id="sec-1-1-8-1-2">Events</h6>
-<div class="outline-text-6" id="text-1-1-8-1-2">
+</li>
+<li>Events<br  /><div class="outline-text-6" id="text-1-1-8-1-2">
 <dl class="org-dl">
 <dt> Event </dt><dd>Something is going to happen at a point in time. Wie das
 digitale Zeitalter..
@@ -272,16 +269,119 @@ digitale Zeitalter..
 Per TTS, Text notification, IRC, Jabber whatever hinweisen
 </p>
 </div>
-</div>
+</li></ul>
 </div>
 </div>
 
 <div id="outline-container-sec-1-1-9" class="outline-4">
-<h4 id="sec-1-1-9"><span class="todo ASSIGNED">ASSIGNED</span> pizza / essen / f00d&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_hej">@hej</span>&#xa0;<span class="c3po">c3po</span></span></h4>
+<h4 id="sec-1-1-9"><span class="todo OPEN">OPEN</span> graphite integration</h4>
+<div class="outline-text-4" id="text-1-1-9">
+<p>
+Es macht sinn sensoren an ein graphite zu knoten. Dadruch bekommt man
+gleich daten über zeit und eine ganze reihe von funktionen über diese
+daten.
+</p>
+
+<p>
+Daten aus graphite gekommt man über die <code>?render</code> HTTP Schnittstelle
+in den gängigsten formaten wie JSON, CSV, SVG, PNG.
+</p>
 </div>
+
+<div id="outline-container-sec-1-1-9-1" class="outline-5">
+<h5 id="sec-1-1-9-1">Mögliche Umsetzungen</h5>
+<div class="outline-text-5" id="text-1-1-9-1">
+</div><ul class="org-ul"><li>RPC<br  /><div class="outline-text-6" id="text-1-1-9-1-1">
+<p>
+AMQP RPC Pattern implementieren
+</p>
+</div>
+</li>
+
+<li>PubSub<br  /><div class="outline-text-6" id="text-1-1-9-1-2">
+<p>
+Subscribe periodic sensor updates
+</p>
+</div>
+</li>
+
+<li>Nicht integrieren<br  /><div class="outline-text-6" id="text-1-1-9-1-3">
+<p>
+Direkt mit Graphite sprechen
+</p>
+</div>
+</li></ul>
+</div>
+</div>
+
 <div id="outline-container-sec-1-1-10" class="outline-4">
-<h4 id="sec-1-1-10"><span class="todo ASSIGNED">ASSIGNED</span> actor service / rule engine&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></h4>
+<h4 id="sec-1-1-10"><span class="todo OPEN">OPEN</span> Wetterbericht</h4>
 <div class="outline-text-4" id="text-1-1-10">
+<p>
+Wie ist das subraum wetter?
+</p>
+
+<p>
+Als email abbonierbar? Erreichbar per Telefon
+</p>
+
+<p>
+Content:
+</p>
+<ul class="org-ul">
+<li>Temperatur innen. (Mit forecast?)
+</li>
+<li>Temperatur aussen
+</li>
+<li>User liste
+</li>
+<li>Termine heute:
+<ul class="org-ul">
+<li>Heute abend ist smalltalk
+</li>
+<li>15:00-18:00 Safer Internet Day in der ComBi
+</li>
+</ul>
+</li>
+<li>Kommentar wie "Ganz schön sonnig heute. Komm lieber in den Subraum"
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1-11" class="outline-4">
+<h4 id="sec-1-1-11"><span class="todo OPEN">OPEN</span> thehonestbookoftruth: support !eta with dates</h4>
+<div class="outline-text-4" id="text-1-1-11">
+<p>
+Support:
+</p>
+<ul class="org-ul">
+<li>!eta 2014-03-12 20:00
+</li>
+<li>!eta Tomorrow 20:00
+</li>
+<li>!eta Morgen 20:00
+</li>
+<li>!eta Mittwoch 20:00
+</li>
+</ul>
+
+<p>
+Retain support for times only. Use today as date
+</p>
+<ul class="org-ul">
+<li>!eta 20:00
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1-12" class="outline-4">
+<h4 id="sec-1-1-12"><span class="todo ASSIGNED">ASSIGNED</span> pizza / essen / f00d&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_hej">@hej</span>&#xa0;<span class="c3po">c3po</span></span></h4>
+</div>
+<div id="outline-container-sec-1-1-13" class="outline-4">
+<h4 id="sec-1-1-13"><span class="todo ASSIGNED">ASSIGNED</span> actor service / rule engine&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></h4>
+<div class="outline-text-4" id="text-1-1-13">
 <p>
 currently a simple python script to map things like 'act bulb on' to
 messages on the <code>act_433_mhz</code> queue
@@ -306,9 +406,9 @@ their own actor exchanges, e.g <i>act<sub>433</sub><sub>mhz</sub></i> where mess
 the commands for the sender as payload.
 </p>
 </div>
-<div id="outline-container-sec-1-1-10-1" class="outline-5">
-<h5 id="sec-1-1-10-1">Idee</h5>
-<div class="outline-text-5" id="text-1-1-10-1">
+<div id="outline-container-sec-1-1-13-1" class="outline-5">
+<h5 id="sec-1-1-13-1">Idee</h5>
+<div class="outline-text-5" id="text-1-1-13-1">
 <ul class="org-ul">
 <li>Jedes event transformiert den aktuellen system state in einen neuen
 (clojure swap! semantik)
@@ -371,12 +471,12 @@ EVENT -&gt; OLD STATE -&gt; STATE CHANGE -&gt; NEW STATE
 </div>
 </div>
 </div>
-<div id="outline-container-sec-1-1-11" class="outline-4">
-<h4 id="sec-1-1-11"><span class="todo ASSIGNED">ASSIGNED</span> openhab integration&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_snowball">@snowball</span></span></h4>
+<div id="outline-container-sec-1-1-14" class="outline-4">
+<h4 id="sec-1-1-14"><span class="todo ASSIGNED">ASSIGNED</span> openhab integration&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_snowball">@snowball</span></span></h4>
 </div>
-<div id="outline-container-sec-1-1-12" class="outline-4">
-<h4 id="sec-1-1-12"><span class="todo ASSIGNED">ASSIGNED</span> music player daemon&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_snowball">@snowball</span>&#xa0;<span class="c3po">c3po</span></span></h4>
-<div class="outline-text-4" id="text-1-1-12">
+<div id="outline-container-sec-1-1-15" class="outline-4">
+<h4 id="sec-1-1-15"><span class="todo ASSIGNED">ASSIGNED</span> music player daemon&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_snowball">@snowball</span>&#xa0;<span class="c3po">c3po</span>&#xa0;<span class="r1">r1</span></span></h4>
+<div class="outline-text-4" id="text-1-1-15">
 <ul class="org-ul">
 <li>mpd commands als messages
 </li>
@@ -392,9 +492,9 @@ EVENT -&gt; OLD STATE -&gt; STATE CHANGE -&gt; NEW STATE
 </div>
 </div>
 
-<div id="outline-container-sec-1-1-13" class="outline-4">
-<h4 id="sec-1-1-13"><span class="todo TEST">TEST</span> presence: eta login&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></h4>
-<div class="outline-text-4" id="text-1-1-13">
+<div id="outline-container-sec-1-1-16" class="outline-4">
+<h4 id="sec-1-1-16"><span class="todo TEST">TEST</span> presence: eta login&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span>&#xa0;<span class="r1">r1</span></span></h4>
+<div class="outline-text-4" id="text-1-1-16">
 <p>
 Commands: !ul, !eta, !login, !logout
 </p>
@@ -411,40 +511,19 @@ Implemented: <i>proc/thehonestbookoftruth</i>
 </p>
 </div>
 </div>
-<div id="outline-container-sec-1-1-14" class="outline-4">
-<h4 id="sec-1-1-14"><span class="todo TEST">TEST</span> dmx actor&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_grollicus">@grollicus</span>&#xa0;<span class="c3po">c3po</span></span></h4>
-<div class="outline-text-4" id="text-1-1-14">
+
+<div id="outline-container-sec-1-1-17" class="outline-4">
+<h4 id="sec-1-1-17"><span class="todo TEST">TEST</span> dmx actor&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_grollicus">@grollicus</span>&#xa0;<span class="c3po">c3po</span>&#xa0;<span class="r1">r1</span></span></h4>
+<div class="outline-text-4" id="text-1-1-17">
 <p>
-See <code>cube:/var/git/c3po/dmx</code>. DMX is connected to the serial port.
-</p>
-
-<p>
-Example code:
-</p>
-<div class="org-src-container">
-
-<pre class="src src-python"><span class="org-comment-delimiter">#</span><span class="org-comment">!/usr/bin/python</span>
-
-<span class="org-keyword">import</span> sys
-<span class="org-keyword">import</span> serial
-
-<span class="org-variable-name">ser</span> = serial.Serial(<span class="org-string">'/dev/dmx'</span>, 38400, timeout=1)
-
-ser.write(<span class="org-string">"B1"</span>)
-
-ser.close()
-</pre>
-</div>
-
-<p>
-There is also a dmx jsonrpc server:
-<code>cube:/var/git/c3po/jsonrpcdmx</code>
+See: <code>sink/dmx</code>. Written in ruby.
 </p>
 </div>
 </div>
-<div id="outline-container-sec-1-1-15" class="outline-4">
-<h4 id="sec-1-1-15"><span class="done DONE">DONE</span> scheduled messages&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></h4>
-<div class="outline-text-4" id="text-1-1-15">
+
+<div id="outline-container-sec-1-1-18" class="outline-4">
+<h4 id="sec-1-1-18"><span class="done DONE">DONE</span> scheduled messages&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span>&#xa0;<span class="r1">r1</span></span></h4>
+<div class="outline-text-4" id="text-1-1-18">
 <ul class="org-ul">
 <li>hourly audio messages
 </li>
@@ -465,9 +544,9 @@ mp3 files found on cube..
 </div>
 </div>
 
-<div id="outline-container-sec-1-1-16" class="outline-4">
-<h4 id="sec-1-1-16"><span class="done DONE">DONE</span> shutdown/startup&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></h4>
-<div class="outline-text-4" id="text-1-1-16">
+<div id="outline-container-sec-1-1-19" class="outline-4">
+<h4 id="sec-1-1-19"><span class="done DONE">DONE</span> shutdown/startup&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span>&#xa0;<span class="r1">r1</span></span></h4>
+<div class="outline-text-4" id="text-1-1-19">
 <p>
 Veralgemeinert implementiert: Init mit runlevels.
 </p>
@@ -500,9 +579,9 @@ anzuschalten zu können. Beispielsweise ohne Mamestation.
 </p>
 </div>
 
-<div id="outline-container-sec-1-1-16-1" class="outline-5">
-<h5 id="sec-1-1-16-1">Tool: subinit-rc</h5>
-<div class="outline-text-5" id="text-1-1-16-1">
+<div id="outline-container-sec-1-1-19-1" class="outline-5">
+<h5 id="sec-1-1-19-1">Tool: subinit-rc</h5>
+<div class="outline-text-5" id="text-1-1-19-1">
 <p>
 Tool um für subinit Messages Scripts zu starten. Aufgebaut wie rc*.d
 runlevel scripts.
@@ -515,9 +594,9 @@ ersten Parameter
 </div>
 </div>
 </div>
-<div id="outline-container-sec-1-1-17" class="outline-4">
-<h4 id="sec-1-1-17"><span class="done DONE">DONE</span> text to speech command&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></h4>
-<div class="outline-text-4" id="text-1-1-17">
+<div id="outline-container-sec-1-1-20" class="outline-4">
+<h4 id="sec-1-1-20"><span class="done DONE">DONE</span> text to speech command&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span>&#xa0;<span class="r1">r1</span></span></h4>
+<div class="outline-text-4" id="text-1-1-20">
 <ul class="org-ul">
 <li>listen for tts, say, fortune commands
 </li>
@@ -534,9 +613,9 @@ based on the old acapella-group web scripting.
 </div>
 </div>
 
-<div id="outline-container-sec-1-1-18" class="outline-4">
-<h4 id="sec-1-1-18"><span class="done DONE">DONE</span> irc bot&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></h4>
-<div class="outline-text-4" id="text-1-1-18">
+<div id="outline-container-sec-1-1-21" class="outline-4">
+<h4 id="sec-1-1-21"><span class="done DONE">DONE</span> irc bot&#xa0;&#xa0;&#xa0;<span class="tag"><span class="r1">r1</span>&#xa0;<span class="_irq0">@irq0</span></span></h4>
+<div class="outline-text-4" id="text-1-1-21">
 <ul class="org-ul">
 <li>IRC receive -&gt; msg exchange with key irc.recv.raw
 </li>
@@ -546,9 +625,9 @@ based on the old acapella-group web scripting.
 </div>
 </div>
 
-<div id="outline-container-sec-1-1-19" class="outline-4">
-<h4 id="sec-1-1-19"><span class="done DONE">DONE</span> 433MHz actor&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></h4>
-<div class="outline-text-4" id="text-1-1-19">
+<div id="outline-container-sec-1-1-22" class="outline-4">
+<h4 id="sec-1-1-22"><span class="done DONE">DONE</span> 433MHz actor&#xa0;&#xa0;&#xa0;<span class="tag"><span class="r1">r1</span>&#xa0;<span class="_irq0">@irq0</span></span></h4>
+<div class="outline-text-4" id="text-1-1-22">
 <p>
 <code>act_433mhz</code> exchange
 </p>
@@ -561,9 +640,9 @@ based on the old acapella-group web scripting.
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-1-1-20" class="outline-4">
-<h4 id="sec-1-1-20">User Authentication</h4>
-<div class="outline-text-4" id="text-1-1-20">
+<div id="outline-container-sec-1-1-23" class="outline-4">
+<h4 id="sec-1-1-23">User Authentication</h4>
+<div class="outline-text-4" id="text-1-1-23">
 <ul class="org-ul">
 <li>irc nick &lt;-&gt; subraum LDAP?
 </li>
@@ -571,9 +650,9 @@ based on the old acapella-group web scripting.
 </li>
 </ul>
 </div>
-<div id="outline-container-sec-1-1-20-1" class="outline-5">
-<h5 id="sec-1-1-20-1"><span class="todo ASSIGNED">ASSIGNED</span> irc bot antwortet nur auf op&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></h5>
-<div class="outline-text-5" id="text-1-1-20-1">
+<div id="outline-container-sec-1-1-23-1" class="outline-5">
+<h5 id="sec-1-1-23-1"><span class="todo OPEN">OPEN</span> irc bot antwortet nur auf op&#xa0;&#xa0;&#xa0;<span class="tag"><span class="r1">r1</span></span></h5>
+<div class="outline-text-5" id="text-1-1-23-1">
 <ul class="org-ul">
 <li>bot: only answer to users having op? (TODO)
 </li>
@@ -582,46 +661,40 @@ based on the old acapella-group web scripting.
 </div>
 </div>
 
-<div id="outline-container-sec-1-1-21" class="outline-4">
-<h4 id="sec-1-1-21">Notify sink</h4>
-<div class="outline-text-4" id="text-1-1-21">
-</div><div id="outline-container-sec-1-1-21-1" class="outline-5">
-<h5 id="sec-1-1-21-1">text</h5>
-<div class="outline-text-5" id="text-1-1-21-1">
+<div id="outline-container-sec-1-1-24" class="outline-4">
+<h4 id="sec-1-1-24">Notify sink&#xa0;&#xa0;&#xa0;<span class="tag"><span class="r1">r1</span></span></h4>
+<div class="outline-text-4" id="text-1-1-24">
+</div><div id="outline-container-sec-1-1-24-1" class="outline-5">
+<h5 id="sec-1-1-24-1">text</h5>
+<div class="outline-text-5" id="text-1-1-24-1">
 <p>
 <code>routing_key=text</code> messages.
 </p>
 </div>
 
-<div id="outline-container-sec-1-1-21-1-1" class="outline-6">
-<h6 id="sec-1-1-21-1-1"><span class="done DONE">DONE</span> libnotify sink&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></h6>
-</div>
-<div id="outline-container-sec-1-1-21-1-2" class="outline-6">
-<h6 id="sec-1-1-21-1-2"><span class="todo OPEN">OPEN</span> text notifications on projector</h6>
-</div>
+<ul class="org-ul"><li><span class="done DONE">DONE</span> libnotify sink&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span><br  /></li>
+<li><span class="todo OPEN">OPEN</span> text notifications on projector<br  /></li></ul>
 </div>
 
-<div id="outline-container-sec-1-1-21-2" class="outline-5">
-<h5 id="sec-1-1-21-2">audio</h5>
-<div class="outline-text-5" id="text-1-1-21-2">
+<div id="outline-container-sec-1-1-24-2" class="outline-5">
+<h5 id="sec-1-1-24-2">audio</h5>
+<div class="outline-text-5" id="text-1-1-24-2">
 <p>
 <code>routing_key=audio</code> messages.
 </p>
 </div>
 
-<div id="outline-container-sec-1-1-21-2-1" class="outline-6">
-<h6 id="sec-1-1-21-2-1"><span class="done DONE">DONE</span> mplayer sink&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></h6>
-<div class="outline-text-6" id="text-1-1-21-2-1">
+<ul class="org-ul"><li><span class="done DONE">DONE</span> mplayer sink&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span><br  /><div class="outline-text-6" id="text-1-1-24-2-1">
 <p>
 shell one-liner with amqp-tools
 </p>
 </div>
-</div>
+</li></ul>
 </div>
 
-<div id="outline-container-sec-1-1-21-3" class="outline-5">
-<h5 id="sec-1-1-21-3"><span class="todo OPEN">OPEN</span> uri</h5>
-<div class="outline-text-5" id="text-1-1-21-3">
+<div id="outline-container-sec-1-1-24-3" class="outline-5">
+<h5 id="sec-1-1-24-3"><span class="todo OPEN">OPEN</span> uri</h5>
+<div class="outline-text-5" id="text-1-1-24-3">
 <p>
 <code>routing_key=uri</code> messages.
 </p>
@@ -631,24 +704,14 @@ Idea: Play media URIs in messages. Sinilar to the mplayer listener on cube.
 </p>
 </div>
 </div>
-
-<div id="outline-container-sec-1-1-21-4" class="outline-5">
-<h5 id="sec-1-1-21-4"><span class="todo OPEN">OPEN</span> user</h5>
-<div class="outline-text-5" id="text-1-1-21-4">
-<p>
-Get a message to a specific user. Configure means to reach the user
-somewhere. Have fallbacks. Like "IRC-&gt;Jabber-&gt;Email-&gt;SMS".
-</p>
-</div>
-</div>
 </div>
 
-<div id="outline-container-sec-1-1-22" class="outline-4">
-<h4 id="sec-1-1-22">Telephony</h4>
-<div class="outline-text-4" id="text-1-1-22">
-</div><div id="outline-container-sec-1-1-22-1" class="outline-5">
-<h5 id="sec-1-1-22-1"><span class="todo TEST">TEST</span> asterisk prove of concept&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></h5>
-<div class="outline-text-5" id="text-1-1-22-1">
+<div id="outline-container-sec-1-1-25" class="outline-4">
+<h4 id="sec-1-1-25">Telephony</h4>
+<div class="outline-text-4" id="text-1-1-25">
+</div><div id="outline-container-sec-1-1-25-1" class="outline-5">
+<h5 id="sec-1-1-25-1"><span class="todo TEST">TEST</span> asterisk prove of concept&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span>&#xa0;<span class="r1">r1</span></span></h5>
+<div class="outline-text-5" id="text-1-1-25-1">
 <ul class="org-ul">
 <li>Integrate telephony
 </li>
@@ -663,9 +726,9 @@ somewhere. Have fallbacks. Like "IRC-&gt;Jabber-&gt;Email-&gt;SMS".
 </div>
 </div>
 
-<div id="outline-container-sec-1-1-22-2" class="outline-5">
-<h5 id="sec-1-1-22-2"><span class="todo OPEN">OPEN</span> integrate SMS</h5>
-<div class="outline-text-5" id="text-1-1-22-2">
+<div id="outline-container-sec-1-1-25-2" class="outline-5">
+<h5 id="sec-1-1-25-2"><span class="todo OPEN">OPEN</span> integrate SMS</h5>
+<div class="outline-text-5" id="text-1-1-25-2">
 <p>
 SMS -&gt; IRC
 SMS -&gt; TTS
@@ -676,22 +739,32 @@ IRC -&gt; SMS?
 </p>
 </div>
 </div>
+
+<div id="outline-container-sec-1-1-25-3" class="outline-5">
+<h5 id="sec-1-1-25-3"><span class="todo OPEN">OPEN</span> Wetterbericht</h5>
+<div class="outline-text-5" id="text-1-1-25-3">
+<p>
+Gesprochener Wetterbericht. Siehe oben
+</p>
+</div>
+</div>
 </div>
 
-<div id="outline-container-sec-1-1-23" class="outline-4">
-<h4 id="sec-1-1-23"><span class="todo OPEN">OPEN</span> speech to text</h4>
-<div class="outline-text-4" id="text-1-1-23">
+<div id="outline-container-sec-1-1-26" class="outline-4">
+<h4 id="sec-1-1-26"><span class="todo OPEN">OPEN</span> speech to text</h4>
+<div class="outline-text-4" id="text-1-1-26">
 <p>
 Integrate speech to text engine
 </p>
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-1-2" class="outline-3">
 <h3 id="sec-1-2"><span class="section-number-3">1.2</span> Architecture Changes</h3>
 <div class="outline-text-3" id="text-1-2">
 </div><div id="outline-container-sec-1-2-1" class="outline-4">
-<h4 id="sec-1-2-1"><span class="todo ASSIGNED">ASSIGNED</span> list, help messages for 'cmd' exchange&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></h4>
+<h4 id="sec-1-2-1"><span class="todo ASSIGNED">ASSIGNED</span> list, help messages for 'cmd' exchange&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span>&#xa0;<span class="r1">r1</span></span></h4>
 <div class="outline-text-4" id="text-1-2-1">
 <p>
 Everyone on the cmd exchange should consume list and help messages.
@@ -792,6 +865,40 @@ private.
 <div id="outline-container-sec-1-3-3" class="outline-4">
 <h4 id="sec-1-3-3"><span class="todo ASSIGNED">ASSIGNED</span> plan first release</h4>
 </div>
+<div id="outline-container-sec-1-3-4" class="outline-4">
+<h4 id="sec-1-3-4"><span class="todo OPEN">OPEN</span> All EDI subsystems use environment variables to configure..&#xa0;&#xa0;&#xa0;<span class="tag"><span class="r1">r1</span></span></h4>
+<div class="outline-text-4" id="text-1-3-4">
+<p>
+Alle Subsysteme müssen für generelle Einstellungen Environment
+Variablen benutzen. Ist die Variable nicht gesetzt muss ein sinnvoller
+default Wert verwendet werden.
+</p>
+
+<p>
+Warum? Env Variablen vererben sich zu Kindprozessen. Der Service
+Supervisor setzt also Globale Variablen und die einzelnen Subsysteme
+bekommen die Einstellungen mit. Siehe <code>conf/GLOBALS</code> und <code>run</code>.
+</p>
+
+<p>
+Variablen:
+</p>
+<ul class="org-ul">
+<li><code>AMQP_SERVER</code>
+</li>
+</ul>
+
+<p>
+Für die Service Skripte:
+</p>
+<ul class="org-ul">
+<li><code>APPDIR</code>
+</li>
+<li><code>LOGDIR</code>
+</li>
+</ul>
+</div>
+</div>
 </div>
 <div id="outline-container-sec-1-4" class="outline-3">
 <h3 id="sec-1-4"><span class="section-number-3">1.4</span> Project Name</h3>
@@ -825,13 +932,35 @@ Every pice of code connects in some way to it.
 
 <p>
 Most services share a couple of well defined exchanges. See the
-<a href="#sec-2-2">2.2</a> for a description.
+<a href="#sec-2-3">2.3</a> for a description.
 </p>
 </div>
 
 <div id="outline-container-sec-2-1" class="outline-3">
-<h3 id="sec-2-1"><span class="section-number-3">2.1</span> Glossary</h3>
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> Setup</h3>
 <div class="outline-text-3" id="text-2-1">
+<p>
+In theory(tm). Expect some settings to still be hard coded somewhere.
+</p>
+
+<ol class="org-ol">
+<li>Install AMQP Server. Best use RabbitMQ
+</li>
+<li>git clone this repo
+</li>
+<li>Create symlinks from <code>sv/available</code> to <code>sv/enabled</code> for the desired
+subsystems to run
+</li>
+<li>&#x2026;
+</li>
+<li>Start EDI with <code>run</code>
+</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> Glossary</h3>
+<div class="outline-text-3" id="text-2-2">
 <dl class="org-dl">
 <dt> source </dt><dd>Apps that only/mainly produce messages
 </dd>
@@ -845,9 +974,9 @@ system. Like IRC.
 </dl>
 </div>
 </div>
-<div id="outline-container-sec-2-2" class="outline-3">
-<h3 id="sec-2-2"><span class="section-number-3">2.2</span> Well-defined Exchanges</h3>
-<div class="outline-text-3" id="text-2-2">
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> Well-defined Exchanges</h3>
+<div class="outline-text-3" id="text-2-3">
 
 <div class="figure">
 <p><img src="https://git.c3pb.de/c3pb/subraum-automatisierung/blob/master/doc/exchanges.jpeg" alt="exchanges.jpeg" />
@@ -855,9 +984,9 @@ system. Like IRC.
 </div>
 </div>
 
-<div id="outline-container-sec-2-2-1" class="outline-4">
-<h4 id="sec-2-2-1">msg</h4>
-<div class="outline-text-4" id="text-2-2-1">
+<div id="outline-container-sec-2-3-1" class="outline-4">
+<h4 id="sec-2-3-1">msg</h4>
+<div class="outline-text-4" id="text-2-3-1">
 <p>
 Raw messages received from somewhere. This should be something that
 can be parsed to a command.
@@ -868,9 +997,9 @@ Type: topic
 </p>
 </div>
 
-<div id="outline-container-sec-2-2-1-1" class="outline-5">
-<h5 id="sec-2-2-1-1">Routing Keys</h5>
-<div class="outline-text-5" id="text-2-2-1-1">
+<div id="outline-container-sec-2-3-1-1" class="outline-5">
+<h5 id="sec-2-3-1-1">Routing Keys</h5>
+<div class="outline-text-5" id="text-2-3-1-1">
 <p>
 In general: protocol.bot-name.{send,recv,presence}.channel
 </p>
@@ -886,12 +1015,10 @@ In general: protocol.bot-name.{send,recv,presence}.channel
 </div>
 </div>
 
-<div id="outline-container-sec-2-2-1-2" class="outline-5">
-<h5 id="sec-2-2-1-2">Messages</h5>
-<div class="outline-text-5" id="text-2-2-1-2">
-</div><div id="outline-container-sec-2-2-1-2-1" class="outline-6">
-<h6 id="sec-2-2-1-2-1">#.send.*</h6>
-<div class="outline-text-6" id="text-2-2-1-2-1">
+<div id="outline-container-sec-2-3-1-2" class="outline-5">
+<h5 id="sec-2-3-1-2">Messages</h5>
+<div class="outline-text-5" id="text-2-3-1-2">
+</div><ul class="org-ul"><li>#.send.*<br  /><div class="outline-text-6" id="text-2-3-1-2-1">
 <p>
 Content-Type: application/json
 </p>
@@ -908,11 +1035,9 @@ Content-Type: text/plain
 body: Message
 </p>
 </div>
-</div>
+</li>
 
-<div id="outline-container-sec-2-2-1-2-2" class="outline-6">
-<h6 id="sec-2-2-1-2-2">#.recv.*</h6>
-<div class="outline-text-6" id="text-2-2-1-2-2">
+<li>#.recv.*<br  /><div class="outline-text-6" id="text-2-3-1-2-2">
 <p>
 Content-Type: application/json
 </p>
@@ -923,44 +1048,40 @@ Content-Type: application/json
 </dd>
 </dl>
 </div>
-</div>
+</li></ul>
 </div>
 
-<div id="outline-container-sec-2-2-1-3" class="outline-5">
-<h5 id="sec-2-2-1-3">Processors</h5>
-<div class="outline-text-5" id="text-2-2-1-3">
-</div><div id="outline-container-sec-2-2-1-3-1" class="outline-6">
-<h6 id="sec-2-2-1-3-1">parse-commands.py</h6>
-<div class="outline-text-6" id="text-2-2-1-3-1">
+<div id="outline-container-sec-2-3-1-3" class="outline-5">
+<h5 id="sec-2-3-1-3">Processors</h5>
+<div class="outline-text-5" id="text-2-3-1-3">
+</div><ul class="org-ul"><li>parse-commands.py<br  /><div class="outline-text-6" id="text-2-3-1-3-1">
 <p>
 Transform <code>!&lt;command&gt;</code> to <b>cmd</b> Messages. (See <b>cmd</b> Exchange)
 </p>
 </div>
+</li></ul>
 </div>
-</div>
-<div id="outline-container-sec-2-2-1-4" class="outline-5">
-<h5 id="sec-2-2-1-4">Bots</h5>
-<div class="outline-text-5" id="text-2-2-1-4">
-</div><div id="outline-container-sec-2-2-1-4-1" class="outline-6">
-<h6 id="sec-2-2-1-4-1">IRC Bot - mqbot.py</h6>
-<div class="outline-text-6" id="text-2-2-1-4-1">
+<div id="outline-container-sec-2-3-1-4" class="outline-5">
+<h5 id="sec-2-3-1-4">Bots</h5>
+<div class="outline-text-5" id="text-2-3-1-4">
+</div><ul class="org-ul"><li>IRC Bot - mqbot.py<br  /><div class="outline-text-6" id="text-2-3-1-4-1">
 <p>
 IRC -&gt; MQ, MQ -&gt; IRC
 </p>
 </div>
+</li></ul>
 </div>
-</div>
-<div id="outline-container-sec-2-2-1-5" class="outline-5">
-<h5 id="sec-2-2-1-5">Sinks</h5>
+<div id="outline-container-sec-2-3-1-5" class="outline-5">
+<h5 id="sec-2-3-1-5">Sinks</h5>
 </div>
 
-<div id="outline-container-sec-2-2-1-6" class="outline-5">
-<h5 id="sec-2-2-1-6">Sources</h5>
+<div id="outline-container-sec-2-3-1-6" class="outline-5">
+<h5 id="sec-2-3-1-6">Sources</h5>
 </div>
 </div>
-<div id="outline-container-sec-2-2-2" class="outline-4">
-<h4 id="sec-2-2-2">cmd</h4>
-<div class="outline-text-4" id="text-2-2-2">
+<div id="outline-container-sec-2-3-2" class="outline-4">
+<h4 id="sec-2-3-2">cmd</h4>
+<div class="outline-text-4" id="text-2-3-2">
 <p>
 Messages that do something :)
 </p>
@@ -970,12 +1091,10 @@ Type: topic
 </p>
 </div>
 
-<div id="outline-container-sec-2-2-2-1" class="outline-5">
-<h5 id="sec-2-2-2-1">Known routing Keys</h5>
-<div class="outline-text-5" id="text-2-2-2-1">
-</div><div id="outline-container-sec-2-2-2-1-1" class="outline-6">
-<h6 id="sec-2-2-2-1-1">TTS</h6>
-<div class="outline-text-6" id="text-2-2-2-1-1">
+<div id="outline-container-sec-2-3-2-1" class="outline-5">
+<h5 id="sec-2-3-2-1">Known routing Keys</h5>
+<div class="outline-text-5" id="text-2-3-2-1">
+</div><ul class="org-ul"><li>TTS<br  /><div class="outline-text-6" id="text-2-3-2-1-1">
 <ul class="org-ul">
 <li>tts
 </li>
@@ -985,21 +1104,17 @@ Type: topic
 </li>
 </ul>
 </div>
-</div>
+</li>
 
-<div id="outline-container-sec-2-2-2-1-2" class="outline-6">
-<h6 id="sec-2-2-2-1-2">Actor Service</h6>
-<div class="outline-text-6" id="text-2-2-2-1-2">
+<li>Actor Service<br  /><div class="outline-text-6" id="text-2-3-2-1-2">
 <ul class="org-ul">
 <li>act
 </li>
 </ul>
 </div>
-</div>
+</li>
 
-<div id="outline-container-sec-2-2-2-1-3" class="outline-6">
-<h6 id="sec-2-2-2-1-3">subinit</h6>
-<div class="outline-text-6" id="text-2-2-2-1-3">
+<li>subinit<br  /><div class="outline-text-6" id="text-2-3-2-1-3">
 <ul class="org-ul">
 <li>telinit
 </li>
@@ -1007,11 +1122,9 @@ Type: topic
 </li>
 </ul>
 </div>
-</div>
+</li>
 
-<div id="outline-container-sec-2-2-2-1-4" class="outline-6">
-<h6 id="sec-2-2-2-1-4">thehonestbookoftruth</h6>
-<div class="outline-text-6" id="text-2-2-2-1-4">
+<li>thehonestbookoftruth<br  /><div class="outline-text-6" id="text-2-3-2-1-4">
 <ul class="org-ul">
 <li>login
 </li>
@@ -1027,11 +1140,9 @@ Type: topic
 </li>
 </ul>
 </div>
-</div>
+</li>
 
-<div id="outline-container-sec-2-2-2-1-5" class="outline-6">
-<h6 id="sec-2-2-2-1-5">What every command should implement:</h6>
-<div class="outline-text-6" id="text-2-2-2-1-5">
+<li>What every command should implement:<br  /><div class="outline-text-6" id="text-2-3-2-1-5">
 <ul class="org-ul">
 <li>list
 </li>
@@ -1039,11 +1150,11 @@ Type: topic
 </li>
 </ul>
 </div>
+</li></ul>
 </div>
-</div>
-<div id="outline-container-sec-2-2-2-2" class="outline-5">
-<h5 id="sec-2-2-2-2">Messages</h5>
-<div class="outline-text-5" id="text-2-2-2-2">
+<div id="outline-container-sec-2-3-2-2" class="outline-5">
+<h5 id="sec-2-3-2-2">Messages</h5>
+<div class="outline-text-5" id="text-2-3-2-2">
 <p>
 Content-Type: application/json
 </p>
@@ -1067,18 +1178,16 @@ Implement a same default like reply based on <code>src</code> or default destina
 </dl>
 </div>
 </div>
-<div id="outline-container-sec-2-2-2-3" class="outline-5">
-<h5 id="sec-2-2-2-3">Sources</h5>
+<div id="outline-container-sec-2-3-2-3" class="outline-5">
+<h5 id="sec-2-3-2-3">Sources</h5>
 </div>
-<div id="outline-container-sec-2-2-2-4" class="outline-5">
-<h5 id="sec-2-2-2-4">Sinks</h5>
+<div id="outline-container-sec-2-3-2-4" class="outline-5">
+<h5 id="sec-2-3-2-4">Sinks</h5>
 </div>
-<div id="outline-container-sec-2-2-2-5" class="outline-5">
-<h5 id="sec-2-2-2-5">Processors</h5>
-<div class="outline-text-5" id="text-2-2-2-5">
-</div><div id="outline-container-sec-2-2-2-5-1" class="outline-6">
-<h6 id="sec-2-2-2-5-1">tts</h6>
-<div class="outline-text-6" id="text-2-2-2-5-1">
+<div id="outline-container-sec-2-3-2-5" class="outline-5">
+<h5 id="sec-2-3-2-5">Processors</h5>
+<div class="outline-text-5" id="text-2-3-2-5">
+</div><ul class="org-ul"><li>tts<br  /><div class="outline-text-6" id="text-2-3-2-5-1">
 <p>
 Transform <i>tts</i> <b>cmd</b> Messages to notification audio messages.
 </p>
@@ -1087,10 +1196,8 @@ Transform <i>tts</i> <b>cmd</b> Messages to notification audio messages.
 Text -&gt; Audio file.
 </p>
 </div>
-</div>
-<div id="outline-container-sec-2-2-2-5-2" class="outline-6">
-<h6 id="sec-2-2-2-5-2">Simple Actor Service - act.py</h6>
-<div class="outline-text-6" id="text-2-2-2-5-2">
+</li>
+<li>Simple Actor Service - act.py<br  /><div class="outline-text-6" id="text-2-3-2-5-2">
 <p>
 Map <i>act</i> commands to actors.
 </p>
@@ -1104,20 +1211,20 @@ venti on =&gt; 433Mhz sender, payload 11111 1 1
 See <code>act_433mhz</code> exchange for the 433Mhz actor implementation.
 </p>
 </div>
+</li></ul>
 </div>
 </div>
-</div>
-<div id="outline-container-sec-2-2-3" class="outline-4">
-<h4 id="sec-2-2-3">notify</h4>
-<div class="outline-text-4" id="text-2-2-3">
+<div id="outline-container-sec-2-3-3" class="outline-4">
+<h4 id="sec-2-3-3">notify</h4>
+<div class="outline-text-4" id="text-2-3-3">
 <p>
 <b>Sink</b> exchage for notifications.
 </p>
 </div>
 
-<div id="outline-container-sec-2-2-3-1" class="outline-5">
-<h5 id="sec-2-2-3-1">Routing Keys</h5>
-<div class="outline-text-5" id="text-2-2-3-1">
+<div id="outline-container-sec-2-3-3-1" class="outline-5">
+<h5 id="sec-2-3-3-1">Routing Keys</h5>
+<div class="outline-text-5" id="text-2-3-3-1">
 <ul class="org-ul">
 <li>audio
 </li>
@@ -1126,23 +1233,21 @@ See <code>act_433mhz</code> exchange for the 433Mhz actor implementation.
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-2-2-3-2" class="outline-5">
-<h5 id="sec-2-2-3-2">Sinks</h5>
-<div class="outline-text-5" id="text-2-2-3-2">
-</div><div id="outline-container-sec-2-2-3-2-1" class="outline-6">
-<h6 id="sec-2-2-3-2-1">mplayer one-liner</h6>
-<div class="outline-text-6" id="text-2-2-3-2-1">
+<div id="outline-container-sec-2-3-3-2" class="outline-5">
+<h5 id="sec-2-3-3-2">Sinks</h5>
+<div class="outline-text-5" id="text-2-3-3-2">
+</div><ul class="org-ul"><li>mplayer one-liner<br  /><div class="outline-text-6" id="text-2-3-3-2-1">
 <div class="org-src-container">
 
 <pre class="src src-sh">amqp-consume --url=<span class="org-string">"amqp://mopp"</span> --exchange=<span class="org-string">"notify"</span> --routing-key=<span class="org-string">"audio"</span> mplayer -
 </pre>
 </div>
 </div>
+</li></ul>
 </div>
-</div>
-<div id="outline-container-sec-2-2-3-3" class="outline-5">
-<h5 id="sec-2-2-3-3">Messages</h5>
-<div class="outline-text-5" id="text-2-2-3-3">
+<div id="outline-container-sec-2-3-3-3" class="outline-5">
+<h5 id="sec-2-3-3-3">Messages</h5>
+<div class="outline-text-5" id="text-2-3-3-3">
 <p>
 Content-Type depending on exchange keys. Should be directly usable by
 the sink (e.g mp3 file to hand over to mplayer).
@@ -1150,9 +1255,9 @@ the sink (e.g mp3 file to hand over to mplayer).
 </div>
 </div>
 </div>
-<div id="outline-container-sec-2-2-4" class="outline-4">
-<h4 id="sec-2-2-4"><code>act_433mhz</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="private">private</span></span></h4>
-<div class="outline-text-4" id="text-2-2-4">
+<div id="outline-container-sec-2-3-4" class="outline-4">
+<h4 id="sec-2-3-4"><code>act_433mhz</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="private">private</span></span></h4>
+<div class="outline-text-4" id="text-2-3-4">
 <p>
 <b>Sink</b> exchange to signal 433mhz transmitter.
 </p>
@@ -1162,22 +1267,22 @@ Type: fanout
 </p>
 </div>
 
-<div id="outline-container-sec-2-2-4-1" class="outline-5">
-<h5 id="sec-2-2-4-1">Messages</h5>
-<div class="outline-text-5" id="text-2-2-4-1">
+<div id="outline-container-sec-2-3-4-1" class="outline-5">
+<h5 id="sec-2-3-4-1">Messages</h5>
+<div class="outline-text-5" id="text-2-3-4-1">
 <p>
 Commandline arguments for `rcswitch-pi`.
 </p>
 </div>
 </div>
-<div id="outline-container-sec-2-2-4-2" class="outline-5">
-<h5 id="sec-2-2-4-2">Sinks</h5>
+<div id="outline-container-sec-2-3-4-2" class="outline-5">
+<h5 id="sec-2-3-4-2">Sinks</h5>
 </div>
 </div>
 
-<div id="outline-container-sec-2-2-5" class="outline-4">
-<h4 id="sec-2-2-5">subinit&#xa0;&#xa0;&#xa0;<span class="tag"><span class="private">private</span></span></h4>
-<div class="outline-text-4" id="text-2-2-5">
+<div id="outline-container-sec-2-3-5" class="outline-4">
+<h4 id="sec-2-3-5">subinit&#xa0;&#xa0;&#xa0;<span class="tag"><span class="private">private</span></span></h4>
+<div class="outline-text-4" id="text-2-3-5">
 <p>
 <b>Sink</b> exchange for subinit messages
 </p>
@@ -1186,9 +1291,9 @@ Commandline arguments for `rcswitch-pi`.
 Type: topic
 </p>
 </div>
-<div id="outline-container-sec-2-2-5-1" class="outline-5">
-<h5 id="sec-2-2-5-1">Messages</h5>
-<div class="outline-text-5" id="text-2-2-5-1">
+<div id="outline-container-sec-2-3-5-1" class="outline-5">
+<h5 id="sec-2-3-5-1">Messages</h5>
+<div class="outline-text-5" id="text-2-3-5-1">
 <p>
 Content-type: text/plain
 </p>
@@ -1199,27 +1304,25 @@ Must always contain the same as the routing key.
 </div>
 </div>
 
-<div id="outline-container-sec-2-2-5-2" class="outline-5">
-<h5 id="sec-2-2-5-2">Sinks</h5>
-<div class="outline-text-5" id="text-2-2-5-2">
-</div><div id="outline-container-sec-2-2-5-2-1" class="outline-6">
-<h6 id="sec-2-2-5-2-1">subinit-rc</h6>
-<div class="outline-text-6" id="text-2-2-5-2-1">
+<div id="outline-container-sec-2-3-5-2" class="outline-5">
+<h5 id="sec-2-3-5-2">Sinks</h5>
+<div class="outline-text-5" id="text-2-3-5-2">
+</div><ul class="org-ul"><li>subinit-rc<br  /><div class="outline-text-6" id="text-2-3-5-2-1">
 <p>
 Launch scripts on subinit messages consumed. Feel similar to sysvinit
 scripts and runlevels
 </p>
 </div>
+</li></ul>
 </div>
 </div>
 </div>
-</div>
-<div id="outline-container-sec-2-3" class="outline-3">
-<h3 id="sec-2-3"><span class="section-number-3">2.3</span> Software, Libs, etc.</h3>
-<div class="outline-text-3" id="text-2-3">
-</div><div id="outline-container-sec-2-3-1" class="outline-4">
-<h4 id="sec-2-3-1">Debian packages</h4>
-<div class="outline-text-4" id="text-2-3-1">
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> Software, Libs, etc.</h3>
+<div class="outline-text-3" id="text-2-4">
+</div><div id="outline-container-sec-2-4-1" class="outline-4">
+<h4 id="sec-2-4-1">Debian packages</h4>
+<div class="outline-text-4" id="text-2-4-1">
 <ul class="org-ul">
 <li>rabbitmq-server (debian testing ist aktuell genug)
 </li>
@@ -1232,9 +1335,9 @@ scripts and runlevels
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-2-3-2" class="outline-4">
-<h4 id="sec-2-3-2">docker</h4>
-<div class="outline-text-4" id="text-2-3-2">
+<div id="outline-container-sec-2-4-2" class="outline-4">
+<h4 id="sec-2-4-2">docker</h4>
+<div class="outline-text-4" id="text-2-4-2">
 <p>
 For development docker seemes a good choice:
 </p>
@@ -1255,22 +1358,22 @@ Use <code>mopp</code>, running on the dell netbook.
 </div>
 </div>
 
-<div id="outline-container-sec-2-3-3" class="outline-4">
-<h4 id="sec-2-3-3">Useful libraries</h4>
+<div id="outline-container-sec-2-4-3" class="outline-4">
+<h4 id="sec-2-4-3">Useful libraries</h4>
 </div>
 </div>
-<div id="outline-container-sec-2-4" class="outline-3">
-<h3 id="sec-2-4"><span class="section-number-3">2.4</span> Development</h3>
-<div class="outline-text-3" id="text-2-4">
+<div id="outline-container-sec-2-5" class="outline-3">
+<h3 id="sec-2-5"><span class="section-number-3">2.5</span> Development</h3>
+<div class="outline-text-3" id="text-2-5">
 <p>
 Install requirements. Setup exchanges in rabbitmq. The web interfaces
 comes in handy here ;)
 </p>
 </div>
 
-<div id="outline-container-sec-2-4-1" class="outline-4">
-<h4 id="sec-2-4-1">Repository Organization</h4>
-<div class="outline-text-4" id="text-2-4-1">
+<div id="outline-container-sec-2-5-1" class="outline-4">
+<h4 id="sec-2-5-1">Repository Organization</h4>
+<div class="outline-text-4" id="text-2-5-1">
 <dl class="org-dl">
 <dt> src </dt><dd>Tools that only <b>publish</b> messages
 </dd>
@@ -1302,21 +1405,21 @@ Have something to add? Let me pull your repo!
 </p>
 </div>
 </div>
-<div id="outline-container-sec-2-4-2" class="outline-4">
-<h4 id="sec-2-4-2">External Documentation</h4>
-<div class="outline-text-4" id="text-2-4-2">
+<div id="outline-container-sec-2-5-2" class="outline-4">
+<h4 id="sec-2-5-2">External Documentation</h4>
+<div class="outline-text-4" id="text-2-5-2">
 <ul class="org-ul">
 <li><a href="http://www.rabbitmq.com/getstarted.html">Must read rabbitmq tutorial - covers all the basic use cases</a>
 </li>
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-2-4-3" class="outline-4">
-<h4 id="sec-2-4-3">Libraries</h4>
-<div class="outline-text-4" id="text-2-4-3">
-</div><div id="outline-container-sec-2-4-3-1" class="outline-5">
-<h5 id="sec-2-4-3-1">Python</h5>
-<div class="outline-text-5" id="text-2-4-3-1">
+<div id="outline-container-sec-2-5-3" class="outline-4">
+<h4 id="sec-2-5-3">Libraries</h4>
+<div class="outline-text-4" id="text-2-5-3">
+</div><div id="outline-container-sec-2-5-3-1" class="outline-5">
+<h5 id="sec-2-5-3-1">Python</h5>
+<div class="outline-text-5" id="text-2-5-3-1">
 <dl class="org-dl">
 <dt> pika </dt><dd><a href="http://pika.readthedocs.org/en/latest/">http://pika.readthedocs.org/en/latest/</a> Documented, Async lib
 </dd>
@@ -1326,9 +1429,9 @@ the .py files. Which are quite readable ;)
 </dl>
 </div>
 </div>
-<div id="outline-container-sec-2-4-3-2" class="outline-5">
-<h5 id="sec-2-4-3-2">Commandline</h5>
-<div class="outline-text-5" id="text-2-4-3-2">
+<div id="outline-container-sec-2-5-3-2" class="outline-5">
+<h5 id="sec-2-5-3-2">Commandline</h5>
+<div class="outline-text-5" id="text-2-5-3-2">
 <dl class="org-dl">
 <dt> amqp-tools </dt><dd>Make sure you get the recent ones. Debian testing
 works quite well. Debian stable not so.
@@ -1336,9 +1439,9 @@ works quite well. Debian stable not so.
 </dl>
 </div>
 </div>
-<div id="outline-container-sec-2-4-3-3" class="outline-5">
-<h5 id="sec-2-4-3-3">Clojure</h5>
-<div class="outline-text-5" id="text-2-4-3-3">
+<div id="outline-container-sec-2-5-3-3" class="outline-5">
+<h5 id="sec-2-5-3-3">Clojure</h5>
+<div class="outline-text-5" id="text-2-5-3-3">
 <dl class="org-dl">
 <dt> langohr </dt><dd><a href="http://clojurerabbitmq.info/">http://clojurerabbitmq.info/</a> Excellent library.
 </dd>
@@ -1356,7 +1459,7 @@ works quite well. Debian stable not so.
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2014-03-10 Mo 01:25</p>
+<p class="date">Created: 2014-03-12 Mi 17:07</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

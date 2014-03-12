@@ -1,15 +1,14 @@
 #+TITLE: EDI
-#+OPTIONS: creator:nil author:nil H:6 toc:2 num:2
+#+OPTIONS: creator:nil author:nil H:4 toc:2 num:2
 #+SEQ_TODO: OPEN IDEA ASSIGNED TEST | DONE
 #+HTML_HEAD: <link href="css/bootstrap.css" rel="stylesheet">
 #+HTML_HEAD: <link href="css/bootstrap-responsive.css" rel="stylesheet">
 #+HTML_HEAD: <link href="css/jquery.tocify.css" rel="stylesheet">
 #+HTML_HEAD: <link href="css/custom.css" rel="stylesheet" media="screen">
 
-
 * Ideas, Todos
 ** Features
-*** OPEN User Notifications
+*** OPEN User Notifications                                            :r1:
 - Im LDAP gibt es eine liste mit wegen einen user zu notifien
   - IRC nick
   - jabber id
@@ -20,7 +19,7 @@
 - Message exchange und consumer sagen nack, wenn nicht zustellbar.
   Z.B. IRC offline
 - Aehlich wie die notify exchange, audio fuer shouts in den subraum
--
+
 *** OPEN guess commands                                                :c3po:
 - see =thomas.py=, =pr.py= auf cube
 
@@ -46,17 +45,19 @@ Decke?
     31337 auf'm PIN Pad?
     - Pizza daemon wartet auf button 31337 messages..
 
-*** OPEN jabber bot
+*** OPEN jabber bot                                                    :r1:
 - user same msg exchange as irc bot
 
 - Possible routing keys: "jabber.recv.raw" "jabber.send.raw"
 
-*** OPEN mail bot
+*** OPEN mail bot                                                      :r1:
 - wie jabber bot nur ueber email
 - nuetzlich auch fuer den notify: user service
 - unauthenticated mail?!
 
 *** OPEN irc reader
+In simpler implementiert. Siehe [[misc/read_msg.py]]. Keine verschiedenen Stimmen.
+
 **** assign voices to each participant
 ***** parameters
 - speed
@@ -64,7 +65,7 @@ Decke?
 - voice: lea, julia, kenny...
 **** participants can change voices
 
-*** OPEN calendar integration - ics?
+*** OPEN calendar integration - ics?                                   :r1:
 - Repeadedly parse calendar files. Idealy ics. Load from caldav?
   google calendar?
 
@@ -82,6 +83,43 @@ irq0: Damit koennte ich mir meinen Wecker bauen..
            digitale Zeitalter..
 
 Per TTS, Text notification, IRC, Jabber whatever hinweisen
+*** OPEN graphite integration
+Es macht sinn sensoren an ein graphite zu knoten. Dadruch bekommt man
+gleich daten über zeit und eine ganze reihe von funktionen über diese
+daten.
+
+Daten aus graphite gekommt man über die =?render= HTTP Schnittstelle
+in den gängigsten formaten wie JSON, CSV, SVG, PNG.
+
+**** Mögliche Umsetzungen
+***** RPC
+AMQP RPC Pattern implementieren
+***** PubSub
+Subscribe periodic sensor updates
+***** Nicht integrieren
+Direkt mit Graphite sprechen
+*** OPEN Wetterbericht
+Wie ist das subraum wetter?
+
+Als email abbonierbar? Erreichbar per Telefon
+
+Content:
+- Temperatur innen. (Mit forecast?)
+- Temperatur aussen
+- User liste
+- Termine heute:
+  - Heute abend ist smalltalk
+  - 15:00-18:00 Safer Internet Day in der ComBi
+- Kommentar wie "Ganz schön sonnig heute. Komm lieber in den Subraum"
+*** OPEN thehonestbookoftruth: support !eta with dates
+Support:
+- !eta 2014-03-12 20:00
+- !eta Tomorrow 20:00
+- !eta Morgen 20:00
+- !eta Mittwoch 20:00
+
+Retain support for times only. Use today as date
+- !eta 20:00
 *** ASSIGNED pizza / essen / f00d                               :@hej:c3po:
 *** ASSIGNED actor service / rule engine                              :@irq0:
 
@@ -134,40 +172,23 @@ EVENT -> OLD STATE -> STATE CHANGE -> NEW STATE
 - =(state-change old)=
 
 *** ASSIGNED openhab integration                                  :@snowball:
-*** ASSIGNED music player daemon                           :@snowball:c3po:
+*** ASSIGNED music player daemon                        :@snowball:c3po:r1:
 - mpd commands als messages
 - Story: Ein EDI MQ command kann verschiedene music player daemons steuern
 - Probleme
   - Mehrere mpds unterstützen; gleichzeitig steuern?
-*** TEST presence: eta login                                        :@irq0:
+*** TEST presence: eta login                                     :@irq0:r1:
 Commands: !ul, !eta, !login, !logout
 
 - cmd exchange consumer/producer
 - store login, eta state somewhere
 
 Implemented: [[proc/thehonestbookoftruth]]
+*** TEST dmx actor                                     :@grollicus:c3po:r1:
+See: =sink/dmx=. Written in ruby.
 
-*** TEST dmx actor                                        :@grollicus:c3po:
-See =cube:/var/git/c3po/dmx=. DMX is connected to the serial port.
 
-Example code:
-#+BEGIN_SRC python
- #!/usr/bin/python
-
- import sys
- import serial
-
- ser = serial.Serial('/dev/dmx', 38400, timeout=1)
-
- ser.write("B1")
-
- ser.close()
-#+END_SRC
-
-There is also a dmx jsonrpc server:
-=cube:/var/git/c3po/jsonrpcdmx=
-
-*** DONE scheduled messages                                         :@irq0:
+*** DONE scheduled messages                                      :@irq0:r1:
 - hourly audio messages
 - web gui?
 - clojure + quarz scheduler?
@@ -176,7 +197,7 @@ Implementation: [[src/shouts]]
 cronjob + amqp-tools + mp3 files
 
 mp3 files found on cube..
-*** DONE shutdown/startup                                           :@irq0:
+*** DONE shutdown/startup                                        :@irq0:r1:
 Veralgemeinert implementiert: Init mit runlevels.
 
 Reagiert auf Commands:
@@ -201,17 +222,17 @@ runlevel scripts.
 Skripts werden mit run-parts gestartet und bekommen die ACTION als
 ersten Parameter
 
-*** DONE text to speech command                                     :@irq0:
+*** DONE text to speech command                                  :@irq0:r1:
 - listen for tts, say, fortune commands
 - text to speech messages
 - put mp3 files in notify exchange with key audio
 
 Actually two implementations. One pico2wave in the EDI repo and one
 based on the old acapella-group web scripting.
-*** DONE irc bot                                                    :@irq0:
+*** DONE irc bot                                                 :r1:@irq0:
 - IRC receive -> msg exchange with key irc.recv.raw
 - msg exchange with key irc.send.raw -> IRC send
-*** DONE 433MHz actor                                               :@irq0:
+*** DONE 433MHz actor                                            :r1:@irq0:
 =act_433mhz= exchange
 
 - consumer on raspberrypi
@@ -220,9 +241,9 @@ based on the old acapella-group web scripting.
 *** User Authentication
 - irc nick <-> subraum LDAP?
 - ueberhaupt noetig?
-**** ASSIGNED irc bot antwortet nur auf op                         :@irq0:
+**** OPEN irc bot antwortet nur auf op                                :r1:
 - bot: only answer to users having op? (TODO)
-*** Notify sink
+*** Notify sink                                                        :r1:
 
 **** text
 =routing_key=text= messages.
@@ -238,11 +259,8 @@ shell one-liner with amqp-tools
 =routing_key=uri= messages.
 
 Idea: Play media URIs in messages. Sinilar to the mplayer listener on cube.
-**** OPEN user
-Get a message to a specific user. Configure means to reach the user
-somewhere. Have fallbacks. Like "IRC->Jabber->Email->SMS".
 *** Telephony
-**** TEST asterisk prove of concept                                   :@irq0:
+**** TEST asterisk prove of concept                             :@irq0:r1:
 - Integrate telephony
 - Read chat messages
 - Add notifications
@@ -253,11 +271,14 @@ SMS -> IRC
 SMS -> TTS
 
 IRC -> SMS?
+**** OPEN Wetterbericht
+Gesprochener Wetterbericht. Siehe oben
 *** OPEN speech to text
 Integrate speech to text engine
 
+
 ** Architecture Changes
-*** ASSIGNED list, help messages for 'cmd' exchange                 :@irq0:
+*** ASSIGNED list, help messages for 'cmd' exchange              :@irq0:r1:
 Everyone on the cmd exchange should consume list and help messages.
 
 **** Replies
@@ -297,6 +318,21 @@ runit. See =sv/{available, enabled}=
 Running on janelane. Put on some server. Keep sipgate credentials
 private.
 *** ASSIGNED plan first release
+*** OPEN All EDI subsystems use environment variables to configure..   :r1:
+Alle Subsysteme müssen für generelle Einstellungen Environment
+Variablen benutzen. Ist die Variable nicht gesetzt muss ein sinnvoller
+default Wert verwendet werden.
+
+Warum? Env Variablen vererben sich zu Kindprozessen. Der Service
+Supervisor setzt also Globale Variablen und die einzelnen Subsysteme
+bekommen die Einstellungen mit. Siehe =conf/GLOBALS= und =run=.
+
+Variablen:
+- =AMQP_SERVER=
+
+Für die Service Skripte:
+- =APPDIR=
+- =LOGDIR=
 
 ** Project Name
 - EDI :: ++
@@ -309,6 +345,16 @@ Every pice of code connects in some way to it.
 
 Most services share a couple of well defined exchanges. See the
 [[Well-defined Exchanges]] for a description.
+
+** Setup
+In theory(tm). Expect some settings to still be hard coded somewhere.
+
+1. Install AMQP Server. Best use RabbitMQ
+2. git clone this repo
+3. Create symlinks from =sv/available= to =sv/enabled= for the desired
+   subsystems to run
+3. ...
+4. Start EDI with =run=
 
 ** Glossary
 - source :: Apps that only/mainly produce messages
@@ -508,6 +554,7 @@ Have something to add? Let me pull your repo!
                 works quite well. Debian stable not so.
 
 **** Clojure
+
 - langohr :: http://clojurerabbitmq.info/ Excellent library.
 
 #+BEGIN_HTML
