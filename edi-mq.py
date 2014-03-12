@@ -51,10 +51,10 @@ def error(cmd, error):
                            content_type="application/json",
                            delivery_mode=2))
 
-def notify_audio(payload, content_type):
+def notify_audio(payload, content_type, dst="audio"):
     print("---> %d bytes of %s" % (len(payload), content_type))
     chan.basic_publish(exchange="notify",
-                       routing_key="audio",
+                       routing_key=dst,
                        body=payload,
                        properties=pika.BasicProperties(
                            content_type=content_type,
@@ -114,7 +114,12 @@ def tts_callback(ch, method, props, body):
 
             if result == "filename":
                 with open(data, "r") as fd:
-                    notify_audio(fd.read(), "audio/mpeg")
+                    payload = fd.read()
+
+                    if d.has_key("dst"):
+                        notify_audio(payload, "audio/mpeg", d["dst"])
+                    else:
+                        notify_audio(payload, "audio/mpeg")
             else:
                 error(d, data)
 
