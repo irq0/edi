@@ -22,6 +22,7 @@ import os
 import json
 
 config = {
+    "ssl" : True,
     "host" : "spaceboyz.net",
     "port" : 9999,
     "channel" : "#c3pb.sh",
@@ -325,14 +326,18 @@ if __name__ == '__main__':
 
     factory = BotFactory()
 
-#    reactor.connectTCP("irc.hackint.org",
-#                       6666,
-#                       factory)
+    if config["ssl"]:
+        print "CONNECT: SSL"
+        reactor.connectSSL(config["host"],
+                           config["port"],
+                           factory,
+                           ssl.ClientContextFactory())
+    else:
+        print "CONNECT: No SSL"
+        reactor.connectTCP("irc.hackint.org",
+                           6666,
+                           factory)
 
-    reactor.connectSSL(config["host"],
-                       config["port"],
-                       factory,
-                       ssl.ClientContextFactory())
 
     # run bot
     reactor.run()
