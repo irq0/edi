@@ -120,6 +120,10 @@ Support:
 
 Retain support for times only. Use today as date
 - !eta 20:00
+*** OPEN set irc topics
+- Calendar events like smalltalks
+- something like the emacs modeline?
+
 *** ASSIGNED pizza / essen / f00d                               :@hej:c3po:
 *** ASSIGNED actor service / rule engine                              :@irq0:
 
