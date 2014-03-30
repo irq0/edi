@@ -20,12 +20,38 @@ import time
 import sys
 import os
 import json
+import re
 
+
+# without ssl
+# config = {
+#     "host" : "spaceboyz.net",
+#     "port" : 6667,
+#     "channel" : "#c3pb.sh",
+#     "nick" : "EDI",
+#     "passwd" : "***REMOVED***"
+# }
+
+# ssl "simple", no cacert, no client cert, no real checking. you get encryption tough..
+# config = {
+#     "ssl" : True,
+#     "host" : "spaceboyz.net",
+#     "port" : 9999,
+#     "channel" : "#c3pb.sh",
+#     "nick" : "EDI",
+#     "passwd" : "***REMOVED***"
+# }
+
+# ssl with ca, client certs
 config = {
-    "ssl" : True,
+    "ssl" : "cert",
     "host" : "spaceboyz.net",
     "port" : 9999,
     "channel" : "#c3pb.sh",
+    "nick" : "EDI",
+    "passwd" : "***REMOVED***",
+    "ssl_clicert" : "ssl/hackint-client.pem",
+    "ssl_cacert" : "ssl/hackint-cacert.pem",
 }
 
 AMQP_SERVER = os.getenv("AMQP_SERVER") or "localhost"
@@ -36,7 +62,6 @@ class MQ(Thread):
         self.daemon = True
         self.bot = bot
         self.init_connection()
-
 
     def init_connection(self):
         self.conn = amqp.Connection(host=AMQP_SERVER)
@@ -239,10 +264,10 @@ class NamesIRCClient(irc.IRCClient):
 class MQBot(NamesIRCClient):
     """http://twistedmatrix.com/documents/8.2.0/api/twisted.words.protocols.irc.IRCClient.html"""
 
-    nickname = "EDI"
-    realname = "Enhanced Subraum Intelligence"
-    username = "EDI"
-    password = "***REMOVED***"
+    nickname = config["nick"]
+    username = config["nick"]
+    password = config["passwd"]
+    realname = """Uh, my name's EDI, uh, I'm not an addict."""
     lineRate = 0.5
 
     ops = set()
@@ -320,24 +345,52 @@ class BotFactory(protocol.ClientFactory):
         print "IRC: connection failed:", connector, reason
         reactor.stop()
 
+def load_clicert(filename):
+    with open(filename, "r") as fd:
+        cert = ssl.PrivateCertificate.loadPEM(fd.read())
+    return cert
 
-if __name__ == '__main__':
-    log.startLogging(sys.stdout)
+def load_cacert(filename):
+    with open(filename, "r") as fd:
+        cert = ssl.Certificate.loadPEM(fd.read())
+    return cert
 
-    factory = BotFactory()
+def connect(factory):
+    if config.has_key("ssl") and config["ssl"]:
+        if config["ssl"] == "cert":
+            print "CONNECT: SSL with client cert"
 
-    if config["ssl"]:
-        print "CONNECT: SSL"
-        reactor.connectSSL(config["host"],
-                           config["port"],
-                           factory,
-                           ssl.ClientContextFactory())
+            cli = load_clicert(config["ssl_clicert"])
+            ca = load_cacert(config["ssl_cacert"])
+
+            print "Using client certificate:"
+            print cli.inspect()
+
+            reactor.connectSSL(config["host"],
+                               config["port"],
+                               factory,
+                               ssl.CertificateOptions(
+                                   privateKey=cli.privateKey.original,
+                                   certificate=cli.original,
+                                   verify=True,
+                                   caCerts=(ca.original,)))
+        else:
+            print "CONNECT: SSL default"
+            reactor.connectSSL(config["host"],
+                               config["port"],
+                               factory,
+                               ssl.ClientContextFactory())
     else:
         print "CONNECT: No SSL"
         reactor.connectTCP("irc.hackint.org",
                            6666,
                            factory)
 
+if __name__ == '__main__':
+    log.startLogging(sys.stdout)
+
+    factory = BotFactory()
+    connect(factory)
 
     # run bot
     reactor.run()
