@@ -178,7 +178,6 @@ class MQ(Thread):
 
     def irc_recvd(self, user, msg, chan, type):
         """Called whenever something was received from irc"""
-        print "RECV: user=%s chan=%s msg=%s" % (user, chan, msg)
 
         jmsg = json.dumps({
             "user" : user.decode("UTF-8"),
@@ -188,8 +187,7 @@ class MQ(Thread):
             "bot" : self.bot.nickname,
             "uflags" : list(self.user_flags(user)),
         })
-
-        print "RECV: Message from authorized user", user, ": JSON MSG", jmsg
+        print "RECV: user=%s chan=%s msg=%s jmsg=%s" % (user, chan, msg, jmsg)
 
         amsg = amqp.Message(jmsg)
         amsg.properties["content_type"] = "application/json"
