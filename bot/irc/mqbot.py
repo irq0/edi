@@ -232,6 +232,7 @@ class MQBot(NamesIRCClient):
     password = "***REMOVED***"
     lineRate = 0.5
 
+    ops = set()
 
     def connectionMade(self):
         print "connection made"
@@ -251,6 +252,29 @@ class MQBot(NamesIRCClient):
         print "IRC: join chan: ", config["channel"]
         self.join(config["channel"])
 
+    def joined(self, chan):
+        if chan == config["channel"]:
+            self.fetch_chan_ops()
+
+    def modeChanged(self, user, chan, do_set_modes, modes, users):
+        if chan == config["channel"] and "o" in modes:
+            print "IRC", "OP change for users", users, "to", do_set_modes
+
+            if do_set_modes:
+                for u in users:
+                    self.ops.add(u)
+            else:
+                for u in users:
+                    self.ops.remove(u)
+
+            print "IRC", config["channel"], "OPS:", self.ops
+
+    def userLeft(self, user, chan):
+        if chan == config["channel"]:
+
+
+            self.fetch_chan_ops()
+
     def privmsg(self, user, chan, msg):
         print "privmsg:", user, chan
         user = user.split('!', 1)[0]
@@ -263,6 +287,13 @@ class MQBot(NamesIRCClient):
 
         print "IRC RECV:* %s %s" % (user, msg)
         self.pub.irc_recvd(user, msg, chan, "action")
+
+    def fetch_chan_ops(self):
+        def parseOps(names):
+            self.ops = set(( n[1:] for n in names
+                             if n.startswith("@")))
+            print "IRC", config["channel"], "OPS:", self.ops
+        self.names(config["channel"]).addCallback(parseOps)
 
 class BotFactory(protocol.ClientFactory):
     protocol = MQBot
