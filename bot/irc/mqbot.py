@@ -1,8 +1,12 @@
 #!/usr/bin/env python
 
 #
-# Simple IRC<->AMQP bot
+# IRC<->AMQP bot
 #
+
+# Note: Twisted irc supports multiple joined channels per irc connection.
+# To keep things easier the bot only supports one channel. See config["channel"]
+
 
 from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol, ssl
