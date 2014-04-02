@@ -120,6 +120,26 @@ Support:
 
 Retain support for times only. Use today as date
 - !eta 20:00
+*** OPEN set irc topics
+- Calendar events like smalltalks
+- something like the emacs modeline?
+*** OPEN dhcp lease loest login aus                                  :c3pb:
+*** OPEN Würfel
+- Zufällig einen user im irc bestimmen für $aufgabe?
+*** OPEN Begrüssungen
+- Vorher: events
+- Verändern durch git repo
+*** OPEN Soundboard
+!sob ?
+
+git repo mit soundfiles
+
+!sob <file>
+
+file matched files im repo
+
+antwortet mit ID3tags was ist
+
 *** ASSIGNED pizza / essen / f00d                               :@hej:c3po:
 *** ASSIGNED actor service / rule engine                              :@irq0:
 
@@ -186,7 +206,6 @@ Commands: !ul, !eta, !login, !logout
 Implemented: [[proc/thehonestbookoftruth]]
 *** TEST dmx actor                                     :@grollicus:c3po:r1:
 See: =sink/dmx=. Written in ruby.
-
 
 *** DONE scheduled messages                                      :@irq0:r1:
 - hourly audio messages
@@ -275,7 +294,6 @@ IRC -> SMS?
 Gesprochener Wetterbericht. Siehe oben
 *** OPEN speech to text
 Integrate speech to text engine
-
 
 ** Architecture Changes
 *** ASSIGNED list, help messages for 'cmd' exchange              :@irq0:r1:
