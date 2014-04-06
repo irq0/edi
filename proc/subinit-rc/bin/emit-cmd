@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 command="$1"
 args="${@:2}"
@@ -10,6 +10,6 @@ if [[ -z $command ]]; then
     exit 1
 fi
 
-amqp-publish -u 'amqp://localhost' -e cmd -r "$command" \
+amqp-publish -u "amqp://${AMQP_SERVER:-localhost}" -e cmd -r "$command" \
 	     --content-type="application/json" \
 	     -b "${json}"
