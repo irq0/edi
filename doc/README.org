@@ -65,7 +65,7 @@ In simpler implementiert. Siehe [[misc/read_msg.py]]. Keine verschiedenen Stimme
 - voice: lea, julia, kenny...
 **** participants can change voices
 
-*** OPEN calendar integration - ics?                                   :r1:
+*** OPEN calendar integration: source                                    :r1:
 - Repeadedly parse calendar files. Idealy ics. Load from caldav?
   google calendar?
 
@@ -83,6 +83,15 @@ irq0: Damit koennte ich mir meinen Wecker bauen..
            digitale Zeitalter..
 
 Per TTS, Text notification, IRC, Jabber whatever hinweisen
+*** OPEN calendar integration: sink/proc
+- siehe auch [[(conj 'seri hackerfyhstuck)]]
+- daily events im irc topic
+- events auf wallhack anzeigen
+- notification mails?
+  - hackerfryhstyck automatisch ankuendigen
+- kallender abonierbar
+- [[(conj 'seri hackerfyhstuck)]] traegt leute zum event ein
+- ETAs als calendar events
 *** OPEN graphite integration
 Es macht sinn sensoren an ein graphite zu knoten. Dadruch bekommt man
 gleich daten über zeit und eine ganze reihe von funktionen über diese
@@ -139,7 +148,8 @@ git repo mit soundfiles
 file matched files im repo
 
 antwortet mit ID3tags was ist
-
+*** OPEN (conj 'seri hackerfyhstuck)
+leute zu dingen eintragen per bot
 *** ASSIGNED pizza / essen / f00d                               :@hej:c3po:
 *** ASSIGNED actor service / rule engine                              :@irq0:
 
@@ -192,11 +202,12 @@ EVENT -> OLD STATE -> STATE CHANGE -> NEW STATE
 - =(state-change old)=
 
 *** ASSIGNED openhab integration                                  :@snowball:
-*** ASSIGNED music player daemon                        :@snowball:c3po:r1:
+*** ASSIGNED music player daemon sink                     :@snowball:c3po:r1:
 - mpd commands als messages
 - Story: Ein EDI MQ command kann verschiedene music player daemons steuern
 - Probleme
   - Mehrere mpds unterstützen; gleichzeitig steuern?
+*** ASSIGNED parse-commands: parse commands only from users having op uflag :@irq0:r1:
 *** TEST presence: eta login                                     :@irq0:r1:
 Commands: !ul, !eta, !login, !logout
 
@@ -206,7 +217,6 @@ Commands: !ul, !eta, !login, !logout
 Implemented: [[proc/thehonestbookoftruth]]
 *** TEST dmx actor                                     :@grollicus:c3po:r1:
 See: =sink/dmx=. Written in ruby.
-
 *** DONE scheduled messages                                      :@irq0:r1:
 - hourly audio messages
 - web gui?
@@ -257,13 +267,14 @@ based on the old acapella-group web scripting.
 - consumer on raspberrypi
 - message payload = commandline arguments to rcswitch tool
 
-*** User Authentication
-- irc nick <-> subraum LDAP?
-- ueberhaupt noetig?
-**** OPEN irc bot antwortet nur auf op                                :r1:
-- bot: only answer to users having op? (TODO)
-*** Notify sink                                                        :r1:
+*** DONE ircbot: Add op flag for ops in #c3pb.sh                 :@irq0:r1:
+Ursprünglich: Bot antwortet nur auf OPs.
 
+Bot fügt jetzt ein flag "op" in msg.uflags ein, wenn user op rechte in
+seinem channel hat.
+
+Dieses flag kann dann von msg consumern ausgewertet werden.
+*** Notify sink                                                        :r1:
 **** text
 =routing_key=text= messages.
 
