@@ -4,28 +4,19 @@ import os
 import subprocess
 import pika
 import json
+import re
+import traceback
 
-from StringIO import StringIO
+import logging
+from multiprocessing import Pool
 
-from config import db
+from config import db, UnknownFooException, ParseException
 
+pool = Pool(processes=4)
+channel = None
 
-amqp_server = os.getenv("AMQP_SERVER") or "localhost"
-conn = pika.BlockingConnection(pika.ConnectionParameters(amqp_server))
-chan = conn.channel()
-
-e = "cmd"
-q = "act"
-
-chan.queue_declare(queue=q,
-                   durable=True,
-                   auto_delete=True)
-
-chan.queue_bind(exchange=e,
-                queue=q)
-
-def act(dst, rkey, payload):
-    print "---> [%r] %r" % (dst, payload)
+def emit_act(chan, dst, rkey, payload):
+    print "---> [%r] rkey=%r payload=%r" % (dst, rkey, payload)
     chan.basic_publish(exchange=dst,
                        routing_key=rkey,
                        body=payload,
@@ -33,7 +24,7 @@ def act(dst, rkey, payload):
                            content_type="application/octet-stream",
                            delivery_mode=2))
 
-def error(cmd, error):
+def emit_error(chan, cmd, error):
     key = cmd["src"].replace("recv", "send")
     msg = "%s: %s" % (cmd["user"], error)
 
@@ -46,74 +37,120 @@ def error(cmd, error):
                            content_type="text/plain",
                            delivery_mode=2))
 
+def handle_notfound(arg):
+    return "I know nothin' about a \"{}\". Try \"help\"".format(arg)
 
-def make_rkey(thing, args):
-    t = db[thing]
-
-    parg = t["pargs"][args[0]]
-
-    if t.has_key("rkey"):
-        if hasattr(t["rkey"], '__call__'):
-            rkey = t["rkey"](parg, args)
-        else:
-            rkey = t["rkey"]
+def handle_help(arg):
+    if len(arg) > 1 and db.has_key(arg[1]):
+        return db[arg[1]].help()
     else:
-        rkey = ""
+        return "Available actors: {}".format(
+            ", ".join((x.name for x in db.itervalues())))
 
-    print "---- rkey:", rkey
-    return rkey
+def handle_command(chan, thing_name, args):
+    assert db.has_key(thing_name)
+    thing = db[thing_name]
 
-def make_payload(thing, args):
-    t = db[thing]
+    def do():
+        dst = db[thing_name].exchange
 
-    payload = t["payload"]
-    parg = t["pargs"][args[0]]
+        payloads = thing.payload(args)
+        rkeys = thing.rkey(args)
 
-    if hasattr(payload, '__call__'):
-        payload = payload(parg, args)
+        print "---> [CONFIG]", "payloads:", payloads, "rkeys:", rkeys
+
+        assert len(payloads) == len(rkeys)
+
+        for p, r in zip(payloads, rkeys):
+            success = emit_act(chan, dst, r, p)
+            if success:
+                print "---> [?] success=%s" % (success)
+
+        return success
+
+    if hasattr(thing, "expansions"):
+        print "~~~~ [EXPAND] orig:", thing_name, args
+
+        for thing_name, args in [ ex.split(None, 1) for ex in thing.expansions(args) if ex]:
+            print "~~~~ [EXPAND] *", thing_name, args
+            handle_command(chan, thing_name, args)
     else:
-        payload = " ".join((payload, parg))
-
-    print "---- Payload:", payload
-    return payload
+        do()
+#    pool.apply_async(do)
 
 
-def callback(ch, method, props, body):
-
+def callback(chan, method, props, body):
     print "<--- [%r] %r" % (method.routing_key, body)
 
     if props.content_type == "application/json":
         d = json.loads(body)
 
-        args = d["args"].split()
+        args = d["args"].split(None, 1)
+        print "~~~~ CALLBACK: args:", args
 
-        if len(args) == 1 and args[0] == "list":
-            error(d, "Actors: {}".format(", ".join([ "{} ({})".format(k, v["desc"])
-                                                     for k,v in db.iteritems() ])))
-        elif len(args) < 2:
-            error(d, "USAGE: <thing> <arg> [more args..]")
-
-        elif args[0] not in db:
-            error(d, "I know nothin' about a %s" % (args[0]))
-
-        else:
-            thing = args[0]
-
-            dst = db[thing]["dst"]
-            payload = make_payload(thing, args[1:])
-            rkey = make_rkey(thing, args[1:])
-
-            success = act(dst, rkey, payload)
-            if success:
-                print "---> [?] success=%s" % (success)
+        try:
+            if 0 < len(args) < 2:
+                emit_error(chan, d, "More input please")
+            elif args[0] == "help":
+                emit_error(chan, d, handle_help(args))
+            elif args[0] not in db:
+                emit_error(chan, d, handle_notfound(args))
+            else:
+                handle_command(chan, args[0], args[1])
                 chan.basic_ack(delivery_tag = method.delivery_tag)
 
+        except UnknownFooException:
+            emit_error(chan, d, handle_notfound(args))
 
-print "---- Using queue:", q
-print "---- Waiting for messages:"
+        except ParseException:
+            # todo print something nicer..
+            emit_error(chan, d, handle_notfound(args))
 
-chan.basic_consume(callback,
-                   queue=q)
+        except Exception, e:
+            print "~~~~ EXCEPTION in callback: ", e
+            traceback.print_exc()
 
-chan.start_consuming()
-conn.close()
+def main():
+    amqp_server = os.getenv("AMQP_SERVER") or "localhost"
+    conn = pika.BlockingConnection(pika.ConnectionParameters(amqp_server))
+    chan = conn.channel()
+    exchange = "cmd"
+    queue = "act"
+
+    pika_logger = logging.getLogger('pika')
+    pika_logger.setLevel(logging.INFO)
+
+    def setup():
+        logging.basicConfig()
+
+        chan.queue_declare(queue=queue,
+                           durable=True,
+                           auto_delete=True)
+
+        chan.queue_bind(exchange=exchange,
+                        queue=queue)
+
+        print "---- Using queue:", queue
+
+    def run():
+        print "---- Waiting for messages:"
+
+        chan.basic_consume(callback,
+                           queue=queue)
+
+        chan.start_consuming()
+
+    def teardown():
+        conn.close()
+
+    try:
+        setup()
+        run()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        teardown()
+
+
+if __name__ == "__main__":
+    main()
