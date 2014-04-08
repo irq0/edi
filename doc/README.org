@@ -150,6 +150,43 @@ file matched files im repo
 antwortet mit ID3tags was ist
 *** OPEN (conj 'seri hackerfyhstuck)
 leute zu dingen eintragen per bot
+*** ASSIGNED voice recognition                                      :@irq0:
+**** Idea
+To speech to text. At least in english. Perform natural language
+processing to extract meaning. Generate commands.
+
+**** Tools
+***** pocketsphinx
+pocketsphinx is a cpp implementation of sphinx, smaller and not java.
+
+- debian/ubuntu packages: https://launchpad.net/~dhuggins/+archive/cmusphinx
+- transformations:
+  - we can't recognize users by voice.
+  - "!say" not nice to say. instead:
+    - "user command <user> <command>"
+    - "UC <user> <command>"
+    - "command <command>
+    - "do <command>"
+
+- "EDI: command say foo"
+- "EDI: user command seri login"
+- "EDI: user command seri logout"
+- "EDI <TONE> "
+
+***** wit.io
+- natural language processing web app
+- does the text -> meaning part
+- exports sphinx language models
+
+**** integration
+***** msg
+- recv :: voice recognition with some custom transformations
+- send :: notify.audio?
+***** asterisk
+- .. we can recocnize users by callerid
+- login by phone?
+- desktop edi voice clients based on SIP
+
 *** ASSIGNED pizza / essen / f00d                               :@hej:c3po:
 *** ASSIGNED actor service / rule engine                              :@irq0:
 
