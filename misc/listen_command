@@ -1,0 +1,186 @@
+#!/usr/bin/env python
+
+import argparse
+import pika
+import sys
+import time
+import json
+import re
+import os
+import subprocess
+import logging
+import traceback
+
+cmds = {}
+
+def make_cmd_list(name, descr):
+    def cmd_list(*args):
+        return "{}: {}".format(name, descr)
+    return cmd_list
+
+def make_cmd_help(name, cmds):
+    def cmd_help(arg):
+        if arg["args"] == name:
+            return "{}: {}".format(name, " ".join(cmds))
+    return cmd_help
+
+def make_cmd_exec(cmd, app):
+    def do_exec(data):
+        stdin = output_formatter(data)
+        p = subprocess.Popen(app,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE,
+                             stdin=subprocess.PIPE)
+
+        stdout, stderr = p.communicate(input=stdin)
+
+        print "#### Command \"{}\"output: STDOUT".format(cmd)
+        print (stdout or "")
+        print "#### Command \"{}\"output: STDERR".format(cmd)
+        print (stderr or "")
+
+    return do_exec
+
+# TODO replace with loev
+def emit_msg(chan, msg):
+    key = "irc.EDI.send._channel_"
+
+    print "---> [%r] %r" % (key, msg)
+
+    chan.basic_publish(exchange="msg",
+                       routing_key=key,
+                       body=msg,
+                       properties=pika.BasicProperties(
+                           content_type="text/plain",
+                           delivery_mode=2))
+
+def cmd_callback(chan, method, props, body):
+    print "<--- [%r] %r" % (method.routing_key, body)
+
+    if props.content_type == "application/json":
+        d = json.loads(body)
+
+        try:
+            cmd = d["cmd"]
+            args = d["args"].split(None, 1)
+
+            func = cmds[d["cmd"]]
+
+            print "~~~~ Dispatching cmd \"{}\" to function: {}".format(cmd, func)
+            ret = func(d)
+            if ret:
+                emit_msg(chan, ret)
+
+        except Exception, e:
+            print "~~~~ EXCEPTION in callback: ", e
+            traceback.print_exc()
+
+def output_formatter(x):
+    return str(x)
+
+def output_formatter_awkfriendly(x):
+    return "\n".join("{}\x1E{}".format(k,str(v)) for k,v in x.iteritems())
+
+def output_formatter_onlyargs(x):
+    return x["args"]
+
+def NameString(v):
+    regex = r"^(\w+)$"
+    try:
+        return re.match(regex, v).group(0)
+    except:
+        raise ArgumentTypeError("Must match {}".format(regex))
+
+def parse_args(args=None):
+       parser =argparse.ArgumentParser()
+
+       parser.add_argument("--cmd",
+                           action='append',
+                           type=NameString,
+                           required=True,
+                           help="Command to register. Repeat for multiple commands")
+       parser.add_argument("--name",
+                           required=True,
+                           type=NameString,
+                           help="Name of the command handler")
+       parser.add_argument("--description",
+                           required=True,
+                           help="Help command text")
+       parser.add_argument("--data",
+                           choices=("json", "awkfriendly", "onlyargs"),
+                           default="json",
+                           help="Format of data the handler script gets through stdin. Default: json")
+       parser.add_argument("--exe",
+                           required=True,
+                           help="Program to call for each recvd command")
+
+       result = parser.parse_args(args)
+       return result
+
+def main():
+    logging.basicConfig()
+
+    args = parse_args()
+    print args
+
+    amqp_server = os.getenv("AMQP_SERVER") or "localhost"
+    conn = pika.BlockingConnection(pika.ConnectionParameters(amqp_server))
+    chan = conn.channel()
+
+    pika_logger = logging.getLogger('pika')
+    pika_logger.setLevel(logging.INFO)
+
+
+    global output_formatter
+    if args.data == 'awkfriendly':
+        output_formatter = output_formatter_awkfriendly
+    elif args.data == 'onlyargs':
+        output_formatter = output_formatter_onlyargs
+
+    exchange = "cmd"
+    queue = "generic_listen_command__{}".format(args.name)
+
+    def init_dispatch_table():
+        global cmds
+        cmds["help"] = make_cmd_help(args.name, args.cmd)
+        cmds["list"] = make_cmd_list(args.name, args.description)
+
+        for cmd in args.cmd:
+            cmds[cmd] = make_cmd_exec(cmd, args.exe)
+
+    def setup():
+        keys = ["list", "help"] + list(args.cmd)
+        print "---- Using queue:", queue
+        print "---- Binding routing keys:", ", ".join(keys)
+
+        chan.queue_declare(queue=queue,
+                           durable=True,
+                           auto_delete=True)
+
+        for k in keys:
+            chan.queue_bind(exchange=exchange,
+                            queue=queue,
+                            routing_key=k)
+
+        chan.basic_consume(cmd_callback,
+                           queue=queue)
+
+    def run():
+        print "---- Waiting for messages:"
+        chan.start_consuming()
+
+    def teardown():
+        conn.close()
+
+    try:
+        setup()
+        init_dispatch_table()
+        run()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        teardown()
+
+
+if __name__ == "__main__":
+    main()

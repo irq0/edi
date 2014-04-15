@@ -1,0 +1,19 @@
+#!/bin/bash
+
+SCRIPTPATH=$(dirname $0)
+
+file_info () {
+    tn=$(mediainfo --Inform="General;%Track%" "$file")
+
+    if [[ -z $tn ]]; then
+	echo "$(basename "$file")"
+    else
+	echo "$tn"
+    fi
+}
+
+search=$(read)
+file="$(${SCRIPTPATH}/approx_find_file $search)"
+
+emit_msg "SOB: $(file_info "$file")"
+emit_notification "$file"

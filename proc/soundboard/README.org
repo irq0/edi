@@ -1,0 +1,23 @@
+
+* Idea
+Play audio files through the notification system based on approx
+string matching of metadata in files.
+
+Example:
+=!sob duke=
+Plays file which contains the word /duke/ in metadata like title or filename.
+* Implementation
+
+** Index
+Generate files containing keywords based on input files.
+** Approx String Match
+Do approx string match over index files. Return best match. In case
+multiple files match return random match to keep things interesting.
+
+* Add files
+1. Put file in =files/=.
+2. Regenerate index: =./make_index=
+
+* Dependencies
+- mediainfo
+  For metadata extraction like
