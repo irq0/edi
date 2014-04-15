@@ -1,7 +1,6 @@
-#!/bin/env python
+#!/usr/bin/env python
 
 import os
-import subprocess
 import pika
 import json
 import re
@@ -12,7 +11,6 @@ from multiprocessing import Pool
 
 from config import db, UnknownFooException, ParseException
 
-pool = Pool(processes=4)
 channel = None
 
 def emit_act(chan, dst, rkey, payload):
@@ -76,7 +74,6 @@ def handle_command(chan, thing_name, args):
             handle_command(chan, thing_name, args)
     else:
         do()
-#    pool.apply_async(do)
 
 
 def callback(chan, method, props, body):
