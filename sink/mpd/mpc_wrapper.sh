@@ -40,11 +40,20 @@ echo "CMD: $cmd $arg" >&2
 
 if [[ $cmd =~ ^(volume|next|prev|toggle|insert|play|pause|stop|clear)$ ]]; then
     m "${cmd}" "${arg}"
-elif [[ $cmd =~ ^(playthis)$ ]]; then
+elif [[ $cmd = "playthis" ]]; then
     m clear
     m insert "${arg}"
     sleep 2
     m play 
+elif [[ $cmd = "playpls" ]]; then
+    m clear
+
+    for adr in $(curl -s "${arg}" | awk 'BEGIN { FS="=" } /File/ { print $2 }'); do
+        m insert "${adr}"
+    done
+    sleep 2
+    m play 
 fi
 
+sleep 2
 notify "$(stat)"
