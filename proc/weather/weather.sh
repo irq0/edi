@@ -1,16 +1,23 @@
 #!/bin/bash -x
 
-GRAPHITE_HOST="mopp"
+GRAPHITE_HOST="localhost:8000"
 LOCATION="edlp"
 
 subraum () {
-    curl -s "http://${GRAPHITE_HOST}/render?target=sens.subraum.temp_1.degree_c&format=csv&from=-10min" \
+    curl -s "http://${GRAPHITE_HOST}/render?target=summarize(sens.subraum.temp_1.degree_c,\"10min\",\"avg\")&format=raw&from=-10min" \
 	| awk '
 BEGIN {
-   FS=","
+   FS="|";
 }
 {
-   printf "%.1f°C", $3
+   FS=",";
+   $0=$2;
+   if ($2 == "None") {
+      print "NA"
+   } else {
+      printf "%.1f°C", $2;
+   }
+   exit 0;
 }'
 }
 
