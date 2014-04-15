@@ -50,7 +50,7 @@ def recv(ch, method, props, body):
 
         m = re.search(r"^!(\w+)\s?(.*?)$", msg["msg"])
 
-        if m:
+        if m and "op" in msg["uflags"]:
             assert len(m.groups()) == 2
 
             cmd, args = m.groups()
