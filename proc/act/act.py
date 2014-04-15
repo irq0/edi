@@ -38,7 +38,7 @@ def emit_error(chan, cmd, error):
                            delivery_mode=2))
 
 def handle_notfound(arg):
-    return "I know nothin' about a \"{}\". Try \"help\"".format(arg)
+    return "I know nothin' about a \"{}\". Try \"help\"".format(" ".join(arg))
 
 def handle_help(arg):
     if len(arg) > 1 and db.has_key(arg[1]):
@@ -89,10 +89,12 @@ def callback(chan, method, props, body):
         print "~~~~ CALLBACK: args:", args
 
         try:
-            if 0 < len(args) < 2:
+            if 0 < len(args) < 1:
                 emit_error(chan, d, "More input please")
             elif args[0] == "help":
                 emit_error(chan, d, handle_help(args))
+            elif 0 < len(args) < 2:
+                emit_error(chan, d, "More input please")
             elif args[0] not in db:
                 emit_error(chan, d, handle_notfound(args))
             else:
