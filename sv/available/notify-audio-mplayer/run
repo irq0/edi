@@ -2,4 +2,5 @@
 
 exec 2>&1
 
-exec amqp-consume --url="amqp://${AMQP_SERVER:-localhost}" --exchange="notify" --queue="audio2" --routing-key="audio" mplayer -
+cd $(dirname $0)
+exec amqp-consume --url="amqp://${AMQP_SERVER:-localhost}" --exchange="notify" --queue="audio2" --routing-key="audio" ./play.sh
