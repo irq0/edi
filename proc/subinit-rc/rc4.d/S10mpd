@@ -1,0 +1,11 @@
+#!/bin/bash
+
+
+case "$1" in
+	start)
+		emit-cmd act music bassdrive
+		;;
+	stop)
+		emit-cmd act mpd stop
+		;;
+esac
