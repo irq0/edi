@@ -18,10 +18,27 @@ notify () {
     fi
 }
 
+stat () {
+    mpc 2> /dev/null \
+      | gawk '
+!/^(\[|volume)/ { 
+   title=$0 
+} 
+/^\[/ { 
+   status=$1 
+} 
+END { 
+   if (status == "[playing]") { 
+      gsub(/:.*$/,"", title); 
+      print title 
+   } 
+}'
+}
+
 read -r cmd arg
 echo "CMD: $cmd $arg" >&2
 
-if [[ $cmd =~ ^(volume|next|prev|toggle|insert|play|clear)$ ]]; then
+if [[ $cmd =~ ^(volume|next|prev|toggle|insert|play|pause|stop|clear)$ ]]; then
     m "${cmd}" "${arg}"
 elif [[ $cmd =~ ^(playthis)$ ]]; then
     m clear
@@ -30,5 +47,4 @@ elif [[ $cmd =~ ^(playthis)$ ]]; then
     m play 
 fi
 
-sleep 2
-notify "$($MPC | awk '!/^(\[|volume)/ { print $0 }')"
+notify "$(stat)"
