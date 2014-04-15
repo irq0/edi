@@ -1,5 +1,7 @@
 #!/bin/env python
 
+
+import xml.etree.cElementTree as ET
 import requests
 import re
 
@@ -111,7 +113,7 @@ class RewriteActor(BaseActor):
         self.rules = rules
 
     def expansions(self, args):
-        for rule, expansions in self.rules:
+        for rule, descr, expansions in self.rules:
             if re.match(rule, args):
                 return expansions
         raise UnknownFooException
@@ -125,28 +127,33 @@ class RewriteActor(BaseActor):
     def help(self):
         h = super(RewriteActor, self).help()
 
-        return "{} - ALIASES: {}".format(
+        return "{} - COMMANDS: {}".format(
             h,
-            ", ".join(("{}->{}".format(k,v)
-                       for k, v in self.rules)))
+            ", ".join(("{}->{}".format(k,desc)
+                       for k, desc, url in self.rules)))
 
 
-def fetch_bassdrive_stream_url():
-    req = requests.get("http://www.bassdrive.com/v2/streams/BassDrive3.pls")
-    if req.ok:
-        return re.findall("(http://.*)", req.text)[0]
+def somafm():
+    try:
+        r = requests.get("http://api.somafm.com/channels.xml")
+        if r.ok:
+            root = ET.fromstring(r.text)
+            return [(chan.attrib["id"],
+                     chan.findtext("title"),
+                     ("mpd playpls {}".format(chan.findtext("highestpls") or
+                                               chan.findtext("fastpls")),))
+                    for chan in root ]
+    except Exception:
+        pass
 
 conf = [
     RewriteActor("music",
                  "Play I some music: dis a $GENRE music!",
-                 [("play", ("mpd play 1",)),
-                  ("bassdrive", ("mpd clear",
-                                 "mpd insert {}".format(fetch_bassdrive_stream_url()),
-                                 "mpd play 1")),
-                  ("ldnb", ("mpd clear",
-                            "mpd insert {}".format(fetch_bassdrive_stream_url()),
-                            "mpd play 1")),
-              ]),
+                 somafm()
+                 + [("bassdrive",
+                     "Bassdrive",
+                     ("mpd loadplay http://www.bassdrive.com/v2/streams/BassDrive3.pls",)),
+                ]),
 
     FourThreeThreeMhzActor("venti", "Ventilator", "11111 1"),
     FourThreeThreeMhzActor("bulb", "Bunte Lampe", "11111 2"),
@@ -168,7 +175,6 @@ conf = [
                      "subraum",
                      lambda args : re.match(r"(\w+|\w+ )+", args)),
 ]
-
 
 
 db = { e.name : e for e in conf }
