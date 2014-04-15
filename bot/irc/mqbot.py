@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-
+# -*- coding: utf-8 -*-
+# ✓
 #
 # IRC<->AMQP bot
 #
@@ -7,6 +8,7 @@
 # Note: Twisted irc supports multiple joined channels per irc connection.
 # To keep things easier the bot only supports one channel. See config["channel"]
 
+# Encoding Note: Expects IO to be in utf-8. Will break otherwise.
 
 from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol, ssl, defer
@@ -17,11 +19,12 @@ from threading import Thread
 from amqplib import client_0_8 as amqp
 
 import time
+import traceback
 import sys
 import os
 import json
 import re
-
+import codecs
 
 # without ssl
 # config = {
@@ -94,19 +97,21 @@ class MQ(Thread):
 
     def handle_consume(self, raw_msg):
         try:
-            key = raw_msg.delivery_info["routing_key"].split(".")
-
-            print "CONSUME: routing_key=%s properties=%s body=%s" % (key, raw_msg.properties, raw_msg.body)
+            key = raw_msg.delivery_info["routing_key"].decode("utf-8").split(u".")
+            body = raw_msg.body.decode("utf-8")
+            
+            print u"CONSUME: routing_key={} body={}".format(key, body)
 
             if raw_msg.properties["content_type"] == "application/json":
-                self.handle_json_message(key, json.loads(raw_msg.body))
+                self.handle_json_message(key, json.loads(body))
             elif raw_msg.properties["content_type"] == "text/plain":
-                self.handle_plain_message(key, raw_msg.body)
+                self.handle_plain_message(key, body)
             else:
-                print "Message with unknown content type:", raw_msg
+                print u"Message with unknown content type:", body
 
         except Exception, e:
             print "Exception in consume handler:", e
+            traceback.print_exc()           
 
     def handle_json_message(self, key, msg):
         if key[2] == "presence":
@@ -114,7 +119,7 @@ class MQ(Thread):
         elif key[2] == "send":
             self.irc_send(key[3], msg["user"], msg["msg"])
         else:
-            print "Unknown message type:", key[2], msg
+            print u"Unknown message type:", key[2], msg
 
     def handle_plain_message(self, key, msg):
         if key[2] == "presence":
@@ -122,7 +127,7 @@ class MQ(Thread):
         elif key[2] == "send":
             self.irc_send(key[3], key[3], msg)
         else:
-            print "Unknown message type:", key[2], msg
+            print u"Unknown message type:", key[2], msg
 
     def remove_consumer(self):
         for tag in self.consumer_tags:
@@ -136,20 +141,16 @@ class MQ(Thread):
         elif status == "online":
             self.bot.back()
         else:
-            print "Received unknown status:", status
+            print u"Received unknown status:", status
 
     def irc_send(self, dest, user, msg):
-        user = user.encode("UTF-8")
-        msg = msg.encode("UTF-8")
-        dest = dest.encode("UTF-8")
-
         # long message with user intended for channel -> msg user
         if len(msg) > 120 and dest == config["channel"] and user != config["channel"]:
-            self.bot.msg(dest, "{}: Lots of data.. Sending you a msg".format(user))
+            self.bot.msg(dest.encode("utf-8"), u"{}: Lots of data.. Sending you a msg".format(user).encode("utf-8"))
             dest = user
         # message for channel with known user -> prefix with 'user:'
         elif dest == config["channel"] and user != config["channel"]:
-            msg = user + ": " + msg
+            msg = user + u": " + msg
 
         # dest is bot (irc recv from /msg) -> map to user
         elif dest == self.bot.nickname and user != self.bot.nickname:
@@ -160,10 +161,10 @@ class MQ(Thread):
             dest = config["channel"]
 
 
-        dest = dest.replace("_channel_", config["channel"])
-        print "SEND: dest=%s msg=%s" % (dest, msg)
+        dest = dest.replace(u"_channel_", config["channel"])
+        print u"SEND: dest=%s msg=%s" % (dest, msg)
 
-        self.bot.msg(dest, msg)
+        self.bot.msg(dest.encode("utf-8"), msg.encode("utf-8"))
 
 
     def user_flags(self, user):
@@ -179,35 +180,37 @@ class MQ(Thread):
     def irc_recvd(self, user, msg, chan, type):
         """Called whenever something was received from irc"""
 
+        user, msg, chan, type = [ x.decode("utf-8") for x in (user, msg, chan, type) ]
+
         jmsg = json.dumps({
-            "user" : user.decode("UTF-8"),
-            "msg" : msg.decode("UTF-8"),
-            "chan" : chan.decode("UTF-8"),
-            "type" : type.decode("UTF-8"),
+            "user" : user,
+            "msg" : msg,
+            "chan" : chan,
+            "type" : type,
             "bot" : self.bot.nickname,
             "uflags" : list(self.user_flags(user)),
         })
-        print "RECV: user=%s chan=%s msg=%s jmsg=%s" % (user, chan, msg, jmsg)
+        print u"RECV: user=%s chan=%s msg=%s type=%s jmsg=%s" % (user, chan, msg, type, jmsg)
 
-        amsg = amqp.Message(jmsg)
-        amsg.properties["content_type"] = "application/json"
+        amsg = amqp.Message(jmsg.encode("utf-8"))
+        amsg.properties["content_type"] = u"application/json"
         amsg.properties["delivery_mode"] = 2
-        amsg.properties["app_id"] = "edi-irc"
+        amsg.properties["app_id"] = u"edi-irc"
 
-        key = ".".join(("irc",
+        key = u".".join((u"irc",
                         self.bot.nickname,
-                        "recv",
-                        chan.replace(config["channel"],"_channel_")))
+                        u"recv",
+                        chan.replace(config["channel"],u"_channel_")))
 
 
         try:
-            print "PUBLISH: routing_key=%s msg=%s" % (key, amsg)
+            print u"PUBLISH: routing_key=%s msg=%s" % (key, amsg)
 
             self.chan.basic_publish(exchange=self.exchange,
                                     routing_key=key,
                                     msg=amsg)
         except Exception, e:
-            print "Exception while publishing message:", e
+            print u"Exception while publishing message:", e
 
     def run(self):
         while self.chan.callbacks:
@@ -220,7 +223,7 @@ class MQ(Thread):
         try:
             self.conn.close()
         except IOError, e:
-            print "Error while closing amqp connection:", e
+            print u"Error while closing amqp connection:", e
 
 class NamesIRCClient(irc.IRCClient):
     def __init__(self, *args, **kwargs):
@@ -271,7 +274,7 @@ class MQBot(NamesIRCClient):
     ops = set()
 
     def connectionMade(self):
-        print "connection made"
+        print u"connection made"
         irc.IRCClient.connectionMade(self)
         self.pub = MQ(self)
         self.pub.start()
@@ -281,11 +284,11 @@ class MQBot(NamesIRCClient):
         self.pub.close()
 
     def signedOn(self):
-        print "IRC: Signed on"
+        print u"IRC: Signed on"
 
         self.msg("NickServ", "IDENTIFY {}".format(self.password))
 
-        print "IRC: join chan: ", config["channel"]
+        print u"IRC: join chan: ", config["channel"]
         self.join(config["channel"])
 
     def joined(self, chan):
@@ -294,7 +297,7 @@ class MQBot(NamesIRCClient):
 
     def modeChanged(self, user, chan, do_set_modes, modes, users):
         if chan == config["channel"] and "o" in modes:
-            print "IRC", "OP change for users", users, "to", do_set_modes
+            print u"IRC", "OP change for users", users, "to", do_set_modes
 
             if do_set_modes:
                 for u in users:
@@ -303,7 +306,7 @@ class MQBot(NamesIRCClient):
                 for u in users:
                     self.ops.remove(u)
 
-            print "IRC", config["channel"], "OPS:", self.ops
+            print u"IRC", config["channel"], "OPS:", self.ops
 
     def userLeft(self, user, chan):
         if chan == config["channel"]:
@@ -312,35 +315,33 @@ class MQBot(NamesIRCClient):
             self.fetch_chan_ops()
 
     def privmsg(self, user, chan, msg):
-        print "privmsg:", user, chan
+        print u"privmsg:", user, chan
         user = user.split('!', 1)[0]
 
-        print "IRC RECV: <%s> %s" % (user, msg)
         self.pub.irc_recvd(user, msg, chan, "privmsg")
 
     def action(self, user, chan, msg):
         user = user.split('!', 1)[0]
 
-        print "IRC RECV:* %s %s" % (user, msg)
         self.pub.irc_recvd(user, msg, chan, "action")
 
     def fetch_chan_ops(self):
         def parseOps(names):
             self.ops = set(( n[1:] for n in names
                              if n.startswith("@")))
-            print "IRC", config["channel"], "OPS:", self.ops
+            print u"IRC", config["channel"], "OPS:", self.ops
         self.names(config["channel"]).addCallback(parseOps)
 
 class BotFactory(protocol.ClientFactory):
     protocol = MQBot
 
     def clientConnectionLost(self, connector, reason):
-        print "IRC: connection lost:", connector, reason
-        print "IRC: reconnecting.."
+        print u"IRC: connection lost:", connector, reason
+        print u"IRC: reconnecting.."
         connector.connect()
 
     def clientConnectionFailed(self, connector, reason):
-        print "IRC: connection failed:", connector, reason
+        print u"IRC: connection failed:", connector, reason
         reactor.stop()
 
 def load_clicert(filename):
@@ -356,12 +357,12 @@ def load_cacert(filename):
 def connect(factory):
     if config.has_key("ssl") and config["ssl"]:
         if config["ssl"] == "cert":
-            print "CONNECT: SSL with client cert"
+            print u"CONNECT: SSL with client cert"
 
             cli = load_clicert(config["ssl_clicert"])
             ca = load_cacert(config["ssl_cacert"])
 
-            print "Using client certificate:"
+            print u"Using client certificate:"
             print cli.inspect()
 
             reactor.connectSSL(config["host"],
@@ -373,13 +374,13 @@ def connect(factory):
                                    verify=True,
                                    caCerts=(ca.original,)))
         else:
-            print "CONNECT: SSL default"
+            print u"CONNECT: SSL default"
             reactor.connectSSL(config["host"],
                                config["port"],
                                factory,
                                ssl.ClientContextFactory())
     else:
-        print "CONNECT: No SSL"
+        print u"CONNECT: No SSL"
         reactor.connectTCP("irc.hackint.org",
                            6666,
                            factory)

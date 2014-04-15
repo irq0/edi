@@ -2,5 +2,7 @@
 
 exec 2>&1
 
+export PYTHONIOENCODING="utf-8"
+
 cd ${APPDIR}/bot/irc
 exec python "${APPDIR}/bot/irc/mqbot.py"
