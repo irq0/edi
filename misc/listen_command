@@ -41,6 +41,19 @@ def make_cmd_exec(cmd, app):
 
     return do_exec
 
+# TODO replace with loev
+def emit_msg(chan, msg):
+    key = "irc.EDI.send._channel_"
+
+    print "---> [%r] %r" % (key, msg)
+
+    chan.basic_publish(exchange="msg",
+                       routing_key=key,
+                       body=msg,
+                       properties=pika.BasicProperties(
+                           content_type="text/plain",
+                           delivery_mode=2))
+
 def cmd_callback(chan, method, props, body):
     print "<--- [%r] %r" % (method.routing_key, body)
 
@@ -54,7 +67,9 @@ def cmd_callback(chan, method, props, body):
             func = cmds[d["cmd"]]
 
             print "~~~~ Dispatching cmd \"{}\" to function: {}".format(cmd, func)
-            func(d)
+            ret = func(d)
+            if ret:
+                emit_msg(chan, ret)
 
         except Exception, e:
             print "~~~~ EXCEPTION in callback: ", e
