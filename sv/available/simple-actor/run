@@ -2,4 +2,6 @@
 
 exec 2>&1
 
-exec python "${APPDIR}/proc/act/act.py"
+cd "${APPDIR}/proc/act"
+
+exec python "./act.py"
