@@ -8,7 +8,7 @@
 
 * Ideas, Todos
 ** Features
-*** OPEN User Notifications                                            :r1:
+*** OPEN User Notifications
 - Im LDAP gibt es eine liste mit wegen einen user zu notifien
   - IRC nick
   - jabber id
@@ -45,25 +45,15 @@ Decke?
     31337 auf'm PIN Pad?
     - Pizza daemon wartet auf button 31337 messages..
 
-*** OPEN jabber bot                                                    :r1:
+*** OPEN jabber bot
 - user same msg exchange as irc bot
 
 - Possible routing keys: "jabber.recv.raw" "jabber.send.raw"
 
-*** OPEN mail bot                                                      :r1:
+*** OPEN mail bot
 - wie jabber bot nur ueber email
 - nuetzlich auch fuer den notify: user service
 - unauthenticated mail?!
-
-*** OPEN irc reader
-In simpler implementiert. Siehe [[misc/read_msg.py]]. Keine verschiedenen Stimmen.
-
-**** assign voices to each participant
-***** parameters
-- speed
-- pitch
-- voice: lea, julia, kenny...
-**** participants can change voices
 
 *** OPEN calendar integration: source                                    :r1:
 - Repeadedly parse calendar files. Idealy ics. Load from caldav?
@@ -107,19 +97,6 @@ AMQP RPC Pattern implementieren
 Subscribe periodic sensor updates
 ***** Nicht integrieren
 Direkt mit Graphite sprechen
-*** OPEN Wetterbericht
-Wie ist das subraum wetter?
-
-Als email abbonierbar? Erreichbar per Telefon
-
-Content:
-- Temperatur innen. (Mit forecast?)
-- Temperatur aussen
-- User liste
-- Termine heute:
-  - Heute abend ist smalltalk
-  - 15:00-18:00 Safer Internet Day in der ComBi
-- Kommentar wie "Ganz schön sonnig heute. Komm lieber in den Subraum"
 *** OPEN thehonestbookoftruth: support !eta with dates
 Support:
 - !eta 2014-03-12 20:00
@@ -138,16 +115,6 @@ Retain support for times only. Use today as date
 *** OPEN Begrüssungen
 - Vorher: events
 - Verändern durch git repo
-*** OPEN Soundboard
-!sob ?
-
-git repo mit soundfiles
-
-!sob <file>
-
-file matched files im repo
-
-antwortet mit ID3tags was ist
 *** OPEN (conj 'seri hackerfyhstuck)
 leute zu dingen eintragen per bot
 *** ASSIGNED voice recognition                                      :@irq0:
@@ -239,20 +206,54 @@ EVENT -> OLD STATE -> STATE CHANGE -> NEW STATE
 - =(state-change old)=
 
 *** ASSIGNED openhab integration                                  :@snowball:
-*** ASSIGNED music player daemon sink                     :@snowball:c3po:r1:
-- mpd commands als messages
-- Story: Ein EDI MQ command kann verschiedene music player daemons steuern
-- Probleme
-  - Mehrere mpds unterstützen; gleichzeitig steuern?
-*** ASSIGNED parse-commands: parse commands only from users having op uflag :@irq0:r1:
-*** TEST presence: eta login                                     :@irq0:r1:
+*** TEST irc reader                                                 :@irq0:
+In simpler implementiert. Siehe [[misc/read_msg.py]]. Keine verschiedenen Stimmen.
+
+**** assign voices to each participant
+***** parameters
+- speed
+- pitch
+- voice: lea, julia, kenny...
+**** participants can change voices
+
+*** DONE Soundboard                                                 :@irq0:
+!sob ?
+
+git repo mit soundfiles
+
+!sob <file>
+
+file matched files im repo
+
+antwortet mit ID3tags was ist
+*** DONE Wetterbericht
+Wie ist das subraum wetter?
+
+Als email abbonierbar? Erreichbar per Telefon
+
+Content:
+- Temperatur innen. (Mit forecast?)
+- Temperatur aussen
+
+*** DONE parse-commands: parse commands only from users having op uflag :@irq0:r1:
+*** DONE presence: eta login                                     :@irq0:r1:
 Commands: !ul, !eta, !login, !logout
 
 - cmd exchange consumer/producer
 - store login, eta state somewhere
 
 Implemented: [[proc/thehonestbookoftruth]]
-*** TEST dmx actor                                     :@grollicus:c3po:r1:
+*** DONE music player daemon sink                             :@irq0:r1:c3po:
+- mpd commands als messages
+- Story: Ein EDI MQ command kann verschiedene music player daemons steuern
+- Probleme
+  - Mehrere mpds unterstützen; gleichzeitig steuern?
+**** Implementation
+- shell wrapper around mpc
+- send notifications after play
+- support some extra commands to load playlists from remote sources
+
+*** DONE dmx actor                                       :@grollicus:c3po:r1:
 See: =sink/dmx=. Written in ruby.
 *** DONE scheduled messages                                      :@irq0:r1:
 - hourly audio messages
@@ -340,8 +341,7 @@ SMS -> TTS
 IRC -> SMS?
 **** OPEN Wetterbericht
 Gesprochener Wetterbericht. Siehe oben
-*** OPEN speech to text
-Integrate speech to text engine
+
 
 ** Architecture Changes
 *** ASSIGNED list, help messages for 'cmd' exchange              :@irq0:r1:
@@ -360,7 +360,7 @@ Everyone on the cmd exchange should consume list and help messages.
 **** Status
 - The newer commands have this build in. Works fine.
 
-*** IDEA state change exchange?
+*** IDEA state change exchange / log / events
 Ohne globalen state müssen state veränderungen irgendwie kommuniziert
 werden. Beispiel: user loggt sich ein.
 
@@ -377,6 +377,8 @@ oder so an den exchange.
 Ein event->tts consumer generiert tts commands wenn nötig
 
 Die rule engine verändert ihren systemzustand und wertet rules neu aus.
+**** Implementation
+loev exchange: Log and events. Siehe papier.
 ** Janitor Tasks
 *** DONE integrate daemon supervisor                                :@irq0:
 runit. See =sv/{available, enabled}=
@@ -400,11 +402,7 @@ Für die Service Skripte:
 - =APPDIR=
 - =LOGDIR=
 
-** Project Name
-- EDI :: ++
-- ESI :: Enhanced Subraum Intelligence?
-*** Subtitle?
-- The hacker (friendly) space automation?
+
 * Documentation
 The core of the architecture is the rabbitmq amqp message server.
 Every pice of code connects in some way to it.

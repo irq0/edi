@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>EDI</title>
-<!-- 2014-04-08 Di 22:03 -->
+<!-- 2014-04-16 Mi 01:50 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <link href="css/bootstrap.css" rel="stylesheet">
@@ -70,7 +70,6 @@ for the JavaScript code in this tag.
 <li><a href="#sec-1-1">1.1. Features</a></li>
 <li><a href="#sec-1-2">1.2. Architecture Changes</a></li>
 <li><a href="#sec-1-3">1.3. Janitor Tasks</a></li>
-<li><a href="#sec-1-4">1.4. Project Name</a></li>
 </ul>
 </li>
 <li><a href="#sec-2">2. Documentation</a>
@@ -93,7 +92,7 @@ for the JavaScript code in this tag.
 <h3 id="sec-1-1"><span class="section-number-3">1.1</span> Features</h3>
 <div class="outline-text-3" id="text-1-1">
 </div><div id="outline-container-sec-1-1-1" class="outline-4">
-<h4 id="sec-1-1-1"><span class="todo OPEN">OPEN</span> User Notifications&#xa0;&#xa0;&#xa0;<span class="tag"><span class="r1">r1</span></span></h4>
+<h4 id="sec-1-1-1"><span class="todo OPEN">OPEN</span> User Notifications</h4>
 <div class="outline-text-4" id="text-1-1-1">
 <ul class="org-ul">
 <li>Im LDAP gibt es eine liste mit wegen einen user zu notifien
@@ -177,7 +176,7 @@ Decke?
 </div>
 </div>
 <div id="outline-container-sec-1-1-5" class="outline-4">
-<h4 id="sec-1-1-5"><span class="todo OPEN">OPEN</span> jabber bot&#xa0;&#xa0;&#xa0;<span class="tag"><span class="r1">r1</span></span></h4>
+<h4 id="sec-1-1-5"><span class="todo OPEN">OPEN</span> jabber bot</h4>
 <div class="outline-text-4" id="text-1-1-5">
 <ul class="org-ul">
 <li>user same msg exchange as irc bot
@@ -189,7 +188,7 @@ Decke?
 </div>
 </div>
 <div id="outline-container-sec-1-1-6" class="outline-4">
-<h4 id="sec-1-1-6"><span class="todo OPEN">OPEN</span> mail bot&#xa0;&#xa0;&#xa0;<span class="tag"><span class="r1">r1</span></span></h4>
+<h4 id="sec-1-1-6"><span class="todo OPEN">OPEN</span> mail bot</h4>
 <div class="outline-text-4" id="text-1-1-6">
 <ul class="org-ul">
 <li>wie jabber bot nur ueber email
@@ -202,36 +201,8 @@ Decke?
 </div>
 </div>
 <div id="outline-container-sec-1-1-7" class="outline-4">
-<h4 id="sec-1-1-7"><span class="todo OPEN">OPEN</span> irc reader</h4>
+<h4 id="sec-1-1-7"><span class="todo OPEN">OPEN</span> calendar integration: source&#xa0;&#xa0;&#xa0;<span class="tag"><span class="r1">r1</span></span></h4>
 <div class="outline-text-4" id="text-1-1-7">
-<p>
-In simpler implementiert. Siehe <i>misc/read_msg.py</i>. Keine verschiedenen Stimmen.
-</p>
-</div>
-
-<div id="outline-container-sec-1-1-7-1" class="outline-5">
-<h5 id="sec-1-1-7-1">assign voices to each participant</h5>
-<div class="outline-text-5" id="text-1-1-7-1">
-</div><ul class="org-ul"><li>parameters<br  /><div class="outline-text-6" id="text-1-1-7-1-1">
-<ul class="org-ul">
-<li>speed
-</li>
-<li>pitch
-</li>
-<li>voice: lea, julia, kenny&#x2026;
-</li>
-</ul>
-</div>
-</li></ul>
-</div>
-
-<div id="outline-container-sec-1-1-7-2" class="outline-5">
-<h5 id="sec-1-1-7-2">participants can change voices</h5>
-</div>
-</div>
-<div id="outline-container-sec-1-1-8" class="outline-4">
-<h4 id="sec-1-1-8"><span class="todo OPEN">OPEN</span> calendar integration: source&#xa0;&#xa0;&#xa0;<span class="tag"><span class="r1">r1</span></span></h4>
-<div class="outline-text-4" id="text-1-1-8">
 <ul class="org-ul">
 <li>Repeadedly parse calendar files. Idealy ics. Load from caldav?
 google calendar?
@@ -239,10 +210,10 @@ google calendar?
 </ul>
 </div>
 
-<div id="outline-container-sec-1-1-8-1" class="outline-5">
-<h5 id="sec-1-1-8-1">Variants</h5>
-<div class="outline-text-5" id="text-1-1-8-1">
-</div><ul class="org-ul"><li>Calendar Commands<br  /><div class="outline-text-6" id="text-1-1-8-1-1">
+<div id="outline-container-sec-1-1-7-1" class="outline-5">
+<h5 id="sec-1-1-7-1">Variants</h5>
+<div class="outline-text-5" id="text-1-1-7-1">
+</div><ul class="org-ul"><li>Calendar Commands<br  /><div class="outline-text-6" id="text-1-1-7-1-1">
 <ul class="org-ul">
 <li>Im Kallender stehen edi commands. Diese zu den eingestellten Zeiten
 injecten.
@@ -258,7 +229,7 @@ irq0: Damit koennte ich mir meinen Wecker bauen..
 </p>
 </div>
 </li>
-<li>Events<br  /><div class="outline-text-6" id="text-1-1-8-1-2">
+<li>Events<br  /><div class="outline-text-6" id="text-1-1-7-1-2">
 <dl class="org-dl">
 <dt> Event </dt><dd>Something is going to happen at a point in time. Wie das
 digitale Zeitalter..
@@ -273,9 +244,9 @@ Per TTS, Text notification, IRC, Jabber whatever hinweisen
 </div>
 </div>
 
-<div id="outline-container-sec-1-1-9" class="outline-4">
-<h4 id="sec-1-1-9"><span class="todo OPEN">OPEN</span> calendar integration: sink/proc</h4>
-<div class="outline-text-4" id="text-1-1-9">
+<div id="outline-container-sec-1-1-8" class="outline-4">
+<h4 id="sec-1-1-8"><span class="todo OPEN">OPEN</span> calendar integration: sink/proc</h4>
+<div class="outline-text-4" id="text-1-1-8">
 <ul class="org-ul">
 <li>siehe auch <a href="#coderef-conj 'seri hackerfyhstuck"class="coderef" onmouseover="CodeHighlightOn(this, 'coderef-conj 'seri hackerfyhstuck');" onmouseout="CodeHighlightOff(this, 'coderef-conj 'seri hackerfyhstuck');">nil</a>
 </li>
@@ -299,9 +270,9 @@ Per TTS, Text notification, IRC, Jabber whatever hinweisen
 </div>
 </div>
 
-<div id="outline-container-sec-1-1-10" class="outline-4">
-<h4 id="sec-1-1-10"><span class="todo OPEN">OPEN</span> graphite integration</h4>
-<div class="outline-text-4" id="text-1-1-10">
+<div id="outline-container-sec-1-1-9" class="outline-4">
+<h4 id="sec-1-1-9"><span class="todo OPEN">OPEN</span> graphite integration</h4>
+<div class="outline-text-4" id="text-1-1-9">
 <p>
 Es macht sinn sensoren an ein graphite zu knoten. Dadruch bekommt man
 gleich daten über zeit und eine ganze reihe von funktionen über diese
@@ -314,24 +285,24 @@ in den gängigsten formaten wie JSON, CSV, SVG, PNG.
 </p>
 </div>
 
-<div id="outline-container-sec-1-1-10-1" class="outline-5">
-<h5 id="sec-1-1-10-1">Mögliche Umsetzungen</h5>
-<div class="outline-text-5" id="text-1-1-10-1">
-</div><ul class="org-ul"><li>RPC<br  /><div class="outline-text-6" id="text-1-1-10-1-1">
+<div id="outline-container-sec-1-1-9-1" class="outline-5">
+<h5 id="sec-1-1-9-1">Mögliche Umsetzungen</h5>
+<div class="outline-text-5" id="text-1-1-9-1">
+</div><ul class="org-ul"><li>RPC<br  /><div class="outline-text-6" id="text-1-1-9-1-1">
 <p>
 AMQP RPC Pattern implementieren
 </p>
 </div>
 </li>
 
-<li>PubSub<br  /><div class="outline-text-6" id="text-1-1-10-1-2">
+<li>PubSub<br  /><div class="outline-text-6" id="text-1-1-9-1-2">
 <p>
 Subscribe periodic sensor updates
 </p>
 </div>
 </li>
 
-<li>Nicht integrieren<br  /><div class="outline-text-6" id="text-1-1-10-1-3">
+<li>Nicht integrieren<br  /><div class="outline-text-6" id="text-1-1-9-1-3">
 <p>
 Direkt mit Graphite sprechen
 </p>
@@ -340,44 +311,9 @@ Direkt mit Graphite sprechen
 </div>
 </div>
 
-<div id="outline-container-sec-1-1-11" class="outline-4">
-<h4 id="sec-1-1-11"><span class="todo OPEN">OPEN</span> Wetterbericht</h4>
-<div class="outline-text-4" id="text-1-1-11">
-<p>
-Wie ist das subraum wetter?
-</p>
-
-<p>
-Als email abbonierbar? Erreichbar per Telefon
-</p>
-
-<p>
-Content:
-</p>
-<ul class="org-ul">
-<li>Temperatur innen. (Mit forecast?)
-</li>
-<li>Temperatur aussen
-</li>
-<li>User liste
-</li>
-<li>Termine heute:
-<ul class="org-ul">
-<li>Heute abend ist smalltalk
-</li>
-<li>15:00-18:00 Safer Internet Day in der ComBi
-</li>
-</ul>
-</li>
-<li>Kommentar wie "Ganz schön sonnig heute. Komm lieber in den Subraum"
-</li>
-</ul>
-</div>
-</div>
-
-<div id="outline-container-sec-1-1-12" class="outline-4">
-<h4 id="sec-1-1-12"><span class="todo OPEN">OPEN</span> thehonestbookoftruth: support !eta with dates</h4>
-<div class="outline-text-4" id="text-1-1-12">
+<div id="outline-container-sec-1-1-10" class="outline-4">
+<h4 id="sec-1-1-10"><span class="todo OPEN">OPEN</span> thehonestbookoftruth: support !eta with dates</h4>
+<div class="outline-text-4" id="text-1-1-10">
 <p>
 Support:
 </p>
@@ -402,9 +338,9 @@ Retain support for times only. Use today as date
 </div>
 </div>
 
-<div id="outline-container-sec-1-1-13" class="outline-4">
-<h4 id="sec-1-1-13"><span class="todo OPEN">OPEN</span> set irc topics</h4>
-<div class="outline-text-4" id="text-1-1-13">
+<div id="outline-container-sec-1-1-11" class="outline-4">
+<h4 id="sec-1-1-11"><span class="todo OPEN">OPEN</span> set irc topics</h4>
+<div class="outline-text-4" id="text-1-1-11">
 <ul class="org-ul">
 <li>Calendar events like smalltalks
 </li>
@@ -414,12 +350,12 @@ Retain support for times only. Use today as date
 </div>
 </div>
 
-<div id="outline-container-sec-1-1-14" class="outline-4">
-<h4 id="sec-1-1-14"><span class="todo OPEN">OPEN</span> dhcp lease loest login aus&#xa0;&#xa0;&#xa0;<span class="tag"><span class="c3pb">c3pb</span></span></h4>
+<div id="outline-container-sec-1-1-12" class="outline-4">
+<h4 id="sec-1-1-12"><span class="todo OPEN">OPEN</span> dhcp lease loest login aus&#xa0;&#xa0;&#xa0;<span class="tag"><span class="c3pb">c3pb</span></span></h4>
 </div>
-<div id="outline-container-sec-1-1-15" class="outline-4">
-<h4 id="sec-1-1-15"><span class="todo OPEN">OPEN</span> Würfel</h4>
-<div class="outline-text-4" id="text-1-1-15">
+<div id="outline-container-sec-1-1-13" class="outline-4">
+<h4 id="sec-1-1-13"><span class="todo OPEN">OPEN</span> Würfel</h4>
+<div class="outline-text-4" id="text-1-1-13">
 <ul class="org-ul">
 <li>Zufällig einen user im irc bestimmen für $aufgabe?
 </li>
@@ -427,9 +363,9 @@ Retain support for times only. Use today as date
 </div>
 </div>
 
-<div id="outline-container-sec-1-1-16" class="outline-4">
-<h4 id="sec-1-1-16"><span class="todo OPEN">OPEN</span> Begrüssungen</h4>
-<div class="outline-text-4" id="text-1-1-16">
+<div id="outline-container-sec-1-1-14" class="outline-4">
+<h4 id="sec-1-1-14"><span class="todo OPEN">OPEN</span> Begrüssungen</h4>
+<div class="outline-text-4" id="text-1-1-14">
 <ul class="org-ul">
 <li>Vorher: events
 </li>
@@ -439,56 +375,31 @@ Retain support for times only. Use today as date
 </div>
 </div>
 
-<div id="outline-container-sec-1-1-17" class="outline-4">
-<h4 id="sec-1-1-17"><span class="todo OPEN">OPEN</span> Soundboard</h4>
-<div class="outline-text-4" id="text-1-1-17">
-<p>
-!sob ?
-</p>
-
-<p>
-git repo mit soundfiles
-</p>
-
-<p>
-!sob &lt;file&gt;
-</p>
-
-<p>
-file matched files im repo
-</p>
-
-<p>
-antwortet mit ID3tags was ist
-</p>
-</div>
-</div>
-
-<div id="outline-container-sec-1-1-18" class="outline-4">
-<h4 id="sec-1-1-18"><span class="todo OPEN">OPEN</span> (conj 'seri hackerfyhstuck)</h4>
-<div class="outline-text-4" id="text-1-1-18">
+<div id="outline-container-sec-1-1-15" class="outline-4">
+<h4 id="sec-1-1-15"><span class="todo OPEN">OPEN</span> (conj 'seri hackerfyhstuck)</h4>
+<div class="outline-text-4" id="text-1-1-15">
 <p>
 leute zu dingen eintragen per bot
 </p>
 </div>
 </div>
 
-<div id="outline-container-sec-1-1-19" class="outline-4">
-<h4 id="sec-1-1-19"><span class="todo ASSIGNED">ASSIGNED</span> voice recognition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></h4>
-<div class="outline-text-4" id="text-1-1-19">
-</div><div id="outline-container-sec-1-1-19-1" class="outline-5">
-<h5 id="sec-1-1-19-1">Idea</h5>
-<div class="outline-text-5" id="text-1-1-19-1">
+<div id="outline-container-sec-1-1-16" class="outline-4">
+<h4 id="sec-1-1-16"><span class="todo ASSIGNED">ASSIGNED</span> voice recognition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></h4>
+<div class="outline-text-4" id="text-1-1-16">
+</div><div id="outline-container-sec-1-1-16-1" class="outline-5">
+<h5 id="sec-1-1-16-1">Idea</h5>
+<div class="outline-text-5" id="text-1-1-16-1">
 <p>
 To speech to text. At least in english. Perform natural language
 processing to extract meaning. Generate commands.
 </p>
 </div>
 </div>
-<div id="outline-container-sec-1-1-19-2" class="outline-5">
-<h5 id="sec-1-1-19-2">Tools</h5>
-<div class="outline-text-5" id="text-1-1-19-2">
-</div><ul class="org-ul"><li>pocketsphinx<br  /><div class="outline-text-6" id="text-1-1-19-2-1">
+<div id="outline-container-sec-1-1-16-2" class="outline-5">
+<h5 id="sec-1-1-16-2">Tools</h5>
+<div class="outline-text-5" id="text-1-1-16-2">
+</div><ul class="org-ul"><li>pocketsphinx<br  /><div class="outline-text-6" id="text-1-1-16-2-1">
 <p>
 pocketsphinx is a cpp implementation of sphinx, smaller and not java.
 </p>
@@ -526,7 +437,7 @@ pocketsphinx is a cpp implementation of sphinx, smaller and not java.
 </ul>
 </div>
 </li>
-<li>wit.io<br  /><div class="outline-text-6" id="text-1-1-19-2-2">
+<li>wit.io<br  /><div class="outline-text-6" id="text-1-1-16-2-2">
 <ul class="org-ul">
 <li>natural language processing web app
 </li>
@@ -538,10 +449,10 @@ pocketsphinx is a cpp implementation of sphinx, smaller and not java.
 </div>
 </li></ul>
 </div>
-<div id="outline-container-sec-1-1-19-3" class="outline-5">
-<h5 id="sec-1-1-19-3">integration</h5>
-<div class="outline-text-5" id="text-1-1-19-3">
-</div><ul class="org-ul"><li>msg<br  /><div class="outline-text-6" id="text-1-1-19-3-1">
+<div id="outline-container-sec-1-1-16-3" class="outline-5">
+<h5 id="sec-1-1-16-3">integration</h5>
+<div class="outline-text-5" id="text-1-1-16-3">
+</div><ul class="org-ul"><li>msg<br  /><div class="outline-text-6" id="text-1-1-16-3-1">
 <dl class="org-dl">
 <dt> recv </dt><dd>voice recognition with some custom transformations
 </dd>
@@ -551,7 +462,7 @@ pocketsphinx is a cpp implementation of sphinx, smaller and not java.
 </div>
 </li>
 
-<li>asterisk<br  /><div class="outline-text-6" id="text-1-1-19-3-2">
+<li>asterisk<br  /><div class="outline-text-6" id="text-1-1-16-3-2">
 <ul class="org-ul">
 <li>.. we can recocnize users by callerid
 </li>
@@ -564,12 +475,12 @@ pocketsphinx is a cpp implementation of sphinx, smaller and not java.
 </li></ul>
 </div>
 </div>
-<div id="outline-container-sec-1-1-20" class="outline-4">
-<h4 id="sec-1-1-20"><span class="todo ASSIGNED">ASSIGNED</span> pizza / essen / f00d&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_hej">@hej</span>&#xa0;<span class="c3po">c3po</span></span></h4>
+<div id="outline-container-sec-1-1-17" class="outline-4">
+<h4 id="sec-1-1-17"><span class="todo ASSIGNED">ASSIGNED</span> pizza / essen / f00d&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_hej">@hej</span>&#xa0;<span class="c3po">c3po</span></span></h4>
 </div>
-<div id="outline-container-sec-1-1-21" class="outline-4">
-<h4 id="sec-1-1-21"><span class="todo ASSIGNED">ASSIGNED</span> actor service / rule engine&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></h4>
-<div class="outline-text-4" id="text-1-1-21">
+<div id="outline-container-sec-1-1-18" class="outline-4">
+<h4 id="sec-1-1-18"><span class="todo ASSIGNED">ASSIGNED</span> actor service / rule engine&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></h4>
+<div class="outline-text-4" id="text-1-1-18">
 <p>
 currently a simple python script to map things like 'act bulb on' to
 messages on the <code>act_433_mhz</code> queue
@@ -594,9 +505,9 @@ their own actor exchanges, e.g <i>act<sub>433</sub><sub>mhz</sub></i> where mess
 the commands for the sender as payload.
 </p>
 </div>
-<div id="outline-container-sec-1-1-21-1" class="outline-5">
-<h5 id="sec-1-1-21-1">Idee</h5>
-<div class="outline-text-5" id="text-1-1-21-1">
+<div id="outline-container-sec-1-1-18-1" class="outline-5">
+<h5 id="sec-1-1-18-1">Idee</h5>
+<div class="outline-text-5" id="text-1-1-18-1">
 <ul class="org-ul">
 <li>Jedes event transformiert den aktuellen system state in einen neuen
 (clojure swap! semantik)
@@ -659,33 +570,90 @@ EVENT -&gt; OLD STATE -&gt; STATE CHANGE -&gt; NEW STATE
 </div>
 </div>
 </div>
-<div id="outline-container-sec-1-1-22" class="outline-4">
-<h4 id="sec-1-1-22"><span class="todo ASSIGNED">ASSIGNED</span> openhab integration&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_snowball">@snowball</span></span></h4>
+<div id="outline-container-sec-1-1-19" class="outline-4">
+<h4 id="sec-1-1-19"><span class="todo ASSIGNED">ASSIGNED</span> openhab integration&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_snowball">@snowball</span></span></h4>
 </div>
-<div id="outline-container-sec-1-1-23" class="outline-4">
-<h4 id="sec-1-1-23"><span class="todo ASSIGNED">ASSIGNED</span> music player daemon sink&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_snowball">@snowball</span>&#xa0;<span class="c3po">c3po</span>&#xa0;<span class="r1">r1</span></span></h4>
-<div class="outline-text-4" id="text-1-1-23">
+<div id="outline-container-sec-1-1-20" class="outline-4">
+<h4 id="sec-1-1-20"><span class="todo TEST">TEST</span> irc reader&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></h4>
+<div class="outline-text-4" id="text-1-1-20">
+<p>
+In simpler implementiert. Siehe <i>misc/read_msg.py</i>. Keine verschiedenen Stimmen.
+</p>
+</div>
+
+<div id="outline-container-sec-1-1-20-1" class="outline-5">
+<h5 id="sec-1-1-20-1">assign voices to each participant</h5>
+<div class="outline-text-5" id="text-1-1-20-1">
+</div><ul class="org-ul"><li>parameters<br  /><div class="outline-text-6" id="text-1-1-20-1-1">
 <ul class="org-ul">
-<li>mpd commands als messages
+<li>speed
 </li>
-<li>Story: Ein EDI MQ command kann verschiedene music player daemons steuern
+<li>pitch
 </li>
-<li>Probleme
-<ul class="org-ul">
-<li>Mehrere mpds unterstützen; gleichzeitig steuern?
+<li>voice: lea, julia, kenny&#x2026;
 </li>
 </ul>
-</li>
-</ul>
+</div>
+</li></ul>
+</div>
+
+<div id="outline-container-sec-1-1-20-2" class="outline-5">
+<h5 id="sec-1-1-20-2">participants can change voices</h5>
+</div>
+</div>
+<div id="outline-container-sec-1-1-21" class="outline-4">
+<h4 id="sec-1-1-21"><span class="done DONE">DONE</span> Soundboard&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span></span></h4>
+<div class="outline-text-4" id="text-1-1-21">
+<p>
+!sob ?
+</p>
+
+<p>
+git repo mit soundfiles
+</p>
+
+<p>
+!sob &lt;file&gt;
+</p>
+
+<p>
+file matched files im repo
+</p>
+
+<p>
+antwortet mit ID3tags was ist
+</p>
 </div>
 </div>
 
-<div id="outline-container-sec-1-1-24" class="outline-4">
-<h4 id="sec-1-1-24"><span class="todo ASSIGNED">ASSIGNED</span> parse-commands: parse commands only from users having op uflag&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span>&#xa0;<span class="r1">r1</span></span></h4>
+<div id="outline-container-sec-1-1-22" class="outline-4">
+<h4 id="sec-1-1-22"><span class="done DONE">DONE</span> Wetterbericht</h4>
+<div class="outline-text-4" id="text-1-1-22">
+<p>
+Wie ist das subraum wetter?
+</p>
+
+<p>
+Als email abbonierbar? Erreichbar per Telefon
+</p>
+
+<p>
+Content:
+</p>
+<ul class="org-ul">
+<li>Temperatur innen. (Mit forecast?)
+</li>
+<li>Temperatur aussen
+</li>
+</ul>
 </div>
-<div id="outline-container-sec-1-1-25" class="outline-4">
-<h4 id="sec-1-1-25"><span class="todo TEST">TEST</span> presence: eta login&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span>&#xa0;<span class="r1">r1</span></span></h4>
-<div class="outline-text-4" id="text-1-1-25">
+</div>
+<div id="outline-container-sec-1-1-23" class="outline-4">
+<h4 id="sec-1-1-23"><span class="done DONE">DONE</span> parse-commands: parse commands only from users having op uflag&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span>&#xa0;<span class="r1">r1</span></span></h4>
+</div>
+<div id="outline-container-sec-1-1-24" class="outline-4">
+<h4 id="sec-1-1-24"><span class="done DONE">DONE</span> presence: eta login&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span>&#xa0;<span class="r1">r1</span></span></h4>
+<div class="outline-text-4" id="text-1-1-24">
 <p>
 Commands: !ul, !eta, !login, !logout
 </p>
@@ -703,8 +671,38 @@ Implemented: <i>proc/thehonestbookoftruth</i>
 </div>
 </div>
 
+<div id="outline-container-sec-1-1-25" class="outline-4">
+<h4 id="sec-1-1-25"><span class="done DONE">DONE</span> music player daemon sink&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_irq0">@irq0</span>&#xa0;<span class="r1">r1</span>&#xa0;<span class="c3po">c3po</span></span></h4>
+<div class="outline-text-4" id="text-1-1-25">
+<ul class="org-ul">
+<li>mpd commands als messages
+</li>
+<li>Story: Ein EDI MQ command kann verschiedene music player daemons steuern
+</li>
+<li>Probleme
+<ul class="org-ul">
+<li>Mehrere mpds unterstützen; gleichzeitig steuern?
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div id="outline-container-sec-1-1-25-1" class="outline-5">
+<h5 id="sec-1-1-25-1">Implementation</h5>
+<div class="outline-text-5" id="text-1-1-25-1">
+<ul class="org-ul">
+<li>shell wrapper around mpc
+</li>
+<li>send notifications after play
+</li>
+<li>support some extra commands to load playlists from remote sources
+</li>
+</ul>
+</div>
+</div>
+</div>
 <div id="outline-container-sec-1-1-26" class="outline-4">
-<h4 id="sec-1-1-26"><span class="todo TEST">TEST</span> dmx actor&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_grollicus">@grollicus</span>&#xa0;<span class="c3po">c3po</span>&#xa0;<span class="r1">r1</span></span></h4>
+<h4 id="sec-1-1-26"><span class="done DONE">DONE</span> dmx actor&#xa0;&#xa0;&#xa0;<span class="tag"><span class="_grollicus">@grollicus</span>&#xa0;<span class="c3po">c3po</span>&#xa0;<span class="r1">r1</span></span></h4>
 <div class="outline-text-4" id="text-1-1-26">
 <p>
 See: <code>sink/dmx</code>. Written in ruby.
@@ -937,16 +935,8 @@ Gesprochener Wetterbericht. Siehe oben
 </div>
 </div>
 </div>
+</div>
 
-<div id="outline-container-sec-1-1-35" class="outline-4">
-<h4 id="sec-1-1-35"><span class="todo OPEN">OPEN</span> speech to text</h4>
-<div class="outline-text-4" id="text-1-1-35">
-<p>
-Integrate speech to text engine
-</p>
-</div>
-</div>
-</div>
 <div id="outline-container-sec-1-2" class="outline-3">
 <h3 id="sec-1-2"><span class="section-number-3">1.2</span> Architecture Changes</h3>
 <div class="outline-text-3" id="text-1-2">
@@ -990,7 +980,7 @@ Everyone on the cmd exchange should consume list and help messages.
 </div>
 </div>
 <div id="outline-container-sec-1-2-2" class="outline-4">
-<h4 id="sec-1-2-2"><span class="todo IDEA">IDEA</span> state change exchange?</h4>
+<h4 id="sec-1-2-2"><span class="todo IDEA">IDEA</span> state change exchange / log / events</h4>
 <div class="outline-text-4" id="text-1-2-2">
 <p>
 Ohne globalen state müssen state veränderungen irgendwie kommuniziert
@@ -1023,6 +1013,14 @@ Ein event-&gt;tts consumer generiert tts commands wenn nötig
 <p>
 Die rule engine verändert ihren systemzustand und wertet rules neu aus.
 </p>
+</div>
+<div id="outline-container-sec-1-2-2-1" class="outline-5">
+<h5 id="sec-1-2-2-1">Implementation</h5>
+<div class="outline-text-5" id="text-1-2-2-1">
+<p>
+loev exchange: Log and events. Siehe papier.
+</p>
+</div>
 </div>
 </div>
 </div>
@@ -1082,26 +1080,6 @@ Für die Service Skripte:
 <li><code>APPDIR</code>
 </li>
 <li><code>LOGDIR</code>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div id="outline-container-sec-1-4" class="outline-3">
-<h3 id="sec-1-4"><span class="section-number-3">1.4</span> Project Name</h3>
-<div class="outline-text-3" id="text-1-4">
-<dl class="org-dl">
-<dt> EDI </dt><dd>++
-</dd>
-<dt> ESI </dt><dd>Enhanced Subraum Intelligence?
-</dd>
-</dl>
-</div>
-<div id="outline-container-sec-1-4-1" class="outline-4">
-<h4 id="sec-1-4-1">Subtitle?</h4>
-<div class="outline-text-4" id="text-1-4-1">
-<ul class="org-ul">
-<li>The hacker (friendly) space automation?
 </li>
 </ul>
 </div>
@@ -1646,7 +1624,7 @@ works quite well. Debian stable not so.
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2014-04-08 Di 22:03</p>
+<p class="date">Created: 2014-04-16 Mi 01:50</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
