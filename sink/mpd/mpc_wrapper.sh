@@ -13,8 +13,13 @@ m () {
 read -r cmd arg
 echo "CMD: $cmd $arg" >&2
 
-if [[ $cmd =~ ^(volume|next|prev|toggle)$ ]]; then
-    m "${cmd}"
+if [[ $cmd =~ ^(volume|next|prev|toggle|insert)$ ]]; then
+    m "${cmd}" "${arg}"
+elif [[ $cmd =~ ^(playthis)$ ]]; then
+    m clear
+    m insert "${arg}"
+    sleep 2
+    m play
 elif [[ $cmd =~ ^(\+\+|\-\-|liquid|bassdrive)$ ]]; then
     case "${cmd}" in
 	"++")
@@ -38,8 +43,4 @@ elif [[ $cmd =~ ^(\+\+|\-\-|liquid|bassdrive)$ ]]; then
 	    m play 1
 	    ;;
     esac
-elif [[ $cmd =~ ^(play)$ ]]; then
-    m clear
-    m insert "${arg}"
-    m play 1
 fi
