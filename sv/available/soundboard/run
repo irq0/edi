@@ -1,0 +1,16 @@
+#!/bin/sh
+
+exec 2>&1
+
+export PATH="${PATH}:${APPDIR}/misc:."
+
+cd ${APPDIR}/proc/soundboard
+
+echo "Generating index"
+./make_index
+
+exec ${APPDIR}/misc/listen_command \
+     --cmd sob \
+     --name "soundboard" \
+     --description "SOundBoard - Feed me: git.c3pb.de:irq0/edi.git proc/soundboard/files" \
+     --exe "${APPDIR}/proc/soundboard/edimq-handler"
