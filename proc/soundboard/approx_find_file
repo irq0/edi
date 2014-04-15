@@ -1,0 +1,15 @@
+#!/bin/bash
+
+INDEXPATH="$(dirname $0)/index"
+files="$(find ${INDEXPATH} -mindepth 1)"
+
+key=$@
+
+tre-agrep \
+    --best-match \
+    --ignore-case \
+    --files-with-matches \
+    "$key" \
+    $files \
+| sort -R \
+| head -1
