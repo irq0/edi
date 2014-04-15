@@ -66,11 +66,12 @@ class DMXLampActor(BaseActor):
         except ValueError:
             raise ParseException
 
-        if lamp in self.lamps:
-            return ((lamp,), (color,))
-        elif lamp in self.groups:
+        if lamp in self.lamps.keys():
+            return ((self.lamps[lamp],), (color,))
+        elif lamp in self.groups.keys():
             group = self.groups[lamp]
-            return (group, ((color,) * len(group)))
+            lamps = [ self.lamps[k] for k in group ]
+            return (lamps, ((color,) * len(lamps)))
         else:
             raise UnknownFooException
 
