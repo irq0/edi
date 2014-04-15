@@ -2,7 +2,7 @@
 
 command="$1"
 args="${@:2}"
-json="{\"cmd\":\"${command}\",\"args\":\"${args}\",\"user\":\"subinit-rc\",\"src\":\"subinit-rc\",\"runlevel\":\"${SUBINIT_LEVEL}\",\"action\":\"${SUBINIT_ACTION}\"}"
+json="{\"cmd\":\"${command}\",\"args\":\"${args}\",\"user\":\"emit-cmd\",\"src\":\"na\"}"
 
 
 if [[ -z $command ]]; then
