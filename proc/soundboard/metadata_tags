@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 mediainfo "$1" |
     gawk '
@@ -13,7 +13,7 @@ function add(X) {
 /Complete name/ {
    filename = $2
 }
-/(Track name|Performer|Description)/ {
+/(Track name|Performer|Description|Comment)/ {
    add($2);
 }
 END {
