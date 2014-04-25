@@ -10,16 +10,17 @@ BEGIN {
 {
    t = $0;
    gsub(/.+\//,"", t);
-   gsub(/\.\w+$/,"",t);
+   gsub(/\..+$/,"",t);
    gsub(/[\W_\.]/," ",t);
    print t
 }' -
 }
 
-find "${SCRIPTPATH}/files" -mindepth 1 |
-    while read filename; do
+find "${SCRIPTPATH}/files" -type f -maxdepth 1 -print0 |
+    while read -d '' -r filename; do
 	echo "$filename"
-	index_file="index/$(basename $filename)"
-	echo $filename | filename_tags | tee $index_file
-	"${SCRIPTPATH}/metadata_tags" 2>/dev/null $filename | tee -a $index_file
+	index_file="index/$(basename "$filename")"
+	mkdir -p "$(dirname "$index_file")"
+	echo "$filename" | filename_tags | tee "$index_file"
+	"${SCRIPTPATH}/metadata_tags" 2>/dev/null "$filename" | tee -a "$index_file"
     done
