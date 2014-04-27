@@ -1,10 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# ✓
 
-if [[ $(which jq) ]]; then
-    jq --raw-output .msg -
-elif [[ $(which python) ]]; then
-    python -c 'import sys, json; print json.load(sys.stdin)["msg"]'
-else
-    cat -
-    echo
-fi
+import sys
+import json
+
+data = sys.stdin.read()
+
+try:
+    print json.loads(data)["msg"]
+
+except:
+    print data
