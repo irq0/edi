@@ -27,9 +27,9 @@ await_reply () {
 await_reply &
 
 while true; do
-    read -e -p "[${SRC}] " -a cmd
-
-    if [[ -n $cmd ]]; then
-	emit ${cmd[@]}
+    read -ep "[${SRC}] "
+    history -s "$REPLY"
+    if [[ -n $REPLY ]]; then
+	emit $REPLY
     fi
 done
