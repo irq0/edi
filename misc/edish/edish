@@ -5,7 +5,7 @@ readonly SRC="edish.recv.$RANDOM"
 
 emit () {
     local command="$1"
-    local args="$(printf "%s " "${@:2}")"
+    local args="${@:2}"
     local json="{\"cmd\":\"${command}\",\"args\":\"${args}\",\"user\":\"${USERNAME}\",\"src\":\"${SRC}\"}"
 
     amqp-publish -u "amqp://${AMQP_SERVER:-localhost}" -e cmd -r "$command" \
