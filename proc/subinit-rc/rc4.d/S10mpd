@@ -3,7 +3,7 @@
 
 case "$1" in
 	start)
-		emit-cmd act music bassdrive
+		emit-cmd act music spacestation
 		;;
 	stop)
 		emit-cmd act mpd stop
