@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 SCRIPTPATH=$(dirname $0)
 
@@ -12,8 +12,9 @@ file_info () {
     fi
 }
 
-search=$(read)
-file="$(${SCRIPTPATH}/approx_find_file $search)"
+read search
+echo "Search keyword: $search"
+file="$(${SCRIPTPATH}/approx_find_file ${search})"
 
 emit_msg "SOB: $(file_info "$file")"
 emit_notification "$file"

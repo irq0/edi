@@ -1,18 +1,16 @@
 #!/bin/bash
 
-INDEXPATH="$(dirname $0)/index"
-FILEPATH="$(dirname $0)/files"
-files="$(find ${INDEXPATH} -mindepth 1)"
-
-key=$@
+INDEXPATH="$(dirname "$0")/index"
+FILEPATH="$(dirname "$0")/files"
+key="$(printf "%s " "${@}")"
 
 file="$(tre-agrep \
     --best-match \
     --ignore-case \
     --files-with-matches \
     "$key" \
-    $files \
+    ${INDEXPATH}/* \
 | sort -R \
 | head -1)"
 
-echo "${FILEPATH}/$(basename $file)"
+echo "${FILEPATH}/$(basename "$file")"
