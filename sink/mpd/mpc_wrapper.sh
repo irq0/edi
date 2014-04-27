@@ -29,7 +29,7 @@ stat () {
 } 
 END { 
    if (status == "[playing]") { 
-      gsub(/:.*$/,"", title); 
+      gsub(/(:|\[).*$/,"", title); 
       print title 
    } 
 }'
