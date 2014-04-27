@@ -56,7 +56,12 @@ class MQ(Thread):
 
         self.chan.queue_bind(exchange=self.exchange,
                              queue=self.send_queue_name,
+                             routing_key=".".join(("irc", self.bot.nickname, "action", "*")))
+
+        self.chan.queue_bind(exchange=self.exchange,
+                             queue=self.send_queue_name,
                              routing_key=".".join(("irc", self.bot.nickname, "presence")))
+
 
         self.add_consumer()
 
@@ -80,13 +85,15 @@ class MQ(Thread):
 
         except Exception, e:
             print "Exception in consume handler:", e
-            traceback.print_exc()           
+            traceback.print_exc()
 
     def handle_json_message(self, key, msg):
         if key[2] == "presence":
             self.irc_presence(msg["status"], msg["msg"])
         elif key[2] == "send":
             self.irc_send(key[3], msg["user"], msg["msg"])
+        elif key[2] == "action":
+            self.irc_action(key[3], msg["msg"])
         else:
             print u"Unknown message type:", key[2], msg
 
@@ -95,6 +102,8 @@ class MQ(Thread):
             self.irc_presence(msg, u"")
         elif key[2] == "send":
             self.irc_send(key[3], key[3], msg)
+        elif key[2] == "action":
+            self.irc_action(key[3], msg)
         else:
             print u"Unknown message type:", key[2], msg
 
@@ -112,8 +121,15 @@ class MQ(Thread):
         else:
             print u"Received unknown status:", status
 
+    def irc_action(self, dest, msg):
+        dest = dest.replace(u"_channel_", config["channel"])
+        print u"ACTION: dest=%s msg=%s" % (dest, msg)
+
+        self.bot.me(dest, msg)
+
     def irc_send(self, dest, user, msg):
         dest = dest.replace(u"_channel_", config["channel"])
+        user = user.replace(u"_channel_", config["channel"])
 
         # long message with user intended for channel -> msg user
         if len(msg) > 120 and dest == config["channel"] and user != config["channel"]:
