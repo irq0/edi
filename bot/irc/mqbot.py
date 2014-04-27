@@ -73,7 +73,7 @@ class MQ(Thread):
         try:
             key = raw_msg.delivery_info["routing_key"].decode("utf-8").split(u".")
             body = raw_msg.body.decode("utf-8")
-            
+
             print u"CONSUME: routing_key={} body={}".format(key, body)
 
             if raw_msg.properties["content_type"] == "application/json":
@@ -125,7 +125,7 @@ class MQ(Thread):
         dest = dest.replace(u"_channel_", config["channel"])
         print u"ACTION: dest=%s msg=%s" % (dest, msg)
 
-        self.bot.me(dest, msg)
+        self.bot.me(dest.encode("utf-8"), msg.encode("utf-8"))
 
     def irc_send(self, dest, user, msg):
         dest = dest.replace(u"_channel_", config["channel"])
@@ -316,6 +316,19 @@ class MQBot(NamesIRCClient):
                              if n.startswith("@")))
             print u"IRC", config["channel"], "OPS:", self.ops
         self.names(config["channel"]).addCallback(parseOps)
+
+    def me(self, channel, action):
+        """
+        Strike a pose.
+
+        @type channel: C{str}
+        @param channel: The name of the channel to have an action on. If it
+        has no prefix, C{'#'} will to prepended to it.
+        @type action: C{str}
+        @param action: The action to preform.
+        """
+        if channel[0] not in '&#!+': channel = '#' + channel
+        self.ctcpMakeQuery(channel, [('ACTION', action)])
 
 class BotFactory(protocol.ClientFactory):
     protocol = MQBot
