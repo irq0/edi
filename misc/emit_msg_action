@@ -1,0 +1,14 @@
+#!/bin/bash -x
+
+
+key="irc.EDI.action._channel_"
+msg="$@"
+
+if [[ -z $msg ]]; then
+    echo "USAGE: $0 <message>"
+    exit 1
+fi
+
+amqp-publish -u "amqp://${AMQP_SERVER:-localhost}" -e "msg" -r "$key" \
+	     --content-type="text/plain" \
+	     -b "${msg}"
