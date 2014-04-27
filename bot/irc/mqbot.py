@@ -16,6 +16,8 @@ from twisted.python import log
 
 from threading import Thread
 
+from config import AMQP_SERVER, config
+
 from amqplib import client_0_8 as amqp
 
 import time
@@ -25,39 +27,6 @@ import os
 import json
 import re
 import codecs
-
-# without ssl
-# config = {
-#     "host" : "spaceboyz.net",
-#     "port" : 6667,
-#     "channel" : "#c3pb.sh",
-#     "nick" : "EDI",
-#     "passwd" : "***REMOVED***"
-# }
-
-# ssl "simple", no cacert, no client cert, no real checking. you get encryption tough..
-# config = {
-#     "ssl" : True,
-#     "host" : "spaceboyz.net",
-#     "port" : 9999,
-#     "channel" : "#c3pb.sh",
-#     "nick" : "EDI",
-#     "passwd" : "***REMOVED***"
-# }
-
-# ssl with ca, client certs
-config = {
-    "ssl" : "cert",
-    "host" : "spaceboyz.net",
-    "port" : 9999,
-    "channel" : "#c3pb.sh",
-    "nick" : "EDI",
-    "passwd" : "***REMOVED***",
-    "ssl_clicert" : "ssl/hackint-client.pem",
-    "ssl_cacert" : "ssl/hackint-cacert.pem",
-}
-
-AMQP_SERVER = os.getenv("AMQP_SERVER") or "localhost"
 
 class MQ(Thread):
     def __init__(self, bot):
@@ -87,7 +56,12 @@ class MQ(Thread):
 
         self.chan.queue_bind(exchange=self.exchange,
                              queue=self.send_queue_name,
+                             routing_key=".".join(("irc", self.bot.nickname, "action", "*")))
+
+        self.chan.queue_bind(exchange=self.exchange,
+                             queue=self.send_queue_name,
                              routing_key=".".join(("irc", self.bot.nickname, "presence")))
+
 
         self.add_consumer()
 
@@ -99,7 +73,7 @@ class MQ(Thread):
         try:
             key = raw_msg.delivery_info["routing_key"].decode("utf-8").split(u".")
             body = raw_msg.body.decode("utf-8")
-            
+
             print u"CONSUME: routing_key={} body={}".format(key, body)
 
             if raw_msg.properties["content_type"] == "application/json":
@@ -111,13 +85,15 @@ class MQ(Thread):
 
         except Exception, e:
             print "Exception in consume handler:", e
-            traceback.print_exc()           
+            traceback.print_exc()
 
     def handle_json_message(self, key, msg):
         if key[2] == "presence":
             self.irc_presence(msg["status"], msg["msg"])
         elif key[2] == "send":
             self.irc_send(key[3], msg["user"], msg["msg"])
+        elif key[2] == "action":
+            self.irc_action(key[3], msg["msg"])
         else:
             print u"Unknown message type:", key[2], msg
 
@@ -126,6 +102,8 @@ class MQ(Thread):
             self.irc_presence(msg, u"")
         elif key[2] == "send":
             self.irc_send(key[3], key[3], msg)
+        elif key[2] == "action":
+            self.irc_action(key[3], msg)
         else:
             print u"Unknown message type:", key[2], msg
 
@@ -143,7 +121,16 @@ class MQ(Thread):
         else:
             print u"Received unknown status:", status
 
+    def irc_action(self, dest, msg):
+        dest = dest.replace(u"_channel_", config["channel"])
+        print u"ACTION: dest=%s msg=%s" % (dest, msg)
+
+        self.bot.me(dest.encode("utf-8"), msg.encode("utf-8"))
+
     def irc_send(self, dest, user, msg):
+        dest = dest.replace(u"_channel_", config["channel"])
+        user = user.replace(u"_channel_", config["channel"])
+
         # long message with user intended for channel -> msg user
         if len(msg) > 120 and dest == config["channel"] and user != config["channel"]:
             self.bot.msg(dest.encode("utf-8"), u"{}: Lots of data.. Sending you a msg".format(user).encode("utf-8"))
@@ -160,8 +147,6 @@ class MQ(Thread):
         else:
             dest = config["channel"]
 
-
-        dest = dest.replace(u"_channel_", config["channel"])
         print u"SEND: dest=%s msg=%s" % (dest, msg)
 
         self.bot.msg(dest.encode("utf-8"), msg.encode("utf-8"))
@@ -332,6 +317,19 @@ class MQBot(NamesIRCClient):
             print u"IRC", config["channel"], "OPS:", self.ops
         self.names(config["channel"]).addCallback(parseOps)
 
+    def me(self, channel, action):
+        """
+        Strike a pose.
+
+        @type channel: C{str}
+        @param channel: The name of the channel to have an action on. If it
+        has no prefix, C{'#'} will to prepended to it.
+        @type action: C{str}
+        @param action: The action to preform.
+        """
+        if channel[0] not in '&#!+': channel = '#' + channel
+        self.ctcpMakeQuery(channel, [('ACTION', action)])
+
 class BotFactory(protocol.ClientFactory):
     protocol = MQBot
 
@@ -385,7 +383,17 @@ def connect(factory):
                            6666,
                            factory)
 
+def print_config():
+    format = "{:20s}\t{:20s}"
+
+    print "mqbot configuration"
+    print format.format("amqp server", repr(AMQP_SERVER))
+    print "\n".join((format.format(k,repr(v))
+                    for k,v in config.iteritems()
+                    if k not in ["passwd"]))
+
 if __name__ == '__main__':
+    print_config()
     log.startLogging(sys.stdout)
 
     factory = BotFactory()
