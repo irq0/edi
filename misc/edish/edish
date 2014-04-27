@@ -1,0 +1,35 @@
+#!/bin/bash
+
+readonly USERNAME="$(whoami)"
+readonly SRC="edish.recv.$RANDOM"
+
+emit () {
+    local command="$1"
+    local args="$(printf "%s " "${@:2}")"
+    local json="{\"cmd\":\"${command}\",\"args\":\"${args}\",\"user\":\"${USERNAME}\",\"src\":\"${SRC}\"}"
+
+    amqp-publish -u "amqp://${AMQP_SERVER:-localhost}" -e cmd -r "$command" \
+	--content-type="application/json" \
+	-b "${json}"
+}
+
+await_reply () {
+    local key="${SRC/recv/send}"
+
+    echo "Listening for replys on msg exchange, key ${key}"
+    amqp-consume \
+	-u "amqp://${AMQP_SERVER:-localhost}" \
+	-e msg \
+	-r "$key" \
+	"$(dirname "$0")/pprint_reply" 2> /dev/null
+}
+
+await_reply &
+
+while true; do
+    read -e -p "[${SRC}] " -a cmd
+
+    if [[ -n $cmd ]]; then
+	emit ${cmd[@]}
+    fi
+done
