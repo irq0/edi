@@ -3,10 +3,10 @@
 case "$1" in
 
     start)
-	emit-cmd act dmx all background
+	emit_cmd act dmx all background
 	;;
 
     stop)
-	emit-cmd act dmx all red
+	emit_cmd act dmx all red
 	;;
 esac

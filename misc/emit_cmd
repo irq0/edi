@@ -1,9 +1,13 @@
 #!/bin/bash -x
 
-command="$1"
-args="${@:2}"
-json="{\"cmd\":\"${command}\",\"args\":\"${args}\",\"user\":\"emit-cmd\",\"src\":\"na\"}"
+readonly command="$1"
+readonly args="${@:2}"
 
+if [[ -n $EDI_METADATA ]]; then
+    EDI_METADATA=",\"meta\":${EDI_METADATA}"
+fi
+
+json="{\"cmd\":\"${command}\",\"args\":\"${args}\",\"user\":\"${USERNAME:-emit-cmd}\",\"src\":\"na\"${EDI_METADATA}"
 
 if [[ -z $command ]]; then
     echo "USAGE: $0 <command> [args]"

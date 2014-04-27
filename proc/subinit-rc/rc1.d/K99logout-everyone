@@ -3,7 +3,7 @@
 case "$1" in
 
     stop)
-	emit-cmd logout-all
+	emit_cmd logout-all
 	;;
 
 esac
