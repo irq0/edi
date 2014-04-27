@@ -370,7 +370,17 @@ def connect(factory):
                            6666,
                            factory)
 
+def print_config():
+    format = "{:20s}\t{:20s}"
+
+    print "mqbot configuration"
+    print format.format("amqp server", repr(AMQP_SERVER))
+    print "\n".join((format.format(k,repr(v))
+                    for k,v in config.iteritems()
+                    if k not in ["passwd"]))
+
 if __name__ == '__main__':
+    print_config()
     log.startLogging(sys.stdout)
 
     factory = BotFactory()
