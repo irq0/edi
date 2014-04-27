@@ -7,7 +7,7 @@ if [[ -n $EDI_METADATA ]]; then
     EDI_METADATA=",\"meta\":${EDI_METADATA}"
 fi
 
-json="{\"cmd\":\"${command}\",\"args\":\"${args}\",\"user\":\"${USERNAME:-emit-cmd}\",\"src\":\"na\"${EDI_METADATA}"
+json="{\"cmd\":\"${command}\",\"args\":\"${args}\",\"user\":\"${USERNAME:-emit-cmd}\",\"src\":\"na\"${EDI_METADATA}}"
 
 if [[ -z $command ]]; then
     echo "USAGE: $0 <command> [args]"
