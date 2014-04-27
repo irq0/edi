@@ -1,0 +1,9 @@
+#!/bin/bash
+
+
+key="irc.EDI.presence"
+json="{\"msg\":\"${@:2}\",\"status\":\"${1}\",\"user\":\"${USERNAME}\"}"
+
+amqp-publish -u "amqp://${AMQP_SERVER:-localhost}" -e "msg" -r "$key" \
+	     --content-type="application/json" \
+	     -b "${json}"
