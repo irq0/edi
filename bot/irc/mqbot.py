@@ -113,6 +113,8 @@ class MQ(Thread):
             print u"Received unknown status:", status
 
     def irc_send(self, dest, user, msg):
+        dest = dest.replace(u"_channel_", config["channel"])
+
         # long message with user intended for channel -> msg user
         if len(msg) > 120 and dest == config["channel"] and user != config["channel"]:
             self.bot.msg(dest.encode("utf-8"), u"{}: Lots of data.. Sending you a msg".format(user).encode("utf-8"))
@@ -129,8 +131,6 @@ class MQ(Thread):
         else:
             dest = config["channel"]
 
-
-        dest = dest.replace(u"_channel_", config["channel"])
         print u"SEND: dest=%s msg=%s" % (dest, msg)
 
         self.bot.msg(dest.encode("utf-8"), msg.encode("utf-8"))
