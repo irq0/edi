@@ -3,15 +3,15 @@
 case "$1" in
 
     start)
-	emit-cmd act bulb on
-	emit-cmd act sofaleds on
-	emit-cmd act dmx all green
+	emit_cmd act bulb on
+	emit_cmd act sofaleds on
+	emit_cmd act dmx all green
 	;;
 
     stop)
-	emit-cmd act bulb off
-	emit-cmd act sofaleds off
-	emit-cmd act dmx all black
+	emit_cmd act bulb off
+	emit_cmd act sofaleds off
+	emit_cmd act dmx all black
 	;;
 
 esac

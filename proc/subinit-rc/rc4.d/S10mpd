@@ -3,9 +3,9 @@
 
 case "$1" in
 	start)
-		emit-cmd act music spacestation
+		emit_cmd act music spacestation
 		;;
 	stop)
-		emit-cmd act mpd stop
+		emit_cmd act mpd stop
 		;;
 esac

@@ -15,8 +15,9 @@ $program_path = './programs/'
 $channel_write_interval = 0.1
 $lamps = {
   8  => "background",
-  24 => "background",
-  96 => "background"
+  64 => "background",
+  96 => "background",
+  192 => "background",
 }
 #/config
 

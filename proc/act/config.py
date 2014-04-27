@@ -155,7 +155,7 @@ conf = [
                      ("mpd loadplay http://www.bassdrive.com/v2/streams/BassDrive3.pls",)),
                 ]),
 
-    FourThreeThreeMhzActor("venti", "Ventilator", "11111 1"),
+    FourThreeThreeMhzActor("sofaleds", "LEDs am Sofa", "11111 1"),
     FourThreeThreeMhzActor("bulb", "Bunte Lampe", "11111 2"),
 
     DMXLampActor("dmx",
@@ -163,10 +163,11 @@ conf = [
                  lamps = {
                      "sofa" : "96",
                      "tuer" : "24",
+                     "c64" : "192",
                      "bastelecke" : "8",
                  },
                  groups = {
-                     "all" : ("sofa", "tuer", "bastelecke")
+                     "all" : ("sofa", "tuer", "bastelecke", "c64")
                  }),
 
     PassthroughActor("mpd",
