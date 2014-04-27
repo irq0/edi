@@ -152,7 +152,7 @@ conf = [
                  somafm()
                  + [("bassdrive",
                      "Bassdrive",
-                     ("mpd loadpls http://www.bassdrive.com/v2/streams/BassDrive3.pls",)),
+                     ("mpd playpls http://www.bassdrive.com/v2/streams/BassDrive3.pls",)),
                 ]),
 
     FourThreeThreeMhzActor("sofaleds", "LEDs am Sofa", "11111 1"),
