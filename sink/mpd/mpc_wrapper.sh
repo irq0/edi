@@ -14,7 +14,7 @@ notify () {
     text="$@"
     if [[ -n $text ]]; then
        emit_cmd tts --voice willbadguy --text "Playing: ${text}"
-       emit_msg "Playing ${text}" # TODO use loev service!
+       emit_msg_action "turns on the radio: ${text}" # TODO use loev service!
     fi
 }
 
