@@ -41,9 +41,16 @@ def make_cmd_exec(cmd, app):
 
     return do_exec
 
+
+def reply_dst(cmd):
+    if cmd.has_key("src"):
+        return cmd["src"].replace("recv", "send")
+    else:
+        return "irc.EDI.send._channel_" # TODO: use loev as fallback?
+
 # TODO replace with loev
-def emit_msg(chan, msg):
-    key = "irc.EDI.send._channel_"
+def emit_reply(orig_cmd, chan, msg):
+    key = reply_dst(orig_cmd)
 
     print "---> [%r] %r" % (key, msg)
 
@@ -53,6 +60,7 @@ def emit_msg(chan, msg):
                        properties=pika.BasicProperties(
                            content_type="text/plain",
                            delivery_mode=2))
+
 
 def cmd_callback(chan, method, props, body):
     print "<--- [%r] %r" % (method.routing_key, body)
@@ -69,7 +77,7 @@ def cmd_callback(chan, method, props, body):
             print "~~~~ Dispatching cmd \"{}\" to function: {}".format(cmd, func)
             ret = func(d)
             if ret:
-                emit_msg(chan, ret)
+                emit_reply(d, chan, ret)
 
         except Exception, e:
             print "~~~~ EXCEPTION in callback: ", e
