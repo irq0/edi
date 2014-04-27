@@ -39,6 +39,8 @@ def make_cmd_exec(cmd, app):
         print "#### Command \"{}\"output: STDERR".format(cmd)
         print (stderr or "")
 
+        return stdout
+
     return do_exec
 
 
