@@ -3,8 +3,10 @@
 case "$1" in
     start)
 	emit-cmd tts --voice lea --text Subraum startet
+	emit-cmd sob subraum_startup
 	;;
     stop)
 	emit-cmd tts --voice lea --text Subraum faehrt runter
+	emit-cmd sob subraum_shutdown
 	;;
 esac
