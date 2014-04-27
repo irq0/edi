@@ -7,6 +7,6 @@ case "$1" in
 	;;
 
     stop)
-	emit-cmd act dmx all red
+	emit-cmd act dmx all alarm
 	;;
 esac
