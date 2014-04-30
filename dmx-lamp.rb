@@ -10,34 +10,41 @@
 #Lampenids: 8, 24, 96
 
 #config
-$subsystem = "subraum"
-$program_path = './programs/'
-$channel_write_interval = 0.1
-$lamps = {
-  8  => "background",
-  24 => "background",
-  96 => "background"
-}
-#/config
+def config
+	$subsystem = "subraum"
+	$program_path = './programs/'
+	$channel_write_interval = 0.1
+	$debug = false
+	$lamps = {
+	  8  => Color.resolve("background"),
+	  24 => Color.resolve("background"),
+	  96 => Color.resolve("background"),
+	  192 => Color.resolve("background"),
+	}
+	#/config
+end
 
 require "bunny"
 require "serialport"
 require "thread"
 require "json"
 
-#class SerialDummy
-#  def initialize(dev, bauds)
-#    puts "Opened #{dev}@#{bauds}"
-#  end
-#  def write(s)
-#    puts "Serial write: #{s}"
-#  end
-#end
+class SerialDummy
+  def initialize(dev, bauds)
+    puts "Opened #{dev}@#{bauds}"
+  end
+  def write(s)
+    puts "Serial write: #{s}"
+  end
+end
 
 class DmxControl
   def initialize
-    @serial = SerialPort.new("/dev/dmx", 38400)
-#    @serial = SerialDummy.new("/dev/dmx", 38400)
+    if $debug then
+      @serial = SerialDummy.new("/dev/dmx", 38400)
+    else
+      @serial = SerialPort.new("/dev/dmx", 38400)
+    end
     @sema = Mutex.new #semaphore die @serial schützt
     @channels = {}
     @programs = {}
@@ -164,12 +171,14 @@ class Color
   end
 end
 
+config
 $program_path = File.realpath($program_path)
 Color.load_colors
 
 if __FILE__ == $0
   rkprefix = "dmx.lamp."+$subsystem+"."
   control = DmxControl.new
+  control.on
 
   conn = Bunny.new(:host => "mopp")
   conn.start
