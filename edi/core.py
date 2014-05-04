@@ -29,15 +29,20 @@ def init(amqp_server=(os.getenv("AMQP_SERVER") or "localhost")):
 
     conn = amqp.Connection(amqp_server)
     chan = conn.channel()
-    dispatch_table = {}
+    dispatch_table = {
+        "msg" : {},
+        "cmd" : {},
+    }
 
     chan.exchange_declare("cmd", "topic", auto_delete=False, durable=True)
+    chan.exchange_declare("msg", "topic", auto_delete=False, durable=True)
+
     queue, _, _ = chan.queue_declare(durable=True, auto_delete=True)
 
     log.info("Using queue: %s", queue)
 
     consumer_tag = chan.basic_consume(queue,
-                                      callback=command_dispatcher)
+                                      callback=dispatcher)
 
 def teardown():
     global conn
@@ -48,38 +53,71 @@ def teardown():
     chan.close()
     conn.close()
 
-def command_dispatcher(msg):
-    log.info("<--- [%r] %r", msg.routing_key, msg.body)
+def dispatch_cmd(msg):
+    d = json.loads(msg.body)
+    cmd = d["cmd"]
+    assert(cmd == msg.routing_key)
 
+    func = dispatch_table["cmd"][d["cmd"]]
+
+    log.info("~~~~ Dispatching cmd %r to function: %r", cmd, func)
+    ret = func(**d)
+
+    if ret and d.has_key("src"):
+        emit.msg_reply(msg.channel, d["src"], ret)
+
+def msg_args(msg):
     if msg.properties["content_type"] == "application/json":
         d = json.loads(msg.body)
+        d["rkey"] = msg.routing_key
+    elif msg.properties["content_type"] == "text/plain":
+        return {"msg" : msg.body,
+                "rkey" : msg.routing_key,}
 
-        msg.channel.basic_ack(msg.delivery_tag)
+def dispatch_msg(msg):
+    fns = dispatch_table["msg"][msg.routing_key]
+    for f in fns:
+        log.info("~~~~ Dispatching msg rkey=%r to function: %r", msg.routing_key, func)
+        ret = func(**msg_args(msg))
 
-        try:
-            cmd = d["cmd"]
-            assert(cmd == msg.routing_key)
+def dispatcher(msg):
+    log.info("<--- [%r] key=%r body=%r", msg.delivery_info["exchange"], msg.routing_key, msg.body)
 
-            func = dispatch_table[d["cmd"]]
+    dispatch = msg.delivery_info["exchange"]
+    try:
+        if msg.properties["content_type"] == "application/json" and dispatch == u"cmd":
+            return dispatch_cmd(msg)
+        elif msg.properties["content_type"] in ["application/json", "text/plain"] and dispatch == u"msg":
+            return dispatch_msg(msg)
+        else:
+            log.warning(u"Got message from unknown exchange andor content type")
 
-            log.info("~~~~ Dispatching cmd %r to function: %r", cmd, func)
-            ret = func(**d)
-
-            if ret and d.has_key("src"):
-                emit.msg_reply(msg.channel, d["src"], ret)
-
-        except Exception:
-            log.exception("EXCEPTION in callback")
-
+    except Exception:
+        log.exception(u"EXCEPTION in callback")
 
 def register_command(callback, command):
+    global queue
     chan.queue_bind(queue,
                     "cmd",
                     routing_key=command)
 
-    dispatch_table[command] = callback
+    dispatch_table["cmd"][command] = callback
 
     log.info("Registered command %r: %r", command, callback)
+
+def register_msg_handler(callback, key):
+    global queue
+    chan.queue_bind(queue,
+                    "msg",
+                    routing_key=key)
+
+    try:
+        dispatch_table["msg"][key].append(callback)
+    except KeyError:
+        dispatch_table["msg"][key] = [callback, ]
+
+    log.info("Registered msg handler %r: %r", key, callback)
+
 
 def run():
     global chan
