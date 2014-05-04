@@ -17,10 +17,7 @@ conn = None
 chan = None
 queue = None
 dispatch_table = None
-
-def queue_name():
-    """return unique name for amqp queue"""
-    return "pyedi__{}".format(uuid.uuid4())
+consumer_tag = None
 
 def init(amqp_server=(os.getenv("AMQP_SERVER") or "localhost")):
     """initialize library. mandatory call."""
@@ -28,31 +25,41 @@ def init(amqp_server=(os.getenv("AMQP_SERVER") or "localhost")):
     global chan
     global queue
     global dispatch_table
+    global consumer_tag
 
-    conn = pika.BlockingConnection(pika.ConnectionParameters(amqp_server))
+    conn = amqp.Connection(amqp_server)
     chan = conn.channel()
     dispatch_table = {}
-    queue = queue_name()
+
+    chan.exchange_declare("cmd", "topic", auto_delete=False, durable=True)
+    queue, _, _ = chan.queue_declare(durable=True, auto_delete=True)
 
     log.info("Using queue: %s", queue)
 
-    chan.queue_declare(queue=queue,
-                       durable=True,
-                       auto_delete=True)
+    consumer_tag = chan.basic_consume(queue,
+                                      callback=command_dispatcher)
 
-    chan.basic_consume(command_dispatcher,
-                       queue=queue)
 
 def teardown():
     global conn
-    chan.stop_consuming()
-    conn.close()
+    global chan
+    global consumer_tag
 
-def command_dispatcher(chan, method, props, body):
-    log.into("<--- [%r] %r", method.routing_key, body)
+    chan.basic_cancel(consumer_tag)
+    print "1"
+    chan.close()
+    print "2"
+
+    conn.close()
+    print "3"
+
+def command_dispatcher(msg):
+    log.into("<--- [%r] %r", msg.properties.items(), msg.body)
 
     if props.content_type == "application/json":
-        d = json.loads(body)
+        d = json.loads(msg.body)
+
+        msg.channel.basic_act(msg.delivery_tag)
 
         try:
             cmd = d["cmd"]
@@ -64,7 +71,7 @@ def command_dispatcher(chan, method, props, body):
             ret = func(d)
 
             if ret and d.has_key("src"):
-                emit.msg_reply(chan, d["src"], ret)
+                emit.msg_reply(msg.channel, d["src"], ret)
 
         except Exception, e:
             print "~~~~ EXCEPTION in callback: ", e
@@ -73,8 +80,8 @@ def command_dispatcher(chan, method, props, body):
         pass
 
 def register_command(callback, command):
-    chan.queue_bind(exchange="cmd",
-                    queue=queue,
+    chan.queue_bind(queue,
+                    "cmd",
                     routing_key=command)
 
     dispatch_table[command] = callback
@@ -84,11 +91,16 @@ def register_command(callback, command):
 def run():
     global chan
     log.info("Waiting for messages")
-    chan.start_consuming()
 
+    while chan.callbacks:
+        print "foo"
+        chan.wait()
+        print "bar"
+    print "exit"
 
 def run_background():
     thread = Thread(target=run)
+#    thread.daemon = True
     thread.start()
 
     log.info("Spawning background run thread: %r", thread)

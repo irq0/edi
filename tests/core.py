@@ -12,7 +12,6 @@ class TestCmdRoundtrip(unittest.TestCase):
     def tearDown(self):
         edi.core.teardown()
 
-
     def test_cmd_recv(self):
         reply = None
 
