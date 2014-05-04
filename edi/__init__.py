@@ -7,6 +7,6 @@ __author__ = "Marcel Lauhoff"
 
 
 from .core import init, run, teardown
-from .decorators import edi_msg, edi_filter_msg_with_uflag, edi_filter_msg_matches
+from .decorators import edi_msg, edi_cmd, edi_filter_msg_with_uflag, edi_filter_msg_matches
 
 #foo

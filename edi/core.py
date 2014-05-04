@@ -6,6 +6,7 @@ import logging
 import uuid
 import json
 import os
+from functools import wraps
 
 import emit
 
@@ -37,12 +38,6 @@ def init(amqp_server=(os.getenv("AMQP_SERVER") or "localhost")):
     chan.exchange_declare("cmd", "topic", auto_delete=False, durable=True)
     chan.exchange_declare("msg", "topic", auto_delete=False, durable=True)
 
-    queue, _, _ = chan.queue_declare(durable=True, auto_delete=True)
-
-    log.info("Using queue: %s", queue)
-
-    consumer_tag = chan.basic_consume(queue,
-                                      callback=dispatcher)
 
 def teardown():
     global conn
@@ -52,72 +47,6 @@ def teardown():
     chan.basic_cancel(consumer_tag)
     chan.close()
     conn.close()
-
-def dispatch_cmd(msg):
-    d = json.loads(msg.body)
-    cmd = d["cmd"]
-    assert(cmd == msg.routing_key)
-
-    func = dispatch_table["cmd"][d["cmd"]]
-
-    log.info("~~~~ Dispatching cmd %r to function: %r", cmd, func)
-    ret = func(**d)
-
-    if ret and d.has_key("src"):
-        emit.msg_reply(msg.channel, d["src"], ret)
-
-def msg_args(msg):
-    if msg.properties["content_type"] == "application/json":
-        d = json.loads(msg.body)
-        d["rkey"] = msg.routing_key
-    elif msg.properties["content_type"] == "text/plain":
-        return {"msg" : msg.body,
-                "rkey" : msg.routing_key,}
-
-def dispatch_msg(msg):
-    fns = dispatch_table["msg"][msg.routing_key]
-    for f in fns:
-        log.info("~~~~ Dispatching msg rkey=%r to function: %r", msg.routing_key, func)
-        ret = func(**msg_args(msg))
-
-def dispatcher(msg):
-    log.info("<--- [%r] key=%r body=%r", msg.delivery_info["exchange"], msg.routing_key, msg.body)
-
-    dispatch = msg.delivery_info["exchange"]
-    try:
-        if msg.properties["content_type"] == "application/json" and dispatch == u"cmd":
-            return dispatch_cmd(msg)
-        elif msg.properties["content_type"] in ["application/json", "text/plain"] and dispatch == u"msg":
-            return dispatch_msg(msg)
-        else:
-            log.warning(u"Got message from unknown exchange andor content type")
-
-    except Exception:
-        log.exception(u"EXCEPTION in callback")
-
-def register_command(callback, command):
-    global queue
-    chan.queue_bind(queue,
-                    "cmd",
-                    routing_key=command)
-
-    dispatch_table["cmd"][command] = callback
-
-    log.info("Registered command %r: %r", command, callback)
-
-def register_msg_handler(callback, key):
-    global queue
-    chan.queue_bind(queue,
-                    "msg",
-                    routing_key=key)
-
-    try:
-        dispatch_table["msg"][key].append(callback)
-    except KeyError:
-        dispatch_table["msg"][key] = [callback, ]
-
-    log.info("Registered msg handler %r: %r", key, callback)
-
 
 def run():
     global chan
@@ -133,3 +62,59 @@ def run_background():
 
     log.info("Spawning background run thread: %r", thread)
     return thread
+
+
+
+
+
+def wrap_callback(f):
+    @wraps(f)
+    def wrapper(msg):
+        log.info("<--- [%r] key=%r body=%r", msg.delivery_info["exchange"], msg.routing_key, msg.body)
+
+        try:
+            f(msg)
+        except Exception:
+            log.exception(u"EXCEPTION in callback")
+    return wrapper
+
+def wrap_unpack_json(f):
+    @wraps(f)
+    def wrapper(msg):
+            f(**json.loads(msg.body))
+
+    return wrapper
+
+def wrap_fudge_msg_args(f):
+    @wraps(f)
+    def wrapper(msg):
+        if msg.properties["content_type"] == "application/json":
+            d = json.loads(msg.body)
+            d["rkey"] = msg.routing_key
+        elif msg.properties["content_type"] == "text/plain":
+            d = {"msg" : msg.body,
+                 "rkey" : msg.routing_key,}
+
+        f(**d)
+    return wrapper
+
+def register_command(callback, cmd):
+    register_callback(wrap_callback(wrap_unpack_json(callback)),
+                      "cmd",
+                      cmd)
+
+def register_msg_handler(callback, key):
+    register_callback(wrap_callback(wrap_fudge_msg_args(callback)),
+                      "msg",
+                      key)
+
+def register_callback(callback, ex, key):
+    queue, _, _ = chan.queue_declare(durable=True, auto_delete=True)
+
+    consumer_tag = chan.basic_consume(queue,
+                                      callback=callback)
+    chan.queue_bind(queue,
+                    ex,
+                    routing_key=key)
+
+    log.info("Registered callback ex=%r key=%r q=%r: %r", ex, key, queue, callback)
