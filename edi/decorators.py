@@ -4,24 +4,21 @@
 
 import re
 from functools import wraps
-from edi.core import register_command, register_msg_handler
 
-
-def edi_cmd(cmd_name):
+def edi_cmd(edi, cmd_name):
     "Register EDI command"
     def decorator(f):
-        register_command(f, cmd_name)
+        edi.register_command(f, cmd_name)
         return f
     return decorator
 
 
-def edi_msg(key):
+def edi_msg(edi, key):
     "Listen for EDI msg by routing key"
     def decorator(f):
-        register_msg_handler(f, key)
+        edi.register_msg_handler(f, key)
         return f
     return decorator
-
 
 edi_msg_recv = lambda : edi_msg("#.recv.*")
 edi_msg_recv_proto = lambda proto : edi_msg("{}.*.recv.*".format(proto))

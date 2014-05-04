@@ -14,59 +14,6 @@ from threading import Thread
 
 log = logging.getLogger("edi.util")
 
-conn = None
-chan = None
-queue = None
-dispatch_table = None
-consumer_tag = None
-
-def init(amqp_server=(os.getenv("AMQP_SERVER") or "localhost")):
-    """initialize library. mandatory call."""
-    global conn
-    global chan
-    global queue
-    global dispatch_table
-    global consumer_tag
-
-    conn = amqp.Connection(amqp_server)
-    chan = conn.channel()
-    dispatch_table = {
-        "msg" : {},
-        "cmd" : {},
-    }
-
-    chan.exchange_declare("cmd", "topic", auto_delete=False, durable=True)
-    chan.exchange_declare("msg", "topic", auto_delete=False, durable=True)
-
-
-def teardown():
-    global conn
-    global chan
-    global consumer_tag
-
-    chan.basic_cancel(consumer_tag)
-    chan.close()
-    conn.close()
-
-def run():
-    global chan
-    log.info("Waiting for messages")
-
-    while chan.callbacks:
-        chan.wait()
-
-def run_background():
-    thread = Thread(target=run)
-    thread.daemon = True
-    thread.start()
-
-    log.info("Spawning background run thread: %r", thread)
-    return thread
-
-
-
-
-
 def wrap_callback(f):
     @wraps(f)
     def wrapper(msg):
@@ -98,23 +45,54 @@ def wrap_fudge_msg_args(f):
         f(**d)
     return wrapper
 
-def register_command(callback, cmd):
-    register_callback(wrap_callback(wrap_unpack_json(callback)),
-                      "cmd",
-                      cmd)
+class Manager(object):
+    consumer_tags = []
 
-def register_msg_handler(callback, key):
-    register_callback(wrap_callback(wrap_fudge_msg_args(callback)),
-                      "msg",
-                      key)
+    def __init__(self, amqp_server=(os.getenv("AMQP_SERVER") or "localhost")):
+        self.amqp_server = amqp_server
 
-def register_callback(callback, ex, key):
-    queue, _, _ = chan.queue_declare(durable=True, auto_delete=True)
+    def __enter__(self):
+        log.info("Connecting to AMQP Server: %r", self.amqp_server)
 
-    consumer_tag = chan.basic_consume(queue,
-                                      callback=callback)
-    chan.queue_bind(queue,
-                    ex,
-                    routing_key=key)
+        self.conn = amqp.Connection(self.amqp_server)
+        self.chan = self.conn.channel()
 
-    log.info("Registered callback ex=%r key=%r q=%r: %r", ex, key, queue, callback)
+        self.chan.exchange_declare("cmd", "topic", auto_delete=False, durable=True)
+        self.chan.exchange_declare("msg", "topic", auto_delete=False, durable=True)
+
+
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        for tag in self.consumer_tags:
+            self.chan.basic_cancel(tag)
+
+        self.chan.close()
+        self.conn.close()
+
+    def run(self):
+        log.info("Waiting for messages")
+
+        while self.chan.callbacks:
+            self.chan.wait()
+
+    def register_command(self, callback, cmd):
+        self.register_callback(wrap_callback(wrap_unpack_json(callback)),
+                               "cmd",
+                               cmd)
+
+    def register_msg_handler(self, callback, key):
+        self.register_callback(wrap_callback(wrap_fudge_msg_args(callback)),
+                               "msg",
+                               key)
+
+    def register_callback(self, callback, ex, key):
+        queue, _, _ = self.chan.queue_declare(durable=True, auto_delete=True)
+
+        self.consumer_tags.append(self.chan.basic_consume(queue,
+                                                          callback=callback))
+        self.chan.queue_bind(queue,
+                             ex,
+                             routing_key=key)
+
+        log.info("Registered callback ex=%r key=%r q=%r: %r", ex, key, queue, callback)
