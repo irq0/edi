@@ -39,45 +39,38 @@ def init(amqp_server=(os.getenv("AMQP_SERVER") or "localhost")):
     consumer_tag = chan.basic_consume(queue,
                                       callback=command_dispatcher)
 
-
 def teardown():
     global conn
     global chan
     global consumer_tag
 
     chan.basic_cancel(consumer_tag)
-    print "1"
     chan.close()
-    print "2"
-
     conn.close()
-    print "3"
 
 def command_dispatcher(msg):
-    log.into("<--- [%r] %r", msg.properties.items(), msg.body)
+    log.info("<--- [%r] %r", msg.routing_key, msg.body)
 
-    if props.content_type == "application/json":
+    if msg.properties["content_type"] == "application/json":
         d = json.loads(msg.body)
 
-        msg.channel.basic_act(msg.delivery_tag)
+        msg.channel.basic_ack(msg.delivery_tag)
 
         try:
             cmd = d["cmd"]
-            args = d["args"].split(None, 1)
+            assert(cmd == msg.routing_key)
 
-            func = cmds[d["cmd"]]
+            func = dispatch_table[d["cmd"]]
 
             log.info("~~~~ Dispatching cmd %r to function: %r", cmd, func)
-            ret = func(d)
+            ret = func(**d)
 
             if ret and d.has_key("src"):
                 emit.msg_reply(msg.channel, d["src"], ret)
 
-        except Exception, e:
-            print "~~~~ EXCEPTION in callback: ", e
-            traceback.print_exc()
+        except Exception:
+            log.exception("EXCEPTION in callback")
 
-        pass
 
 def register_command(callback, command):
     chan.queue_bind(queue,
@@ -93,14 +86,11 @@ def run():
     log.info("Waiting for messages")
 
     while chan.callbacks:
-        print "foo"
         chan.wait()
-        print "bar"
-    print "exit"
 
 def run_background():
     thread = Thread(target=run)
-#    thread.daemon = True
+    thread.daemon = True
     thread.start()
 
     log.info("Spawning background run thread: %r", thread)
