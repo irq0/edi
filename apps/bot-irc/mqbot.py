@@ -27,6 +27,10 @@ import os
 import json
 import re
 import codecs
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+log = logging.getLogger("irc-bot")
 
 class MQ(Thread):
     def __init__(self, bot):
@@ -74,18 +78,17 @@ class MQ(Thread):
             key = raw_msg.delivery_info["routing_key"].decode("utf-8").split(u".")
             body = raw_msg.body.decode("utf-8")
 
-            print u"CONSUME: routing_key={} body={}".format(key, body)
+            log.info("CONSUME: routing_key=%r body=%r", key, body)
 
             if raw_msg.properties["content_type"] == "application/json":
                 self.handle_json_message(key, json.loads(body))
             elif raw_msg.properties["content_type"] == "text/plain":
                 self.handle_plain_message(key, body)
             else:
-                print u"Message with unknown content type:", body
+                log.error("Message with unknown content type: %r", body)
 
         except Exception, e:
-            print "Exception in consume handler:", e
-            traceback.print_exc()
+            log.exception("Exception in consume handler")
 
     def handle_json_message(self, key, msg):
         if key[2] == "presence":
@@ -95,7 +98,7 @@ class MQ(Thread):
         elif key[2] == "action":
             self.irc_action(key[3], msg["msg"])
         else:
-            print u"Unknown message type:", key[2], msg
+            log.error("Unknown message type: %r %r", key[2], msg)
 
     def handle_plain_message(self, key, msg):
         if key[2] == "presence":
@@ -105,25 +108,25 @@ class MQ(Thread):
         elif key[2] == "action":
             self.irc_action(key[3], msg)
         else:
-            print u"Unknown message type:", key[2], msg
+            log.error("Unknown message type: %r %r", key[2], msg)
 
     def remove_consumer(self):
         for tag in self.consumer_tags:
             self.chan.basic_cancel(tag)
 
     def irc_presence(self, status, msg):
-        print "PRESENCE:", status, msg
+        log.debug("PRESENCE: %r %r", status, msg)
 
         if status == "away":
             self.bot.away(msg.encode("UTF-8"))
         elif status == "online":
             self.bot.back()
         else:
-            print u"Received unknown status:", status
+            log.error("Received unknown status: %r", status)
 
     def irc_action(self, dest, msg):
         dest = dest.replace(u"_channel_", config["channel"])
-        print u"ACTION: dest=%s msg=%s" % (dest, msg)
+        log.debug("ACTION: dest=%r msg=%r", dest, msg)
 
         self.bot.me(dest.encode("utf-8"), msg.encode("utf-8"))
 
@@ -147,7 +150,7 @@ class MQ(Thread):
         else:
             dest = config["channel"]
 
-        print u"SEND: dest=%s msg=%s" % (dest, msg)
+        log.debug("SEND: dest=%r msg=%r", dest, msg)
 
         self.bot.msg(dest.encode("utf-8"), msg.encode("utf-8"))
 
@@ -175,7 +178,7 @@ class MQ(Thread):
             "bot" : self.bot.nickname,
             "uflags" : list(self.user_flags(user)),
         })
-        print u"RECV: user=%s chan=%s msg=%s type=%s jmsg=%s" % (user, chan, msg, type, jmsg)
+        log.debug("RECV: user=%r chan=%r msg=%r type=%r jmsg=%r", user, chan, msg, type, jmsg)
 
         amsg = amqp.Message(jmsg.encode("utf-8"))
         amsg.properties["content_type"] = u"application/json"
@@ -189,13 +192,13 @@ class MQ(Thread):
 
 
         try:
-            print u"PUBLISH: routing_key=%s msg=%s" % (key, amsg)
+            log.debug("PUBLISH: routing_key=%r msg=%r", key, amsg)
 
             self.chan.basic_publish(exchange=self.exchange,
                                     routing_key=key,
                                     msg=amsg)
         except Exception, e:
-            print u"Exception while publishing message:", e
+            log.exception("Exception while publishing message")
 
     def run(self):
         while self.chan.callbacks:
@@ -208,7 +211,7 @@ class MQ(Thread):
         try:
             self.conn.close()
         except IOError, e:
-            print u"Error while closing amqp connection:", e
+            log.exception("Error while closing amqp connection")
 
 class NamesIRCClient(irc.IRCClient):
     def __init__(self, *args, **kwargs):
@@ -259,7 +262,7 @@ class MQBot(NamesIRCClient):
     ops = set()
 
     def connectionMade(self):
-        print u"connection made"
+        log.info("Connection established")
         irc.IRCClient.connectionMade(self)
         self.pub = MQ(self)
         self.pub.start()
@@ -269,11 +272,11 @@ class MQBot(NamesIRCClient):
         self.pub.close()
 
     def signedOn(self):
-        print u"IRC: Signed on"
+        log.info("IRC: Signed on")
 
         self.msg("NickServ", "IDENTIFY {}".format(self.password))
 
-        print u"IRC: join chan: ", config["channel"]
+        log.info("IRC: join chan: %s", config["channel"])
         self.join(config["channel"])
 
     def joined(self, chan):
@@ -282,7 +285,7 @@ class MQBot(NamesIRCClient):
 
     def modeChanged(self, user, chan, do_set_modes, modes, users):
         if chan == config["channel"] and "o" in modes:
-            print u"IRC", "OP change for users", users, "to", do_set_modes
+            log.debug("IRC OP change for users %r to %r", users, do_set_modes)
 
             if do_set_modes:
                 for u in users:
@@ -291,8 +294,6 @@ class MQBot(NamesIRCClient):
                 for u in users:
                     self.ops.remove(u)
 
-            print u"IRC", config["channel"], "OPS:", self.ops
-
     def userLeft(self, user, chan):
         if chan == config["channel"]:
 
@@ -300,7 +301,7 @@ class MQBot(NamesIRCClient):
             self.fetch_chan_ops()
 
     def privmsg(self, user, chan, msg):
-        print u"privmsg:", user, chan
+        log.debug("PRIVMSG: %r %r", user, chan)
         user = user.split('!', 1)[0]
 
         self.pub.irc_recvd(user, msg, chan, "privmsg")
@@ -314,7 +315,6 @@ class MQBot(NamesIRCClient):
         def parseOps(names):
             self.ops = set(( n[1:] for n in names
                              if n.startswith("@")))
-            print u"IRC", config["channel"], "OPS:", self.ops
         self.names(config["channel"]).addCallback(parseOps)
 
     def me(self, channel, action):
@@ -334,12 +334,12 @@ class BotFactory(protocol.ClientFactory):
     protocol = MQBot
 
     def clientConnectionLost(self, connector, reason):
-        print u"IRC: connection lost:", connector, reason
-        print u"IRC: reconnecting.."
+        log.debug("IRC: connection lost: %r %r", connector, reason)
+        log.error("IRC: reconnecting..")
         connector.connect()
 
     def clientConnectionFailed(self, connector, reason):
-        print u"IRC: connection failed:", connector, reason
+        log.error("IRC: connection failed: %r %r", connector, reason)
         reactor.stop()
 
 def load_clicert(filename):
@@ -355,13 +355,12 @@ def load_cacert(filename):
 def connect(factory):
     if config.has_key("ssl") and config["ssl"]:
         if config["ssl"] == "cert":
-            print u"CONNECT: SSL with client cert"
+            log.info("CONNECT: SSL with client cert")
 
             cli = load_clicert(config["ssl_clicert"])
             ca = load_cacert(config["ssl_cacert"])
 
-            print u"Using client certificate:"
-            print cli.inspect()
+            log.info("Using client certificate:\n %s", cli.inspect())
 
             reactor.connectSSL(config["host"],
                                config["port"],
@@ -372,32 +371,29 @@ def connect(factory):
                                    verify=True,
                                    caCerts=(ca.original,)))
         else:
-            print u"CONNECT: SSL default"
+            log.info("CONNECT: SSL default")
             reactor.connectSSL(config["host"],
                                config["port"],
                                factory,
                                ssl.ClientContextFactory())
     else:
-        print u"CONNECT: No SSL"
+        log.info("CONNECT: No SSL")
         reactor.connectTCP("irc.hackint.org",
                            6666,
                            factory)
 
-def print_config():
-    format = "{:20s}\t{:20s}"
+def log_config():
+    format = "{:s}={:s}"
 
-    print "mqbot configuration"
-    print format.format("amqp server", repr(AMQP_SERVER))
-    print "\n".join((format.format(k,repr(v))
-                    for k,v in config.iteritems()
-                    if k not in ["passwd"]))
+    log.info("mqbot configuration: %s",
+             ", ".join((format.format(k,repr(v))
+                        for k,v in config.iteritems()
+                        if k not in ["passwd"])))
 
 if __name__ == '__main__':
-    print_config()
-    log.startLogging(sys.stdout)
+    log_config()
 
     factory = BotFactory()
     connect(factory)
 
-    # run bot
     reactor.run()
