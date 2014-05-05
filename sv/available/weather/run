@@ -10,4 +10,4 @@ exec chpst -e "$ENVDIR" \
      --cmd wetter \
      --name "weather" \
      --description "Wetterbericht - Subraum und das da draussen" \
-     --exe "${APPDIR}/weather/weather-to-msg.sh"
+     --exe "${APPDIR}/weather/weather.sh"
