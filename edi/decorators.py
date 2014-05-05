@@ -43,3 +43,12 @@ def edi_filter_msg_with_uflag(uflag):
                 return f(**args)
         return wrapper
     return decorator
+
+def edi_filter_msg_without_uflag(uflag):
+    def decorator(f):
+        @wraps(f)
+        def wrapper(**args):
+            if not uflag in args["uflags"]:
+                return f(**args)
+        return wrapper
+    return decorator
