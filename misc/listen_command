@@ -177,7 +177,8 @@ def main():
                             routing_key=k)
 
         chan.basic_consume(cmd_callback,
-                           queue=queue)
+                           queue=queue,
+                           no_ack=True)
 
     def run():
         print "---- Waiting for messages:"
