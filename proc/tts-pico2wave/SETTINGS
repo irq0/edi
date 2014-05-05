@@ -1,6 +1,0 @@
-#!/bin/bash
-
-URL="amqp://localhost"
-CONSUME_QUEUE="tts"
-CONSUME_EXCHANGE="tts_worker"
-PUBLISH_EXCHANGE="say"

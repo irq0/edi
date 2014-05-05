@@ -1,0 +1,15 @@
+#!/bin/sh
+
+exec 2>&1
+
+export PATH="${PATH}:${APPDIR}/misc:."
+
+cd ${APPDIR}/proc/tts-pico2wave
+
+exec ${APPDIR}/misc/listen_command \
+     --cmd say \
+     --cmd tts \
+     --data onlyargs \
+     --name "tts" \
+     --description "pico2wave based tts" \
+     --exe "${APPDIR}/proc/tts-pico2wave/edimq-handler"

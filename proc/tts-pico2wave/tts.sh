@@ -1,23 +1,81 @@
 #!/bin/bash
 
+readonly TMPDIR="$(mktemp -dt "tts.XXXXXXXXXX")"
+readonly ERRLOG="$TMPDIR/err.log"
+
+trap cleanup EXIT
+
 tts() {
-    msg=$(cat -)
+    local lang="$1"
+    local msg="${@:2}"
 
-    lang="$(echo "$msg" | ./langid -l "en,de,es" | awk '/de/ { print "de-DE" } /en/ { print "en-GB" } /es/ { print "es-ES" } ')"
-    tmpdir="$(mktemp -dt "tts.XXXXXXXXXX")"
-    tmp="$tmpdir/pico2wave.wav"
-    pico2wave -l"$lang" -w"$tmp" "$msg"
-    oggenc -o - "$tmp"
-    rm -rf -- "$tmpdir"
+    local id="$RANDOM"
+    local wav="$TMPDIR/pico2wave_${id}.wav"
+    local ogg="$TMPDIR/pico2wave_${id}.ogg"
+
+    if pico2wave --lang="$lang" --wave="$wav" "$msg"; then
+	oggenc -o "$ogg"  "$wav"
+	echo "$ogg"
+    else
+	echo "pico2wave error :("
+	exit 1
+    fi
 }
 
-
-publish() {
-    amqp-publish \
-	--url="amqp://localhost" \
-	--exchange="notify" \
-	--routing-key="audio" \
-	--content-type="audio/vorbis"
+cleanup() {
+    rm -rf "${TMPDIR}"
 }
 
-tts | publish
+usage() {
+    echo "USAGE: <--help | --text TEXT> [--lang de]"
+    exit 1
+}
+
+cli() {
+    local PARSED=$(getopt --name tts-pico2wave --options "h" --longoptions "help,text:,lang:" -- "$@" 2> "$ERRLOG")
+
+    err=$(cat $ERRLOG)
+
+    if [[  -n $err ]]; then
+	echo $err
+	exit 1
+    fi
+
+    eval set -- "$PARSED"
+
+    local lang="de-DE"
+    local text=""
+
+    while true; do
+	case "$1" in
+	    -h|--help)
+		usage
+		;;
+	    --lang)
+		if [[ -n $2 ]]; then
+		    lang="$2"
+		fi
+		shift 2
+		;;
+	    --text)
+		if [[ -n $2 ]]; then
+		    text="$2"
+		fi
+
+		shift 2
+		;;
+	    --)
+		shift
+		break
+		;;
+	esac
+    done
+
+    if [[ -z $lang || -z $text ]]; then
+	echo "Error in commandline"
+	exit 1
+    else
+	echo "$lang" "$text"
+	exit 0
+    fi
+}
