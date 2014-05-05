@@ -24,7 +24,7 @@ edi_msg_recv = lambda : edi_msg("#.recv.*")
 edi_msg_recv_proto = lambda proto : edi_msg("{}.*.recv.*".format(proto))
 edi_msg_recv_ircchan = lambda : edi_msg("irc.*.recv._channel_")
 
-def edi_filter_msg_matches(regex, field="msg"):
+def edi_filter_matches(regex, field="msg"):
     r = re.compile(regex)
     def decorator(f):
         @wraps(f)
