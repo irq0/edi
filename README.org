@@ -1,0 +1,48 @@
+* Examples
+
+** Context Manager, Listen for command and msg
+
+#+BEGIN_SRC python
+import edi
+import sys
+import time
+
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger("checkscript")
+
+
+with edi.Manager() as e:
+        @edi.edi_cmd(e, "test")
+        def cmd_recv(**args):
+                print "CMD", args
+
+        @edi.edi_msg(e, "#")
+        def msg_recv(**msg):
+                print "MSG", msg
+
+        @edi.edi_msg(e, "#.send.*")
+        @edi.edi_filter_msg_matches(r"^!(\w+)\s?(.*?)$")
+        def parse_cmds(regroups, **msg):
+                cmd, args = regroups
+
+                try:
+                        user = msg["user"]
+                except KeyError:
+                        user = "na"
+
+                edi.emit.cmd(e.chan,
+                             cmd="test",
+                             args=args,
+                             user=user,
+                             src=msg["rkey"])
+
+        e.run()
+
+#+END_SRC
+* Tests
+** Run
+#+BEGIN_SRC sh
+AMQP_SERVER=10.23.1.6 nosetests tests
+#+END_SRC
