@@ -1,16 +1,18 @@
 #!/bin/bash
 
+MPLAYER="mplayer -vo null -really-quiet"
+
 tempfile () {
     tmp=$(mktemp -t XXXXXX)
     cat - > "$tmp"
 
-    mplayer -vo null "$tmp"
+    $MPLAYER "$tmp"
 
     rm "$tmp"
 }
 
 cache () {
-    mplayer -cache 1024 -vo null -
+    $MPLAYER -cache 1024 -
 }
 
 ${1:-tempfile}
