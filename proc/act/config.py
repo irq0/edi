@@ -175,10 +175,24 @@ conf = [
                      "act_mpd",
                      "subraum",
                      lambda args : re.match(r"(\w+|\w+ )+", args)),
+    RewriteActor("scenario",
+                 "Meta switch",
+                 [("shutdown", "Alles dunkel :(",
+                   ("dmx all black",
+                    "sofaleds off",
+                    "bulb off",
+                    "mpd stop",)),
+                  ("startup", "Alles an :)",
+                   ("dmx all background",
+                    "sofaleds on",
+                    "bulb on",
+                    "music spacestation"))]),
 ]
 
 
 db = { e.name : e for e in conf }
+
+export_as_cmd = ["music", "dmx", "mpd"]
 
 if __name__ == '__main__':
 

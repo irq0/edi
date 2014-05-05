@@ -13,7 +13,7 @@ m () {
 notify () {
     text="$@"
     if [[ -n $text ]]; then
-       emit_cmd tts --voice willbadguy --text "Playing: ${text}"
+       emit_cmd tts --voice willbadguy "Playing: ${text}"
        emit_msg_action "turns on the radio: ${text}" # TODO use loev service!
     fi
 }
@@ -21,17 +21,17 @@ notify () {
 stat () {
     mpc 2> /dev/null \
       | gawk '
-!/^(\[|volume)/ { 
-   title=$0 
-} 
-/^\[/ { 
-   status=$1 
-} 
-END { 
-   if (status == "[playing]") { 
-      gsub(/(:|\[).*$/,"", title); 
-      print title 
-   } 
+!/^(\[|volume)/ {
+   title=$0
+}
+/^\[/ {
+   status=$1
+}
+END {
+   if (status == "[playing]") {
+      gsub(/(:|\[).*$/,"", title);
+      print title
+   }
 }'
 }
 
@@ -44,7 +44,7 @@ elif [[ $cmd = "playthis" ]]; then
     m clear
     m insert "${arg}"
     sleep 2
-    m play 
+    m play
 elif [[ $cmd = "playpls" ]]; then
     m clear
 
@@ -52,7 +52,7 @@ elif [[ $cmd = "playpls" ]]; then
         m insert "${adr}"
     done
     sleep 2
-    m play 
+    m play
 fi
 
 sleep 2

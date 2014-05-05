@@ -1,49 +1,22 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
 
 import os
-import pika
 import json
 import re
 import traceback
+import argparse
 
 import logging
-from multiprocessing import Pool
 
-from config import db, UnknownFooException, ParseException
+import edi
 
-channel = None
+from config import db, export_as_cmd, UnknownFooException, ParseException
 
-def emit_act(chan, dst, rkey, payload):
-    print "---> [%r] rkey=%r payload=%r" % (dst, rkey, payload)
-    chan.basic_publish(exchange=dst,
-                       routing_key=rkey,
-                       body=payload,
-                       properties=pika.BasicProperties(
-                           content_type="application/octet-stream",
-                           delivery_mode=2))
-
-def emit_error(chan, cmd, error):
-    key = cmd["src"].replace("recv", "send")
-    msg = "%s: %s" % (cmd["user"], error)
-
-    print "---> [%r] %r" % (key, msg)
-
-    chan.basic_publish(exchange="msg",
-                       routing_key=key,
-                       body=msg,
-                       properties=pika.BasicProperties(
-                           content_type="text/plain",
-                           delivery_mode=2))
-
-def handle_notfound(arg):
-    return "I know nothin' about a \"{}\". Try \"help\"".format(" ".join(arg))
-
-def handle_help(arg):
-    if len(arg) > 1 and db.has_key(arg[1]):
-        return db[arg[1]].help()
-    else:
-        return "Available actors: {}".format(
-            ", ".join((x.name for x in db.itervalues())))
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("actor-service")
 
 def handle_command(chan, thing_name, args):
     assert db.has_key(thing_name)
@@ -60,7 +33,7 @@ def handle_command(chan, thing_name, args):
         assert len(payloads) == len(rkeys)
 
         for p, r in zip(payloads, rkeys):
-            success = emit_act(chan, dst, r, p)
+            success = edi.emit.emit(chan, dst, r, p)
             if success:
                 print "---> [?] success=%s" % (success)
 
@@ -75,81 +48,94 @@ def handle_command(chan, thing_name, args):
     else:
         do()
 
+class ArgumentParserError(Exception):
+    pass
 
-def callback(chan, method, props, body):
-    print "<--- [%r] %r" % (method.routing_key, body)
+class ThrowingArgumentParser(argparse.ArgumentParser):
+    def error(self, message):
+        raise ArgumentParserError(message)
 
-    if props.content_type == "application/json":
-        d = json.loads(body)
+def parse_args(args):
+    """Argparse the top level arguments. Throw exceptions instead of sys.exit"""
+    parser = ThrowingArgumentParser(description="Actor Service", add_help=False)
 
-        args = d["args"].split(None, 1)
-        print "~~~~ CALLBACK: args:", args
+    choices = ["act"] + [x.name for x in db.values()]
 
-        try:
-            if 0 < len(args) < 1:
-                emit_error(chan, d, "More input please")
-            elif args[0] == "help":
-                emit_error(chan, d, handle_help(args))
-            elif 0 < len(args) < 2:
-                emit_error(chan, d, "More input please")
-            elif args[0] not in db:
-                emit_error(chan, d, handle_notfound(args))
-            else:
-                handle_command(chan, args[0], args[1])
-                chan.basic_ack(delivery_tag = method.delivery_tag)
+    parser.add_argument("--help",
+                        default=False,
+                        nargs="?",
+                        choices=choices,
+                        help="Help message")
 
-        except UnknownFooException:
-            emit_error(chan, d, handle_notfound(args))
+    parser.add_argument("actor", choices=choices, nargs="?", help="Actor")
+    parser.add_argument("args", nargs=argparse.REMAINDER, help="Actor Arguments")
 
-        except ParseException:
-            # todo print something nicer..
-            emit_error(chan, d, handle_notfound(args))
+    result = parser.parse_args(args)
+    result.help_message = parser.format_help()
 
-        except Exception, e:
-            print "~~~~ EXCEPTION in callback: ", e
-            traceback.print_exc()
+    return result
+
+def cmd_args(c, a):
+    """Handle all cases in which the arguments may be fucked up"""
+
+    if c == "act":
+        s = a.split(None, 1)
+        if len(s) == 2:
+            c = s[0]
+            a = a.split()
+        elif len(s) == 1:
+            c = s[0]
+            a = ("--help", s[0])
+        else:
+            c = ""
+            a = ("--help",)
+        return c,a
+    else:
+        return cmd_args("act", " ".join((c, a)))
 
 def main():
-    amqp_server = os.getenv("AMQP_SERVER") or "localhost"
-    conn = pika.BlockingConnection(pika.ConnectionParameters(amqp_server))
-    chan = conn.channel()
-    exchange = "cmd"
-    queue = "act"
+    with edi.Manager() as e:
+        def reply(args, msg):
+            print args, msg
+            if args.has_key("user"):
+                edi.emit.msg_reply(e.chan,
+                                   src=args["src"],
+                                   user=args["user"],
+                                   msg=msg)
 
-    pika_logger = logging.getLogger('pika')
-    pika_logger.setLevel(logging.INFO)
+        @edi.edi_cmd(e, "list")
+        def list(**args):
+            reply(args, "act " + " ".join(export_as_cmd))
 
-    def setup():
-        logging.basicConfig()
+        @edi.edi_cmd(e, "act")
+        def act(**args):
+            try:
+                c, a = cmd_args(args["cmd"], args["args"])
+                a = parse_args(a)
 
-        chan.queue_declare(queue=queue,
-                           durable=True,
-                           auto_delete=True)
+                if a.help in db.keys():
+                    reply(args, db[a.help].help())
+                elif a.help == None:
+                    reply(args, a.help_message)
+                elif a.actor in db.keys():
+                    handle_command(e.chan, c, " ".join(a.args))
 
-        chan.queue_bind(exchange=exchange,
-                        queue=queue)
+            except ArgumentParserError, ex:
+                reply(args, ex)
 
-        print "---- Using queue:", queue
+            except UnknownFooException:
+                reply(args, "Unknown Foo")
 
-    def run():
-        print "---- Waiting for messages:"
+            except ParseException:
+                reply(args, "Couldn't parse that")
 
-        chan.basic_consume(callback,
-                           queue=queue)
+            except Exception, ex:
+                print "~~~~ EXCEPTION in callback: ", ex
+                traceback.print_exc()
 
-        chan.start_consuming()
+        for cmd in export_as_cmd:
+            e.register_command(act, cmd)
 
-    def teardown():
-        conn.close()
+        e.run()
 
-    try:
-        setup()
-        run()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        teardown()
-
-
-if __name__ == "__main__":
-    main()
+main()

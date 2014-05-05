@@ -27,10 +27,14 @@ def make_cmd_help(name, cmds):
 def make_cmd_exec(cmd, app):
     def do_exec(data):
         stdin = output_formatter(data)
+        env = os.environ
+        env["EDI_CMD"] = cmd
+
         p = subprocess.Popen(app,
                              stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE,
-                             stdin=subprocess.PIPE)
+                             stdin=subprocess.PIPE,
+                             env=env)
 
         stdout, stderr = p.communicate(input=stdin)
 
@@ -173,7 +177,8 @@ def main():
                             routing_key=k)
 
         chan.basic_consume(cmd_callback,
-                           queue=queue)
+                           queue=queue,
+                           no_ack=True)
 
     def run():
         print "---- Waiting for messages:"
