@@ -1,0 +1,29 @@
+PATH=/home/bernd/shouts:/usr/bin:/bin
+
+# m h dom m dow command
+0 0 * * * play.sh 00.mp3
+0 1 * * * play.sh 01.mp3
+0 2 * * * play.sh 02.mp3
+0 3 * * * play.sh 02.mp3
+0 4 * * * play.sh 04.mp3
+0 5 * * * play.sh 05.mp3
+0 6 * * * play.sh 06.mp3
+0 7 * * * play.sh 07.mp3
+0 8 * * * play.sh 08.mp3
+0 9 * * * play.sh 09.mp3
+0 10 * * * play.sh 10.mp3
+0 11 * * * play.sh 11.mp3
+0 12 * * * play.sh 12.mp3
+0 13 * * * play.sh 13.mp3
+0 14 * * * play.sh 14.mp3
+0 15 * * * play.sh 15.mp3
+0 16 * * * play.sh 16.mp3
+0 17 * * * play.sh 17.mp3
+0 18 * * * play.sh 18.mp3
+0 19 * * * play.sh 19.mp3
+0 20 * * * play.sh 20.mp3
+0 21 * * * play.sh 21.mp3
+0 22 * * * play.sh 22.mp3
+0 23 * * * play.sh 23.mp3
+
+42 23 * * * play.sh 2342.mp3
