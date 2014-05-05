@@ -109,7 +109,10 @@ class Manager(object):
         log.info("Waiting for messages")
 
         while self.chan.callbacks:
-            self.chan.wait()
+            try:
+                self.chan.wait()
+            except:
+                log.exception("Exception in edi run loop")
 
     def register_command(self, callback, cmd):
         self.register_callback(wrap_callback(wrap_unpack_json(wrap_check_cmd(callback))),
