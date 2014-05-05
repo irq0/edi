@@ -16,6 +16,8 @@ BEGIN {
 }' -
 }
 
+mkdir -p "${SCRIPTPATH}/index"
+
 find "${SCRIPTPATH}/files" -type f -maxdepth 1 -print0 |
     while read -d '' -r filename; do
 	echo "$filename"
