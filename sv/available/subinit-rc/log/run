@@ -1,6 +1,6 @@
 #!/bin/sh
 
-name="proc-subinit-rc"
+name="subinit-rc"
 dir="${LOGDIR}/${name}"
 
 mkdir -p "${dir}"

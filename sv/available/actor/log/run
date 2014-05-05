@@ -1,6 +1,6 @@
 #!/bin/sh
 
-name="thehonestbookoftruth"
+name="actor-service"
 dir="${LOGDIR}/${name}"
 
 mkdir -p "${dir}"

@@ -1,7 +1,0 @@
-#!/bin/sh
-
-name="proc-simple-actor"
-dir="${LOGDIR}/${name}"
-
-mkdir -p "${dir}"
-exec svlogd -tt "${dir}"

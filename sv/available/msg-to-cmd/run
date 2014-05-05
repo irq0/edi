@@ -2,7 +2,5 @@
 
 exec 2>&1
 
-cd "${APPDIR}/sink-dmx/"
-
 exec chpst -e "$ENVDIR" \
-     ./dmx-lamp.rb
+     "${APPDIR}/msg-to-cmd/parse-commands.py"

@@ -8,43 +8,7 @@
 
 * Ideas, Todos
 ** Features
-*** OPEN User Notifications
-- Im LDAP gibt es eine liste mit wegen einen user zu notifien
-  - IRC nick
-  - jabber id
-  - twitter account (@foo)
-  - email
-- Notifications werden "reliable" zugestellt. Irgendwo kommt die
-  notification an
-- Message exchange und consumer sagen nack, wenn nicht zustellbar.
-  Z.B. IRC offline
-- Aehlich wie die notify exchange, audio fuer shouts in den subraum
-
-*** OPEN guess commands                                                :c3po:
-- see =thomas.py=, =pr.py= auf cube
-
-- aus normalem text informationen gewinnen
-- In etwa "mach mal licht an" -> "cmd bulb on"
-
 *** OPEN hubelmeter                                                    :c3po:
-*** OPEN big red button / klotz
-- hardware button loest 'bigredbutton' command aus?
-
-- Oder: Es können ja durchaus mehrere dinge einen big red button gebrauchen
-- Vielleich ein button exchange einrichten auf dem verschiedene dienste
-  lauschen können?
-- Mehrere Buttons?
-- Prototyp: Button exchange, Button an raspberry pie?
-
-**** Story
-Pizza Bestellung endet in 5 minuten. Countdown läuft. Stoppen? Drück
-den button irgendwo im Raum. Zahlenkombination eingeben? Button an der
-Decke?
-
-  - Bei der Pizza Bestellung angeben? Nur stoppbar durch eingeben von
-    31337 auf'm PIN Pad?
-    - Pizza daemon wartet auf button 31337 messages..
-
 *** OPEN jabber bot
 - user same msg exchange as irc bot
 
@@ -55,7 +19,7 @@ Decke?
 - nuetzlich auch fuer den notify: user service
 - unauthenticated mail?!
 
-*** OPEN calendar integration: source                                    :r1:
+*** OPEN calendar integration: source
 - Repeadedly parse calendar files. Idealy ics. Load from caldav?
   google calendar?
 
@@ -106,18 +70,19 @@ Support:
 
 Retain support for times only. Use today as date
 - !eta 20:00
-*** OPEN set irc topics
+*** OPEN set irc topics/modeline
 - Calendar events like smalltalks
 - something like the emacs modeline?
-*** OPEN dhcp lease loest login aus                                  :c3pb:
-*** OPEN Würfel
-- Zufällig einen user im irc bestimmen für $aufgabe?
 *** OPEN Begrüssungen
 - Vorher: events
 - Verändern durch git repo
-*** OPEN (conj 'seri hackerfyhstuck)
-leute zu dingen eintragen per bot
-*** ASSIGNED voice recognition                                      :@irq0:
+- /Hallo irq0. Wilkommen im Subraum/
+*** OPEN dhcp lease loest login aus                                  :c3pb:
+- private exchange fuer dhcp messages
+  - vom router aus eintueten
+- tool um mac adressen usern zuzuweisen
+- tool um diese user einzuloggen
+*** OPEN voice recognition
 **** Idea
 To speech to text. At least in english. Perform natural language
 processing to extract meaning. Generate commands.
@@ -155,66 +120,58 @@ pocketsphinx is a cpp implementation of sphinx, smaller and not java.
 - desktop edi voice clients based on SIP
 
 *** ASSIGNED pizza / essen / f00d                               :@hej:c3po:
-*** ASSIGNED actor service / rule engine                              :@irq0:
-
-currently a simple python script to map things like 'act bulb on' to
-messages on the =act_433_mhz= queue
-
-Idealy something with a rule engine:
-- First user logged in: initiate startup sequence.
-- Last user log out initiate
-
-
-In the basic incarnation:
-Map 'act' messages to actors. /act/ messages are something a user
-can grasp, e.g /act venti on/. actors are something specific having
-their own actor exchanges, e.g /act_433_mhz/ where messages contain
-the commands for the sender as payload.
-**** Idee
-- Jedes event transformiert den aktuellen system state in einen neuen
-  (clojure swap! semantik)
-- Ändern des systemstates stösst die rule engine an
-- Regeln verändern den state nicht (direkt). Können aber events
-  emiten.
-- State änderungen sind atomar. Ein event verändert. Andere events
-  warten die änderungen ab. Änderungen sind ganz oder garnicht.
-- Rule engine ausführungen immer auf neuen state. Rule engine
-  ausführungen sind unabhängig voneinander
-- Was ist mit aktoren?
-  - State änderung muss irgendwie auch aktoren triggern können..
-  - Hm.
-  - State change funktionen für bestimmte events?
-    - führen auch aktionen aus?
-
-  - should-be relation:
-    - event sagt "an", state sagt "aus" -> an aktion generieren
-    - event sagt "an", state sagt "an" -> nop
-
-      #+BEGIN_EXAMPLE
-EVENT -> OLD STATE -> STATE CHANGE -> NEW STATE
-                       -> ACTIONS
-
-EVENT -> OLD STATE -> STATE CHANGE -> NEW STATE
-                                   -> DIFFERENCE OLD NEW
-                                   -> ACTIONS
-
-      #+END_EXAMPLE
-- Fakten, konfiguration
-  - aktor name zu triggernes foo
-  - 'act bulb on' -> msg =11111 1 on= an =act_433mhz= exchange.
-
-- =(state-change old)=
-
-*** ASSIGNED openhab integration                                  :@snowball:
-*** TEST irc reader                                                 :@irq0:
+*** DONE irc reader                                                   :@irq0:
 In simpler implementiert. Siehe [[misc/read_msg.py]]. Keine verschiedenen Stimmen.
-
 **** assign voices to each participant
 ***** parameters
 - speed
 - pitch
 - voice: lea, julia, kenny...
 **** participants can change voices
+** Architecture Changes
+*** ASSIGNED list, help messages for 'cmd' exchange              :@irq0:r1:
+Everyone on the cmd exchange should consume list and help messages.
+
+**** Replies
+- help :: If "args" = "$0" : Reply with brief usage and supported commands
+- list :: Reply with something like "I exist and my name is"
+
+**** Destination
+
+#+BEGIN_SRC clojure
+(str/replace (:src msg) #"recv" "send")
+#+END_SRC
+
+**** Status
+- The newer commands have this build in. Works fine.
+
+*** IDEA state change exchange / log / events
+Ohne globalen state müssen state veränderungen irgendwie kommuniziert
+werden. Beispiel: user loggt sich ein.
+
+Beispiel:
+- user loggt sich ein
+- tts begrüssung triggern
+- rule engine wertet systemzustand aus
+
+
+Mögliche Umsetzung
+/st/ exchange. User presence manager sendet message mit "userloggedin"
+oder so an den exchange.
+
+Ein event->tts consumer generiert tts commands wenn nötig
+
+Die rule engine verändert ihren systemzustand und wertet rules neu aus.
+**** Implementation
+loev exchange: Log and events. Siehe papier.
+** Janitor Tasks
+*** DONE integrate daemon supervisor                                :@irq0:
+runit. See =sv/{available, enabled}=
+*** ASSIGNED put asterisk container somewhere                       :@irq0:
+Running on janelane. Put on some server. Keep sipgate credentials
+private.
+*** ASSIGNED plan first release
+** Release 1
 
 *** DONE Soundboard                                                 :@irq0:
 !sob ?
@@ -341,51 +298,71 @@ SMS -> TTS
 IRC -> SMS?
 **** OPEN Wetterbericht
 Gesprochener Wetterbericht. Siehe oben
+*** OPEN edi python library
+- reduce code duplication accross most of the tools
+- start with =listen_commands= tool
+
+#+BEGIN_SRC python
+
+  @edi_cmd("say")
+  def tts(chan, command):
 
 
-** Architecture Changes
-*** ASSIGNED list, help messages for 'cmd' exchange              :@irq0:r1:
-Everyone on the cmd exchange should consume list and help messages.
+  @edi_cmd("help")
+  def help(chan, command):
+      edi.emit_reply(chan, command["src"], "USAGE: say <message>")
 
-**** Replies
-- help :: If "args" = "$0" : Reply with brief usage and supported commands
-- list :: Reply with something like "I exist and my name is"
 
-**** Destination
+  @edi_msg_recv_all()
+  def all(frm, msg):
+      edi.msg.reply
 
-#+BEGIN_SRC clojure
-(str/replace (:src msg) #"recv" "send")
+  @edi_msg_recv_regex("edi ist doof", key="irc.#")
+  def foo(frm, msg):
+      edi.msg.reply(frm, "fuck you")
+
+
+
+  def main():
+      edi.register_command(tts_callback, "tts")
+
+      edi.recv_msg(callback, "irc.#")
+      edi.emit_msg("irc.send.EDI")
+      edi.cmd.say("fooo")
+      edi.msg.send(to, "msg")
+
+      edi.register_recv_message(callback, "irc.#")
+
+
+
 #+END_SRC
 
-**** Status
-- The newer commands have this build in. Works fine.
 
-*** IDEA state change exchange / log / events
-Ohne globalen state müssen state veränderungen irgendwie kommuniziert
-werden. Beispiel: user loggt sich ein.
-
-Beispiel:
-- user loggt sich ein
-- tts begrüssung triggern
-- rule engine wertet systemzustand aus
+#+BEGIN_SRC python
 
 
-Mögliche Umsetzung
-/st/ exchange. User presence manager sendet message mit "userloggedin"
-oder so an den exchange.
+  class EdiComand(edi.command):
+      def cmd_help(**args):
+          return "foo"
+      def cmd_say(cmd, args, src, dst="audio"):
+          err = edi.emit_notification(tts.tts(args), dst)
+          if err:
+              return "TTS erro", err
 
-Ein event->tts consumer generiert tts commands wenn nötig
 
-Die rule engine verändert ihren systemzustand und wertet rules neu aus.
-**** Implementation
-loev exchange: Log and events. Siehe papier.
-** Janitor Tasks
-*** DONE integrate daemon supervisor                                :@irq0:
-runit. See =sv/{available, enabled}=
-*** ASSIGNED put asterisk container somewhere                       :@irq0:
-Running on janelane. Put on some server. Keep sipgate credentials
-private.
-*** ASSIGNED plan first release
+
+
+#+END_SRC
+
+
+*** OPEN listen commands doesn't ack messages                         :bug:
+*** OPEN subraum start stop knoeppkens
+- python implementierung nicht sehr robust. in c implementieren?
+*** OPEN Add generic help command
+- "base commands command"
+- help
+*** OPEN parse commands: Add error message for unauthorized users
+*** OPEN edi auf cube umziehen
 *** OPEN All EDI subsystems use environment variables to configure..   :r1:
 Alle Subsysteme müssen für generelle Einstellungen Environment
 Variablen benutzen. Ist die Variable nicht gesetzt muss ein sinnvoller
@@ -401,7 +378,6 @@ Variablen:
 Für die Service Skripte:
 - =APPDIR=
 - =LOGDIR=
-
 
 * Documentation
 The core of the architecture is the rabbitmq amqp message server.
@@ -628,3 +604,4 @@ Have something to add? Let me pull your repo!
 <script src="js/bootstrap.js"></script>
 <script src="js/custom.js"></script>
 #+END_HTML
+n

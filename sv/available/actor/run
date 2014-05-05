@@ -2,7 +2,7 @@
 
 exec 2>&1
 
-cd "${APPDIR}/sink-dmx/"
+cd "${APPDIR}/actor"
 
 exec chpst -e "$ENVDIR" \
-     ./dmx-lamp.rb
+     "./act.py"

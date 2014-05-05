@@ -4,4 +4,5 @@ exec 2>&1
 
 [ ! -r /tmp/eta.edn ] && echo '{}' > /tmp/eta.edn
 
-exec java -jar "${APPDIR}"/proc/thehonestbookoftruth/target/thehonestbookoftruth-*-standalone.jar
+exec chpst -e "$ENVDIR" \
+     java -jar "${APPDIR}"/thehonestbookoftruth/target/thehonestbookoftruth-*-standalone.jar

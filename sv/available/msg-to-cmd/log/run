@@ -1,6 +1,6 @@
 #!/bin/sh
 
-name="thehonestbookoftruth"
+name="msg-to-cmd"
 dir="${LOGDIR}/${name}"
 
 mkdir -p "${dir}"

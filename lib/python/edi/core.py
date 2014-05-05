@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
 
 import amqplib.client_0_8 as amqp
 
@@ -106,7 +109,13 @@ class Manager(object):
         log.info("Waiting for messages")
 
         while self.chan.callbacks:
-            self.chan.wait()
+            try:
+                self.chan.wait()
+            except KeyboardInterrupt:
+                log.info("Shutting down")
+                self.__exit__(None, None, None)
+            except:
+                log.exception("Exception in edi run loop")
 
     def register_command(self, callback, cmd):
         self.register_callback(wrap_callback(wrap_unpack_json(wrap_check_cmd(callback))),

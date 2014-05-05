@@ -2,16 +2,15 @@
 
 exec 2>&1
 
-export PATH="${PATH}:${APPDIR}/misc:."
-
-cd ${APPDIR}/proc/soundboard
+cd ${APPDIR}/soundboard
 
 echo "Generating index"
 ./make_index
 
-exec ${APPDIR}/misc/listen_command \
+exec chpst -e "$ENVDIR" \
+     listen_command \
      --cmd sob \
      --data onlyargs \
      --name "soundboard" \
-     --description "SOundBoard - Feed me: git.c3pb.de:irq0/edi.git proc/soundboard/files" \
-     --exe "${APPDIR}/proc/soundboard/edimq-handler"
+     --description "SOundBoard" \
+     --exe "${APPDIR}/soundboard/edimq-handler"

@@ -1,7 +1,0 @@
-#!/bin/sh
-
-name="proc-parse-commands"
-dir="${LOGDIR}/${name}"
-
-mkdir -p "${dir}"
-exec svlogd -tt "${dir}"
