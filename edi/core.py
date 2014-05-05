@@ -111,6 +111,9 @@ class Manager(object):
         while self.chan.callbacks:
             try:
                 self.chan.wait()
+            except KeyboardInterrupt:
+                log.info("Shutting down")
+                self.__exit__(None, None, None)
             except:
                 log.exception("Exception in edi run loop")
 
