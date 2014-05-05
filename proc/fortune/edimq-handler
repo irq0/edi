@@ -1,0 +1,5 @@
+#!/bin/bash
+
+fortune="$(fortune)"
+echo $fortune
+emit_cmd tts --voice queenelizabeth "$fortune"
