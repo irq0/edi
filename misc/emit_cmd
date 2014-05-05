@@ -1,13 +1,14 @@
 #!/bin/bash
 
 readonly command="$1"
-readonly args="${@:2}"
+readonly args="$(echo -n ${@:2} | $(dirname $0)/json_escape)"
+
 
 if [[ -n $EDI_METADATA ]]; then
     EDI_METADATA=",\"meta\":${EDI_METADATA}"
 fi
 
-json="{\"cmd\":\"${command}\",\"args\":\"${args}\",\"user\":\"${USERNAME:-emit-cmd}\",\"src\":\"na\"${EDI_METADATA}}"
+json="{\"cmd\":\"${command}\",\"args\":${args},\"user\":\"${USERNAME:-emit-cmd}\",\"src\":\"na\"${EDI_METADATA}}"
 
 if [[ -z $command ]]; then
     echo "USAGE: $0 <command> [args]"
