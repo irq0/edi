@@ -16,7 +16,7 @@ import edi
 from config import db, export_as_cmd, UnknownFooException, ParseException
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("actor-service")
+log = logging.getLogger("actor-service")
 
 def handle_command(chan, thing_name, args):
     assert db.has_key(thing_name)
@@ -28,22 +28,22 @@ def handle_command(chan, thing_name, args):
         payloads = thing.payload(args)
         rkeys = thing.rkey(args)
 
-        print "---> [CONFIG]", "payloads:", payloads, "rkeys:", rkeys
+        log.info("---> [CONFIG] payloads: %r %r", payloads, rkeys)
 
         assert len(payloads) == len(rkeys)
 
         for p, r in zip(payloads, rkeys):
             success = edi.emit.emit(chan, dst, r, p)
             if success:
-                print "---> [?] success=%s" % (success)
+                log.debug("---> [?] success=%r", success)
 
         return success
 
     if hasattr(thing, "expansions"):
-        print "~~~~ [EXPAND] orig:", thing_name, args
+        log.info("~~~~ [EXPAND] orig: %r %r", thing_name, args)
 
         for thing_name, args in [ ex.split(None, 1) for ex in thing.expansions(args) if ex]:
-            print "~~~~ [EXPAND] *", thing_name, args
+            log.info("~~~~ [EXPAND] * %r %r", thing_name, args)
             handle_command(chan, thing_name, args)
     else:
         do()
@@ -96,7 +96,6 @@ def cmd_args(c, a):
 def main():
     with edi.Manager() as e:
         def reply(args, msg):
-            print args, msg
             if args.has_key("user"):
                 edi.emit.msg_reply(e.chan,
                                    src=args["src"],
@@ -121,7 +120,7 @@ def main():
                     handle_command(e.chan, c, " ".join(a.args))
 
             except ArgumentParserError, ex:
-                reply(args, ex)
+                reply(args, ex.message)
 
             except UnknownFooException:
                 reply(args, "Unknown Foo")
@@ -130,8 +129,7 @@ def main():
                 reply(args, "Couldn't parse that")
 
             except Exception, ex:
-                print "~~~~ EXCEPTION in callback: ", ex
-                traceback.print_exc()
+                log.exception("~~~~ EXCEPTION in callback: ")
 
         for cmd in export_as_cmd:
             e.register_command(act, cmd)
