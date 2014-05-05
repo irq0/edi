@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 readonly key="irc.EDI.action._channel_"
 readonly msg="$(echo -n $@ | $(dirname $0)/json_escape)"

@@ -4,4 +4,5 @@ exec 2>&1
 
 cd "${APPDIR}/proc/act"
 
-exec python "./act.py"
+exec chpst -e "$ENVDIR" \
+     python "./act.py"

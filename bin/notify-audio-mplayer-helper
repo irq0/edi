@@ -1,16 +1,16 @@
-#!/bin/bash -x
+#!/bin/bash
 
 tempfile () {
     tmp=$(mktemp -t XXXXXX)
     cat - > "$tmp"
 
-    mplayer "$tmp"
+    mplayer -vo null "$tmp"
 
     rm "$tmp"
 }
 
 cache () {
-    mplayer -cache 1024 -
+    mplayer -cache 1024 -vo null -
 }
 
 ${1:-tempfile}

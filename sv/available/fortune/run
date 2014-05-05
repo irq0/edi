@@ -4,7 +4,8 @@ exec 2>&1
 
 export PATH="${PATH}:/usr/games"
 
-exec ${APPDIR}/misc/listen_command \
+exec chpst -e "$ENVDIR" \
+     ${APPDIR}/misc/listen_command \
      --cmd fortune \
      --data onlyargs \
      --name "fortune" \

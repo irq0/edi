@@ -2,8 +2,6 @@
 
 SCRIPTPATH="$(dirname $0)"
 export MPC="mpc"
-export MPD_HOST=${MPD_HOST:=localhost}
-
 
 m () {
     echo "MPC: $MPC ${@}" >&2

@@ -2,11 +2,10 @@
 
 exec 2>&1
 
-export PATH="${PATH}:${APPDIR}/misc:."
-
 cd ${APPDIR}/proc/tts-pico2wave
 
-exec ${APPDIR}/misc/listen_command \
+exec chpst -e "$ENVDIR" \
+     ${APPDIR}/misc/listen_command \
      --cmd say \
      --cmd tts \
      --data onlyargs \

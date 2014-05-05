@@ -2,4 +2,5 @@
 
 exec 2>&1
 
-exec "${APPDIR}/proc/subinit-rc/consumer.sh"
+exec chpst -e "$ENVDIR" \
+     "${APPDIR}/proc/subinit-rc/consumer.sh"

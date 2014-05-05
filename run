@@ -1,21 +1,24 @@
 #!/bin/bash
 
-# 
+#
 # Run EDI subsystems
 #
 # depends: runit
-# 
+#
 # author: Marcel Lauhoff <ml@irq0.org>
 #
 
 set -o errexit
- 
+
 SCRIPTNAME="$(basename $0)"
 SCRIPTPATH="$(dirname $0)"
-source "${SCRIPTPATH}/conf/GLOBALS"
+
 
 export APPDIR="$(readlink -f ${SCRIPTPATH})"
 export LOGDIR="$(readlink -f ${SCRIPTPATH}/log)"
+export ENVDIR="$(readlink -f ${SCRIPTPATH}/conf/env)"
+
+export PATH="${PATH}:${APPDIR}/bin"
 
 RUNSVDIR="${SCRIPTPATH}/sv/enabled"
 

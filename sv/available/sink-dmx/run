@@ -3,4 +3,6 @@
 exec 2>&1
 
 cd "${APPDIR}/sink/dmx/"
-exec ./dmx-lamp.rb
+
+exec chpst -e "$ENVDIR" \
+     ./dmx-lamp.rb

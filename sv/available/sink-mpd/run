@@ -2,7 +2,6 @@
 
 exec 2>&1
 
-export PATH="$PATH:$APPDIR/misc/"
-
 cd "${APPDIR}/sink/mpd/"
-exec ./consume.sh
+exec chpst -e "$ENVDIR" \
+     ./consume.sh

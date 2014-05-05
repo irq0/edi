@@ -2,14 +2,13 @@
 
 exec 2>&1
 
-export PATH="${PATH}:${APPDIR}/misc:."
-
 cd ${APPDIR}/proc/soundboard
 
 echo "Generating index"
 ./make_index
 
-exec ${APPDIR}/misc/listen_command \
+exec chpst -e "$ENVDIR" \
+     ${APPDIR}/misc/listen_command \
      --cmd sob \
      --data onlyargs \
      --name "soundboard" \
