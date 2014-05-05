@@ -32,7 +32,7 @@ usage() {
 }
 
 cli() {
-    local PARSED=$(getopt --name tts-pico2wave --options "h" --longoptions "help,text:,lang:" -- "$@" 2> "$ERRLOG")
+    local PARSED=$(getopt --name tts-pico2wave --options "h" --longoptions "help,voice:,lang:" -- "$@" 2> "$ERRLOG")
 
     err=$(cat $ERRLOG)
 
@@ -57,15 +57,11 @@ cli() {
 		fi
 		shift 2
 		;;
-	    --text)
-		if [[ -n $2 ]]; then
-		    text="$2"
-		fi
-
+	    --voice)
 		shift 2
 		;;
 	    --)
-		shift
+		text="${@:2}"
 		break
 		;;
 	esac
