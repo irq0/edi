@@ -52,3 +52,15 @@ def emit(chan, ex, rkey, payload, content_type="application/octet-stream"):
     chan.basic_publish(exchange=ex,
                        routing_key=rkey,
                        msg=msg)
+
+def audio_notification(chan, payload, content_type, dst="audio"):
+    log.info("---> audio notification with type %r: %d KB", content_type, len(payload)/1024)
+
+    msg = amqp.Message(payload)
+    msg.properties["content_type"] = content_type
+    msg.properties["delivery_mode"] = 2
+    msg.properties["app_id"] = u"edilib"
+
+    chan.basic_publish(exchange="notify",
+                       routing_key=dst,
+                       msg=msg)
