@@ -1,6 +1,6 @@
 #!/bin/sh
 
-name="proc-thehonestbookoftruth"
+name="thehonestbookoftruth"
 dir="${LOGDIR}/${name}"
 
 mkdir -p "${dir}"

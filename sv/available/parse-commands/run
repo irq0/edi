@@ -1,6 +1,0 @@
-#!/bin/sh
-
-exec 2>&1
-
-exec chpst -e "$ENVDIR" \
-     python "${APPDIR}/proc/msg/parse-commands.py"

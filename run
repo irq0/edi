@@ -14,13 +14,14 @@ SCRIPTNAME="$(basename $0)"
 SCRIPTPATH="$(dirname $0)"
 
 
-export APPDIR="$(readlink -f ${SCRIPTPATH})"
+export APPDIR="$(readlink -f ${SCRIPTPATH}/apps)"
 export LOGDIR="$(readlink -f ${SCRIPTPATH}/log)"
 export ENVDIR="$(readlink -f ${SCRIPTPATH}/conf/env)"
+export BINDIR="$(readlink -f ${SCRIPTPATH}/bin)"
 
-export PATH="${PATH}:${APPDIR}/bin"
+export PATH="${PATH}:${BINDIR}"
 
-RUNSVDIR="${SCRIPTPATH}/sv/enabled"
+readonly RUNSVDIR="${SCRIPTPATH}/sv/enabled"
 
 echo "Running EDI systems from ${RUNSVDIR}"
 runsvdir -P "${RUNSVDIR}"

@@ -2,7 +2,7 @@
 
 exec 2>&1
 
-cd "${APPDIR}/proc/act"
+cd "${APPDIR}/actor"
 
 exec chpst -e "$ENVDIR" \
-     python "./act.py"
+     "./act.py"

@@ -3,4 +3,4 @@
 exec 2>&1
 
 exec chpst -e "$ENVDIR" \
-     java -jar "${APPDIR}"/proc/subinitd/target/edinitd-*-SNAPSHOT-standalone.jar
+     java -jar "${APPDIR}"/subinitd/target/edinitd-*-SNAPSHOT-standalone.jar

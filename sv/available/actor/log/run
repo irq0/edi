@@ -1,6 +1,6 @@
 #!/bin/sh
 
-name="proc-simple-actor"
+name="actor-service"
 dir="${LOGDIR}/${name}"
 
 mkdir -p "${dir}"

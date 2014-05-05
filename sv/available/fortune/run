@@ -5,9 +5,9 @@ exec 2>&1
 export PATH="${PATH}:/usr/games"
 
 exec chpst -e "$ENVDIR" \
-     ${APPDIR}/misc/listen_command \
+     listen_command \
      --cmd fortune \
      --data onlyargs \
      --name "fortune" \
      --description "Please everyone in the room with a fortune cookie" \
-     --exe "${APPDIR}/proc/fortune/edimq-handler"
+     --exe "${APPDIR}/fortune/edimq-handler"

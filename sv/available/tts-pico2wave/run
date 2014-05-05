@@ -2,13 +2,13 @@
 
 exec 2>&1
 
-cd ${APPDIR}/proc/tts-pico2wave
+cd ${APPDIR}/tts-pico2wave
 
 exec chpst -e "$ENVDIR" \
-     ${APPDIR}/misc/listen_command \
+     listen_command \
      --cmd say \
      --cmd tts \
      --data onlyargs \
      --name "tts" \
      --description "pico2wave based tts" \
-     --exe "${APPDIR}/proc/tts-pico2wave/edimq-handler"
+     --exe "${APPDIR}/tts-pico2wave/edimq-handler"

@@ -2,12 +2,12 @@
 
 exec 2>&1
 
-cd ${APPDIR}/proc/weather
+cd ${APPDIR}/weather
 
 exec chpst -e "$ENVDIR" \
-     ${APPDIR}/misc/listen_command \
+     listen_command \
      --cmd weather \
      --cmd wetter \
      --name "weather" \
      --description "Wetterbericht - Subraum und das da draussen" \
-     --exe "${APPDIR}/proc/weather/weather-to-msg.sh"
+     --exe "${APPDIR}/weather/weather-to-msg.sh"

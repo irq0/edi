@@ -1,7 +1,0 @@
-#!/bin/sh
-
-exec 2>&1
-
-cd ${APPDIR}/bot/irc
-exec chpst -e "$ENVDIR" \
-     python "${APPDIR}/bot/irc/mqbot.py"
