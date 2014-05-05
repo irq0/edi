@@ -23,7 +23,7 @@ def cmd(chan, **body):
 def msg(chan, dst, **body):
     assert(all(x in body for x in ["msg"]))
 
-    log.info("---> MSG[%r]: %r", key, msg)
+    log.info("---> MSG[%r]: %r", dst, body)
 
     jbody = json.dumps(body)
     msg = amqp.Message(jbody.encode("utf-8"))
@@ -36,7 +36,19 @@ def msg(chan, dst, **body):
                        msg=msg)
 
 def msg_reply(chan, src, **body):
-    assert("recv" in src)
-    dst = src.replace("recv", "send")
+    if "recv" in src:
+        dst = src.replace("recv", "send")
+        msg(chan, dst, **body)
 
-    msg(chan, dst, **body)
+
+def emit(chan, ex, rkey, payload, content_type="application/octet-stream"):
+    log.info("---> ex=%r rkey=%r c/t=%r: %r", ex, rkey, content_type, payload)
+
+    msg = amqp.Message(payload.encode("utf-8"))
+    msg.properties["content_type"] = content_type
+    msg.properties["delivery_mode"] = 2
+    msg.properties["app_id"] = u"edilib"
+
+    chan.basic_publish(exchange=ex,
+                       routing_key=rkey,
+                       msg=msg)
