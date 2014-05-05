@@ -4,5 +4,5 @@
 /sv/enabled/*
 /sv/available/*/supervise
 /sv/available/*/log/supervise
-/mods/soundboard/index/
-/mods/tts-barbershop/cache.dat
+/apps/soundboard/index/
+/apps/tts-barbershop/cache.dat
