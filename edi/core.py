@@ -84,8 +84,18 @@ class Manager(object):
     """Context manager class. Establishes connection to AMQP Server."""
     consumer_tags = []
 
-    def __init__(self, amqp_server=(os.getenv("AMQP_SERVER") or "localhost")):
+    metadata = {
+        "app" : "unknown",
+        "descr" : "unnamed pyedi app",
+        "cmds" : {}
+    }
+
+    def __init__(self, name=None, descr=None, amqp_server=(os.getenv("AMQP_SERVER") or "localhost")):
         self.amqp_server = amqp_server
+        if name:
+            self.set_app_name(name)
+        if descr:
+            self.set_app_descr(descr)
 
     def __enter__(self):
         log.info("Connecting to AMQP Server: %r", self.amqp_server)
@@ -117,10 +127,38 @@ class Manager(object):
             except:
                 log.exception("Exception in edi run loop")
 
-    def register_command(self, callback, cmd):
+    def set_app_name(self, name):
+        self.metadata["app"] = name
+
+    def set_app_descr(self, descr):
+        self.metadata["descr"] = descr
+
+    def set_cmd_metadata(self, cmd, args="none", descr=None, attribs={}):
+        if not descr:
+            descr = self.metadata["descr"]
+
+        self.metadata["cmds"][cmd] = {
+            "args" : args,
+            "descr" : descr,
+            "attribs" : attribs,
+        }
+
+        log.debug("Command %r metadata: args=%r descr=%r attribs=%r",
+                  cmd, args, descr, attribs)
+
+    def register_inspect_command(self):
+        def inspect(src, **args):
+            emit.msg_reply(self.chan,
+                           src=src,
+                           msg=json.dumps(self.metadata))
+
+        self.register_command(inspect, "inspect", descr="pyedi default inspect")
+
+    def register_command(self, callback, cmd, args="none", descr=None, attribs={}):
         self.register_callback(wrap_callback(wrap_unpack_json(wrap_check_cmd(callback))),
                                "cmd",
                                cmd)
+        self.set_cmd_metadata(cmd, args, descr, attribs)
 
     def register_msg_handler(self, callback, key):
         self.register_callback(wrap_callback(wrap_fudge_msg_args(wrap_check_msg(callback))),
