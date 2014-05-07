@@ -30,7 +30,9 @@
         (when-not (empty? result)
           (reply ch msg result)))
       (catch com.fasterxml.jackson.core.JsonParseException e
-        (error "[HANDLER] json decode failed :("))))
+        (error "[HANDLER] json decode failed :("))
+      (catch Exception e
+        (error e))))
   (lb/ack ch delivery-tag))
 
 
