@@ -7,7 +7,7 @@
 
 (timbre/refer-timbre)
 
-(def ^:dynamic *db-file* "/tmp/eta.edn")
+(def ^:dynamic *db-file* (or (System/getenv "ETA_FILE") "/tmp/eta.edn"))
 
 (def ^:dynamic *db* (atom {}))
 
@@ -23,8 +23,10 @@
   (s/deserialize (slurp *db-file*) s/clojure-content-type))
 
 (defn init-from-file! []
-  (reset! *db* (load-db))
-  (info (str "[STATE] Initialized db from file: " @*db*)))
+  (if (.exists (io/as-file *db-file*))
+    (reset! *db* (load-db))
+    (reset! *db* {:user {}}))
+  (info (str "[STATE] Initialized db: " @*db*)))
 
 (defn init-watches []
   (add-watch *db* :persist persist-db!)
