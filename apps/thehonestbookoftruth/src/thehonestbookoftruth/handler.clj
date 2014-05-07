@@ -1,25 +1,38 @@
 (ns thehonestbookoftruth.handler
   (:use [clj-time.local :only [local-now]]
+        [clojurewerkz.serialism.core :as s]
         [thehonestbookoftruth.util :only [parse-eta format-eta format-time-span format-user-list]])
   (:require [thehonestbookoftruth.state :as state]
             [taoensso.timbre :as timbre]))
 
 (timbre/refer-timbre)
 
-(def help "thehonestbookoftruth: login logout ul eta uneta help")
-(def listtxt "thehonestbookoftruth: Presence, ETA")
-
 (defmulti handler
   (fn [args] (keyword (args :cmd))))
 
-(defmethod handler :list [_]
-  listtxt)
-
-(defmethod handler :help
-  [{:keys [args]}]
-
-  (when (= args "thehonestbookoftruth")
-    help))
+(defmethod handler :inspect [_]
+  (s/serialize
+    {:app "thehonestbookoftruth"
+     :descr "Carbon entity presence"
+     :cmds {:ul {:args  "NONE",
+                 :descr "Return list of logged in users and ETAs"
+                 :attribs {}}
+            :login {:args "NONE"
+                    :descr "Login user"
+                    :attribs {:user "User to log in"}}
+            :logout {:args "NONE"
+                     :descr "Logout user"
+                     :attribs {:user "User to log out"}}
+            :logout-all {:args "NONE"
+                         :descr "Logout all users"
+                         :attribs {}}
+            :eta {:args "TIME"
+                  :descr "Set ETA. Supports HHMM, HH:MM, HH:MM:SS, HHMMSS"
+                  :attribs {:user "User to set ETA for"}}
+            :uneta {:args "NONE"
+                    :descr "Remove ETA"
+                    :attribs {:user "Remove ETA from this user"}}}}
+    :json))
 
 (defmethod handler :ul [_]
   (format-user-list @state/*db*))

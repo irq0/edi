@@ -42,7 +42,7 @@
   (let [url   (amqp-url args)
         conn  (rmq/connect {:uri url})
         ch    (lch/open conn)
-        keys  ["login" "logout" "logout-all" "ul" "eta" "uneta" "help" "list"]
+        keys  ["login" "logout" "logout-all" "ul" "eta" "uneta" "inspect"]
         ex    "cmd"
         qname (:queue (lq/declare ch))]
 
