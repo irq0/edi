@@ -33,30 +33,33 @@
   (add-watch *db* :log log-db-changes))
 
 (defn logged-in? [user]
-  (boolean (:ts (@*db* user))))
+  (boolean (:ts ((:user @*db*) user))))
 
 (defn has-eta? [user]
-  (boolean (:eta (@*db* user))))
+  (boolean (:eta ((:user @*db*) user))))
 
 (defn logout! [user]
   (info (str "[STATE] Logout: " user))
-  (swap! *db* (fn [old] (dissoc old user))))
+  (swap! *db* (fn [old] (assoc-in old [:user user] nil))))
 
 (defn logout-all! []
   (info (str "[STATE] Logout: ALL"))
-  (swap! *db* #(into {} (filter (complement (fn [[_ data]] (:ts data))) %))))
+  (swap! *db* #(assoc % :user (into {} (filter (complement (fn [[_ data]] (:ts data))) (:user %))))))
 
 (defn login! [user]
   (info (str "[STATE] Login: " user))
   (swap! *db* (fn [old]
               (-> old
-                (assoc-in [user :ts] (to-date (local-now)))
-                (assoc-in [user :eta] nil)))))
+                (assoc-in [:user user :ts] (to-date (local-now)))
+                (assoc-in [:user user :eta] nil)))))
 
 (defn set-eta! [user ^org.joda.time.DateTime eta]
   (info (str "[STATE] Set ETA: " user " " eta))
-  (swap! *db* (fn [old] (assoc old user {:eta (to-date eta)}))))
+  (swap! *db* (fn [old] (assoc-in old [:user user] {:eta (to-date eta)}))))
 
 (defn unset-eta! [user]
   (info (str "[STATE] Unset ETA: " user))
-  (swap! *db* (fn [old] (assoc-in old [user :eta] nil))))
+  (swap! *db* (fn [old] (assoc-in old [:user user :eta] nil))))
+
+(defn get-login-time [user]
+  (from-date (:ts ((:user @*db*) user))))
