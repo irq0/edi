@@ -1,30 +1,34 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
 
 import argparse
-import pika
 import sys
 import time
-import json
 import re
+import json
 import os
 import subprocess
 import logging
-import traceback
 
-cmds = {}
+import edi
 
-def make_cmd_inspect(config):
-    def cmd_inspect(*args):
-        return json.dumps(config)
-    return cmd_inspect
+logging.basicConfig(level=logging.DEBUG)
+log = logging.getLogger("listen_command")
 
 def make_cmd_exec(cmd, app):
-    def do_exec(data):
+    def do_exec(**data):
+        log.debug("do_exec data: %r", data)
+        log.debug("using output formatter %r", output_formatter)
+
         stdin = output_formatter(data)
+
         env = os.environ
         env["EDI_CMD"] = cmd
+
+        log.info("Calling app %r", app)
+        log.debug("Calling app with environment: %r", env)
 
         p = subprocess.Popen(app,
                              stdout=subprocess.PIPE,
@@ -34,59 +38,19 @@ def make_cmd_exec(cmd, app):
 
         stdout, stderr = p.communicate(input=stdin)
 
-        print "#### Command \"{}\"output: STDOUT".format(cmd)
-        print (stdout or "")
-        print "#### Command \"{}\"output: STDERR".format(cmd)
-        print (stderr or "")
+        log.debug("#### Command %r output: STDOUT", cmd)
+        if stdout:
+            log.debug("%s", stdout)
+        log.debug("#### Command %r output: STDERR", cmd)
+        if stderr:
+            log.debug("%s", stderr)
 
         return stdout
 
     return do_exec
 
-
-def reply_dst(cmd):
-    if cmd.has_key("src"):
-        return cmd["src"].replace("recv", "send")
-    else:
-        return "irc.EDI.send._channel_" # TODO: use loev as fallback?
-
-# TODO replace with loev
-def emit_reply(orig_cmd, chan, msg):
-    key = reply_dst(orig_cmd)
-
-    print "---> [%r] %r" % (key, msg)
-
-    chan.basic_publish(exchange="msg",
-                       routing_key=key,
-                       body=msg,
-                       properties=pika.BasicProperties(
-                           content_type="text/plain",
-                           delivery_mode=2))
-
-
-def cmd_callback(chan, method, props, body):
-    print "<--- [%r] %r" % (method.routing_key, body)
-
-    if props.content_type == "application/json":
-        d = json.loads(body)
-
-        try:
-            cmd = d["cmd"]
-            args = d["args"].split(None, 1)
-
-            func = cmds[d["cmd"]]
-
-            print "~~~~ Dispatching cmd \"{}\" to function: {}".format(cmd, func)
-            ret = func(d)
-            if ret:
-                emit_reply(d, chan, ret)
-
-        except Exception, e:
-            print "~~~~ EXCEPTION in callback: ", e
-            traceback.print_exc()
-
 def output_formatter(x):
-    return str(x)
+    return json.dumps(x)
 
 def output_formatter_awkfriendly(x):
     return "\n".join("{}\x1E{}".format(k,str(v)) for k,v in x.iteritems())
@@ -143,35 +107,22 @@ def parse_args(args=None):
        result.cmd_args = dict(result.cmd_args)
 
        for cmd in set(result.cmd) - set(result.cmd_args.keys()):
-           result.cmd_args[cmd] = "none"
+           result.cmd_args[cmd] = "NONE"
 
-       result.config = {
-           "app" : result.name,
-           "descr" : result.description,
-           "cmds" : {
-               cmd : {
-                   "descr" : result.description,
-                   "args" : result.cmd_args[cmd],
-               }
-               for cmd in result.cmd
+       result.cmds = {
+           cmd : {
+               "descr" : result.description,
+               "args" : result.cmd_args[cmd],
+               "attribs" : {},
            }
+           for cmd in result.cmd
        }
 
        return result
 
 def main():
-    logging.basicConfig()
-
     args = parse_args()
-    print args
-
-    amqp_server = os.getenv("AMQP_SERVER") or "localhost"
-    conn = pika.BlockingConnection(pika.ConnectionParameters(amqp_server))
-    chan = conn.channel()
-
-    pika_logger = logging.getLogger('pika')
-    pika_logger.setLevel(logging.INFO)
-
+    log.debug("Args: %r", args)
 
     global output_formatter
     if args.data == 'awkfriendly':
@@ -179,50 +130,14 @@ def main():
     elif args.data == 'onlyargs':
         output_formatter = output_formatter_onlyargs
 
-    exchange = "cmd"
-    queue = "generic_listen_command__{}".format(args.name)
+    with edi.Manager(name=args.name, descr=args.description) as e:
+        for cmd, meta in args.cmds.iteritems():
+            e.register_command(make_cmd_exec(cmd, args.exe),
+                               cmd,
+                               **meta)
+        e.register_inspect_command()
 
-    def init_dispatch_table():
-        global cmds
-        cmds["inspect"] = make_cmd_inspect(args.config)
-
-        for cmd in args.cmd:
-            cmds[cmd] = make_cmd_exec(cmd, args.exe)
-
-    def setup():
-        keys = ["inspect"] + list(args.cmd)
-        print "---- Using queue:", queue
-        print "---- Binding routing keys:", ", ".join(keys)
-
-        chan.queue_declare(queue=queue,
-                           durable=True,
-                           auto_delete=True)
-
-        for k in keys:
-            chan.queue_bind(exchange=exchange,
-                            queue=queue,
-                            routing_key=k)
-
-        chan.basic_consume(cmd_callback,
-                           queue=queue,
-                           no_ack=True)
-
-    def run():
-        print "---- Waiting for messages:"
-        chan.start_consuming()
-
-    def teardown():
-        conn.close()
-
-    try:
-        setup()
-        init_dispatch_table()
-        run()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        teardown()
-
+        e.run()
 
 if __name__ == "__main__":
     main()
