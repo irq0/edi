@@ -10,6 +10,8 @@ echo "Generating index"
 exec chpst -e "$ENVDIR" \
      listen_command \
      --cmd sob \
+     --cmd-arg sob=TEXT \
+     --cmd-description sob="Approx match argument to soundboad's index. Always play something" \
      --data onlyargs \
      --name "soundboard" \
      --description "SOundBoard" \
