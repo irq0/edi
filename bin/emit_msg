@@ -1,7 +1,9 @@
 #!/bin/bash
 
 readonly key="irc.EDI.send._channel_"
-readonly msg="$(echo -n $@ | $(dirname $0)/json_escape)"
+readonly msg="$@"
+
+echo $msg
 
 if [[ -z $msg ]]; then
     echo "USAGE: $0 <message>"
