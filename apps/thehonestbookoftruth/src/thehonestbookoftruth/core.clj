@@ -34,8 +34,12 @@
   (lb/ack ch delivery-tag))
 
 
+(defn amqp-url [& args]
+  (let [server (or (first args) (System/getenv "AMQP_SERVER") "localhost")]
+    (str "amqp://" server)))
+
 (defn -main [& args]
-  (let [url   (or (first args) (System/getenv "AMQP_URL") "amqp://localhost")
+  (let [url   (amqp-url args)
         conn  (rmq/connect {:uri url})
         ch    (lch/open conn)
         keys  ["login" "logout" "logout-all" "ul" "eta" "uneta" "help" "list"]
