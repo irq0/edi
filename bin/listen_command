@@ -38,6 +38,8 @@ def make_cmd_exec(chan, cmd, app, autoreply=True):
 
         stdout, stderr = p.communicate(input=stdin)
 
+        stdout, stderr = (x.decode("utf-8") for x in (stdout, stderr))
+
         log.info("#### Command %r output: STDOUT", cmd)
         if stdout:
             log.info("%s", stdout)
