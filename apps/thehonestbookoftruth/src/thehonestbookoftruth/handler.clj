@@ -35,21 +35,23 @@
     :json))
 
 (defmethod handler :ul [_]
-  (format-user-list @state/*db*))
+  (format-user-list (:user @state/*db*)))
 
-(defmethod handler :login
-  [{:keys [user]}]
 
-  (if (state/logged-in? user)
-    (str "Already logged in!")
-    (and (state/login! user) (str "Hi, " user))))
+(defmethod  handler :login
+    [{:keys [user]}]
+
+    (if (state/logged-in? user)
+      (str "Already logged in!")
+      (and (state/login! user) "Hi!")))
 
 (defmethod handler :logout
   [{:keys [user]}]
 
   (if (state/logged-in? user)
-    (and (state/logout! user) (str "Cya " user))
-    "Hmm, you are not logged in. So no logout ;)"))
+    (let [span (format-time-span (state/get-login-time user) (local-now))]
+      (and (state/logout! user) (str "Cya. You subraumed for " span " mins" )))
+    "Hmm, you are not logged in. So, no logout ;)"))
 
 (defmethod handler :logout-all
   [_]
@@ -60,7 +62,7 @@
   [{:keys [user args]}]
 
   (if (state/logged-in? user)
-    "Logged in. I'll ignore the ETA :P"
+    "Logged in. I'll ignore that ETA :P"
     (try
       (let [eta (parse-eta args)
             span (format-time-span (local-now) eta)]
