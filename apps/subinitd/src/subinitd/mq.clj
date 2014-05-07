@@ -33,7 +33,7 @@
   (lb/ack ch delivery-tag))
 
 (defn cmd-consume [chan]
-  (let [keys  ["telinit" "runlevel" "help" "list"]
+  (let [keys  ["telinit" "runlevel" "inspect"]
         ex    "cmd"
         qname (:queue (lq/declare chan))]
 
