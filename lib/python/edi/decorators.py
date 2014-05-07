@@ -6,10 +6,10 @@ from __future__ import unicode_literals
 import re
 from functools import wraps
 
-def edi_cmd(edi, cmd_name):
+def edi_cmd(edi, cmd_name, **args):
     "Register EDI command"
     def decorator(f):
-        edi.register_command(f, cmd_name)
+        edi.register_command(f, cmd_name, **args)
         return f
     return decorator
 
