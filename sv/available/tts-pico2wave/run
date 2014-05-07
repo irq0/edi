@@ -7,8 +7,13 @@ cd ${APPDIR}/tts-pico2wave
 exec chpst -e "$ENVDIR" \
      listen_command \
      --cmd say \
+     --cmd-arg say="TEXT" \
+     --cmd-descr say="tts with defaults" \
      --cmd tts \
+     --cmd-descr tts="Customizable tts command. Try --help" \
+     --cmd-arg tts="COMPLEX" \
      --data onlyargs \
+     --autoreply \
      --name "tts" \
-     --description "pico2wave based tts" \
+     --description "pico2wave based tts - default destination is notify audio" \
      --exe "${APPDIR}/tts-pico2wave/edimq-handler"
