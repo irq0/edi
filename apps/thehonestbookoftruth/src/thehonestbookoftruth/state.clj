@@ -7,7 +7,7 @@
 
 (timbre/refer-timbre)
 
-(def ^:dynamic *db-file* "/tmp/eta.edn")
+(def ^:dynamic *db-file* (or (System/getenv "ETA_FILE") "/tmp/eta.edn"))
 
 (def ^:dynamic *db* (atom {}))
 
@@ -23,38 +23,43 @@
   (s/deserialize (slurp *db-file*) s/clojure-content-type))
 
 (defn init-from-file! []
-  (reset! *db* (load-db))
-  (info (str "[STATE] Initialized db from file: " @*db*)))
+  (if (.exists (io/as-file *db-file*))
+    (reset! *db* (load-db))
+    (reset! *db* {:user {}}))
+  (info (str "[STATE] Initialized db: " @*db*)))
 
 (defn init-watches []
   (add-watch *db* :persist persist-db!)
   (add-watch *db* :log log-db-changes))
 
 (defn logged-in? [user]
-  (boolean (:ts (@*db* user))))
+  (boolean (:ts ((:user @*db*) user))))
 
 (defn has-eta? [user]
-  (boolean (:eta (@*db* user))))
+  (boolean (:eta ((:user @*db*) user))))
 
 (defn logout! [user]
   (info (str "[STATE] Logout: " user))
-  (swap! *db* (fn [old] (dissoc old user))))
+  (swap! *db* (fn [old] (assoc-in old [:user user] nil))))
 
 (defn logout-all! []
   (info (str "[STATE] Logout: ALL"))
-  (swap! *db* #(into {} (filter (complement (fn [[_ data]] (:ts data))) %))))
+  (swap! *db* #(assoc % :user (into {} (filter (complement (fn [[_ data]] (:ts data))) (:user %))))))
 
 (defn login! [user]
   (info (str "[STATE] Login: " user))
   (swap! *db* (fn [old]
               (-> old
-                (assoc-in [user :ts] (to-date (local-now)))
-                (assoc-in [user :eta] nil)))))
+                (assoc-in [:user user :ts] (to-date (local-now)))
+                (assoc-in [:user user :eta] nil)))))
 
 (defn set-eta! [user ^org.joda.time.DateTime eta]
   (info (str "[STATE] Set ETA: " user " " eta))
-  (swap! *db* (fn [old] (assoc old user {:eta (to-date eta)}))))
+  (swap! *db* (fn [old] (assoc-in old [:user user] {:eta (to-date eta)}))))
 
 (defn unset-eta! [user]
   (info (str "[STATE] Unset ETA: " user))
-  (swap! *db* (fn [old] (assoc-in old [user :eta] nil))))
+  (swap! *db* (fn [old] (assoc-in old [:user user :eta] nil))))
+
+(defn get-login-time [user]
+  (from-date (:ts ((:user @*db*) user))))

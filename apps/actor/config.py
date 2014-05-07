@@ -25,6 +25,9 @@ class BaseActor(object):
     def help(self):
         return "{}: {}".format(self.name,
                                self.descr)
+    def args(self):
+        return "NONE"
+
 
 class FourThreeThreeMhzActor(BaseActor):
     exchange = "act_433mhz"
@@ -47,6 +50,9 @@ class FourThreeThreeMhzActor(BaseActor):
         return "{} - STATES: {}".format(
             h,
             ", ".join(self.states.keys()))
+
+    def args(self):
+        return states.keys()
 
 class UnknownFooException(Exception):
     pass
@@ -95,6 +101,9 @@ class DMXLampActor(BaseActor):
             ", ".join(self.lamps.keys()),
             ", ".join(self.groups.keys()))
 
+    def args(self):
+        return (self.lamps.keys() + self.groups.keys(), "COLOR")
+
 
 class PassthroughActor(BaseActor):
     def __init__(self, name, descr, exchange, rkey, check_args_fn):
@@ -108,6 +117,9 @@ class PassthroughActor(BaseActor):
             return [args]
         else:
             raise ParseException
+
+    def args(self):
+        return "TEXT"
 
 class RewriteActor(BaseActor):
 
@@ -134,7 +146,8 @@ class RewriteActor(BaseActor):
             h,
             ", ".join(("{}->{}".format(k,desc)
                        for k, desc, url in self.rules)))
-
+    def args(self):
+        return [x[0] for x in self.rules]
 
 def somafm():
     try:
@@ -151,7 +164,7 @@ def somafm():
 
 conf = [
     RewriteActor("music",
-                 "Play I some music: dis a $GENRE music!",
+                 "Play I some music: dis a $GENRE music! Try act music --help for details",
                  somafm()
                  + [("bassdrive",
                      "Bassdrive",
@@ -174,11 +187,11 @@ conf = [
                  }),
 
     PassthroughActor("mpd",
-                     "Music Player Daemon im Subraum - (man mpc)",
+                     "Music Player Daemon passthrough - See man mpc for available commands",
                      "act_mpd",
                      "subraum",
                      lambda args : re.match(r"(\w+|\w+ )+", args)),
-    RewriteActor("scenario",
+    RewriteActor("light-scenario",
                  "Meta switch",
                  [("shutdown", "Alles dunkel :(",
                    ("dmx all black",
@@ -195,7 +208,7 @@ conf = [
 
 db = { e.name : e for e in conf }
 
-export_as_cmd = ["music", "dmx", "mpd"]
+export_as_cmd = ["music", "dmx", "mpd", "light-scenario"]
 
 if __name__ == '__main__':
 

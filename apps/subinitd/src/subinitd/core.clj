@@ -7,8 +7,13 @@
 
 (timbre/refer-timbre)
 
+
+(defn amqp-url [& args]
+  (let [server (or (first args) (System/getenv "AMQP_SERVER") "localhost")]
+    (str "amqp://" server)))
+
 (defn -main [& args]
-  (let [url   (or (System/getenv "AMQP_URL") "amqp://localhost")
+  (let [url   (amqp-url args)
         conn  (rmq/connect {:uri url})
         rl    (Integer/parseInt (or (first args) (System/getenv "SUB_RUNLEVEL") "0"))]
     (rl/-init rl conn)

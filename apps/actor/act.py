@@ -94,7 +94,7 @@ def cmd_args(c, a):
         return cmd_args("act", " ".join((c, a)))
 
 def main():
-    with edi.Manager() as e:
+    with edi.Manager(name="Actor Service", descr="Controller of all the things") as e:
         def reply(args, msg):
             if args.has_key("user"):
                 edi.emit.msg_reply(e.chan,
@@ -102,11 +102,8 @@ def main():
                                    user=args["user"],
                                    msg=msg)
 
-        @edi.edi_cmd(e, "list")
-        def list(**args):
-            reply(args, "act " + " ".join(export_as_cmd))
-
-        @edi.edi_cmd(e, "act")
+        @edi.edi_cmd(e, "act",
+                     descr="Meta actor command. Try --help", args="COMPLEX")
         def act(**args):
             try:
                 c, a = cmd_args(args["cmd"], args["args"])
@@ -132,8 +129,10 @@ def main():
                 log.exception("~~~~ EXCEPTION in callback: ")
 
         for cmd in export_as_cmd:
-            e.register_command(act, cmd)
-
+            e.register_command(act, cmd,
+                               args=db[cmd].args(),
+                               descr=db[cmd].descr)
+        e.register_inspect_command()
         e.run()
 
 main()

@@ -1,5 +1,6 @@
 (ns subinitd.handler
-  (:use [subinitd.runlevel :only [runlevel telinit!]])
+  (:use [subinitd.runlevel :only [runlevel telinit!]]
+        [clojurewerkz.serialism.core :as s])
   (:require [taoensso.timbre :as timbre]))
 
 (timbre/refer-timbre)
@@ -10,15 +11,17 @@
 (defmulti handler
   (fn [args] (keyword (args :cmd))))
 
-(defmethod handler :list [_]
-  listtxt)
-
-(defmethod handler :help
-  [{:keys [args]}]
-
-  (when (= args "subinit")
-    help))
-
+(defmethod handler :inspect [_]
+  (s/serialize
+    {:app "subinitd"
+     :descr "Subraum distributed init system"
+     :cmds {:runlevel {:args  "NONE",
+                 :descr "Return current runlevel"
+                 :attribs {}}
+            :telinit {:args [0 1 2 3 4 5]
+                      :descr "Switch runlevel"
+                      :attribs {}}}}
+    :json))
 
 (defmethod handler :telinit
   [{:keys [user args]}]
