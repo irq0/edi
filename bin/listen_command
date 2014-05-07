@@ -14,7 +14,7 @@ import logging
 
 import edi
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("listen_command")
 
 def make_cmd_exec(chan, cmd, app, autoreply=True):
@@ -38,18 +38,21 @@ def make_cmd_exec(chan, cmd, app, autoreply=True):
 
         stdout, stderr = p.communicate(input=stdin)
 
-        log.debug("#### Command %r output: STDOUT", cmd)
+        log.info("#### Command %r output: STDOUT", cmd)
         if stdout:
-            log.debug("%s", stdout)
-            if autoreply:
-                edi.emit.msg_reply(chan,
-                                   src=data["src"],
-                                   user=data["user"],
-                                   msg=stdout)
+            log.info("%s", stdout)
 
-        log.debug("#### Command %r output: STDERR", cmd)
+        log.info("#### Command %r output: STDERR", cmd)
         if stderr:
-            log.debug("%s", stderr)
+            log.info("%s", stderr)
+
+
+        if autoreply and stdout:
+            edi.emit.msg_reply(chan,
+                               src=data["src"],
+                               user=data["user"],
+                               msg=stdout)
+
 
     return do_exec
 
