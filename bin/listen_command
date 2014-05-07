@@ -17,7 +17,7 @@ import edi
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger("listen_command")
 
-def make_cmd_exec(cmd, app):
+def make_cmd_exec(chan, cmd, app, autoreply=True):
     def do_exec(**data):
         log.debug("do_exec data: %r", data)
         log.debug("using output formatter %r", output_formatter)
@@ -41,11 +41,15 @@ def make_cmd_exec(cmd, app):
         log.debug("#### Command %r output: STDOUT", cmd)
         if stdout:
             log.debug("%s", stdout)
+            if autoreply:
+                edi.emit.msg_reply(chan,
+                                   src=data["src"],
+                                   user=data["user"],
+                                   msg=stdout)
+
         log.debug("#### Command %r output: STDERR", cmd)
         if stderr:
             log.debug("%s", stderr)
-
-        return stdout
 
     return do_exec
 
@@ -101,6 +105,11 @@ def parse_args(args=None):
                            required=True,
                            help="Program to call for each recvd command")
 
+       parser.add_argument("--autoreply",
+                           required=False,
+                           action="store_true",
+                           help="Disable automatic reply of program's stdout back to src?")
+
        result = parser.parse_args(args)
 
        # transform cmd_args to dict with missing set to defaults
@@ -132,7 +141,10 @@ def main():
 
     with edi.Manager(name=args.name, descr=args.description) as e:
         for cmd, meta in args.cmds.iteritems():
-            e.register_command(make_cmd_exec(cmd, args.exe),
+            e.register_command(make_cmd_exec(e.chan,
+                                             cmd,
+                                             args.exe,
+                                             autoreply=args.autoreply),
                                cmd,
                                **meta)
         e.register_inspect_command()
