@@ -25,8 +25,10 @@
 
   (when (= content-type "application/json")
     (try
-      (let [msg (s/deserialize payload :json)]
-        (reply ch msg (handler msg)))
+      (let [msg (s/deserialize payload :json)
+            result (handler msg)]
+        (when-not (empty? result)
+          (reply ch msg result)))
       (catch com.fasterxml.jackson.core.JsonParseException e
         (error "[HANDLER] json decode failed :("))))
   (lb/ack ch delivery-tag))
