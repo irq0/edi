@@ -90,6 +90,12 @@ def parse_args(args=None):
                            type=AssignmentString,
                            required=False,
                            help="Specify command's argument type. Default is 'none'. Currently this option only changes the data returned by the implicit 'inspect' command. Example: --cmd-args weather=none")
+
+       parser.add_argument("--cmd-description",
+                           action="append",
+                           type=AssignmentString,
+                           required=False,
+                           help="Specify command's description. Default is value of --description")
        parser.add_argument("--name",
                            required=True,
                            type=NameString,
@@ -112,16 +118,20 @@ def parse_args(args=None):
 
        result = parser.parse_args(args)
 
-       # transform cmd_args to dict with missing set to defaults
-       result.cmd_args = dict(result.cmd_args)
+       # transform lists to dict with missing set to defaults
+       result.cmd_arg = dict(result.cmd_arg or [])
+       result.cmd_description = dict(result.cmd_description or [])
 
-       for cmd in set(result.cmd) - set(result.cmd_args.keys()):
-           result.cmd_args[cmd] = "NONE"
+       for cmd in set(result.cmd) - set(result.cmd_arg.keys()):
+           result.cmd_arg[cmd] = "NONE"
+
+       for cmd in set(result.cmd) - set(result.cmd_description.keys()):
+           result.cmd_description[cmd] = result.description
 
        result.cmds = {
            cmd : {
-               "descr" : result.description,
-               "args" : result.cmd_args[cmd],
+               "descr" : result.cmd_description[cmd],
+               "args" : result.cmd_arg[cmd],
                "attribs" : {},
            }
            for cmd in result.cmd
