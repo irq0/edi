@@ -67,15 +67,15 @@ def NameString(v):
     try:
         return re.match(regex, v).group(0)
     except:
-        raise ArgumentTypeError("Must match {}".format(regex))
+        raise argparse.ArgumentTypeError("Must match {}".format(regex))
 
 def AssignmentString(v):
-    regex = r"^(\w+)=(\w+)$"
+    regex = r'^(\w+)="?(.+)"?$'
     try:
         m = re.match(regex, v)
         return (m.group(1), m.group(2),)
     except:
-        raise ArgumentTypeError("Must match {}".format(regex))
+        raise argparse.ArgumentTypeError("Must match {}".format(regex))
 
 def parse_args(args=None):
        parser =argparse.ArgumentParser()
@@ -85,7 +85,7 @@ def parse_args(args=None):
                            type=NameString,
                            required=True,
                            help="Command to register. Repeat for multiple commands")
-       parser.add_argument("--cmd-args",
+       parser.add_argument("--cmd-arg",
                            action="append",
                            type=AssignmentString,
                            required=False,
