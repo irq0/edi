@@ -2,10 +2,19 @@
   (:require [clj-time.core     :as tc]
             [clj-time.coerce   :as to]
             [clj-time.local    :as tl]
+            [clojure.string    :as str]
             [clj-time.format   :as tf]))
 
-(defn parse-eta [eta]
-  (let [date (tf/unparse (tf/formatter "yyyyMMdd" (tc/default-time-zone)) (tc/now))
+(declare format-eta)
+
+(defn- expand-special-etas [x]
+  (if (some #{(str/upper-case x)} ["SOON" "GLEICH"])
+    (format-eta (tc/plus (tl/local-now) (tc/minutes 43)))
+    x))
+
+(defn parse-eta [x]
+  (let [eta (expand-special-etas x)
+        date (tf/unparse (tf/formatter "yyyyMMdd" (tc/default-time-zone)) (tc/now))
         form ["yyyyMMdd HHmm"
               "yyyyMMdd HHmmss"
               "yyyyMMdd HH:mm"
