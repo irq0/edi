@@ -33,16 +33,16 @@ cur.executescript("""
 
     create table if not exists msg (
         id integer primary key autoincrement,
-        raw_msg integer,
+        raw_msg integer not null,
         ts_recvd integer not null,
         proto text,
         direction text,
         user text,
         msg text,
-        chan text not null,
-        bot text not null,
-        uflags text not null,
-        type text not null,
+        chan text,
+        bot text,
+        uflags text,
+        type text,
         foreign key(raw_msg) references raw_msg(id))
 """)
 
