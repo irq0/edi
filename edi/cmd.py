@@ -18,6 +18,6 @@ class Cmd(object):
                 cmd=name,
                 src=self.src,
                 user=self.user,
-                args=" ".join(args))
+                args=" ".join(map(str, args)))
 
         return cmd
