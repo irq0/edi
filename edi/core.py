@@ -6,8 +6,9 @@ from __future__ import unicode_literals
 import amqplib.client_0_8 as amqp
 
 import logging
-import uuid
+import binascii
 import json
+import re
 import os
 from functools import wraps
 
@@ -151,6 +152,11 @@ class Manager(object):
         log.debug("Command %r metadata: args=%r descr=%r attribs=%r",
                   cmd, args, descr, attribs)
 
+    def _make_queue_name(self, suffix):
+        return "pyedi_{}__{}".format(
+            re.sub(r"[^\w\s]", "", self.metadata["app"]),
+            suffix)
+
     def register_inspect_command(self):
         def inspect(src, **args):
             emit.msg_reply(self.chan,
@@ -159,19 +165,33 @@ class Manager(object):
 
         self.register_command(inspect, "inspect", descr="pyedi default inspect")
 
-    def register_command(self, callback, cmd, args="none", descr=None, attribs={}):
+    def register_command(self, callback, cmd, args="none", descr=None, attribs={}, queue_name=None):
+        if not queue_name:
+            queue_name = self._make_queue_name("cmd_{}".format(cmd))
+
         self.register_callback(wrap_callback(wrap_unpack_json(wrap_check_cmd(callback))),
                                "cmd",
-                               cmd)
+                               cmd,
+                               queue_name=queue_name)
         self.set_cmd_metadata(cmd, args, descr, attribs)
 
-    def register_msg_handler(self, callback, key):
+    def register_msg_handler(self, callback, key, queue_name=None):
+        if not queue_name:
+            queue_name = self._make_queue_name("msg_{}".format(binascii.b2a_hex(os.urandom(15))))
+
         self.register_callback(wrap_callback(wrap_fudge_msg_args(wrap_check_msg(callback))),
                                "msg",
-                               key)
+                               key,
+                               queue_name=queue_name,)
 
-    def register_callback(self, callback, ex, key):
-        queue, _, _ = self.chan.queue_declare(durable=True, auto_delete=True)
+    def register_callback(self, callback, ex, key, queue_name=None):
+        if not queue_name:
+            queue_name = self._make_queue_name(binascii.b2a_hex(os.urandom(15)))
+
+        queue, _, _ = self.chan.queue_declare(queue=queue_name,
+                                              durable=True,
+                                              exclusive=True,
+                                              auto_delete=True)
 
         self.consumer_tags.append(self.chan.basic_consume(queue,
                                                           callback=callback))
