@@ -154,7 +154,7 @@ class Manager(object):
 
     def _make_queue_name(self, suffix):
         return "pyedi_{}__{}".format(
-            re.sub(r"[^\w\s]", "", self.metadata["app"]),
+            re.sub(r"[^\w]", "", self.metadata["app"]),
             suffix)
 
     def register_inspect_command(self):
