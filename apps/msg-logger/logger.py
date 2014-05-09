@@ -120,7 +120,7 @@ def handle_msg(msg):
         except Exception:
                 log.exception("")
 
-
+        msg.channel.basic_ack(msg.delivery_tag)
 with edi.Manager() as e:
         e.register_callback(handle_msg, "msg", "#")
         e.run()
