@@ -50,6 +50,11 @@ def wrap_callback(f):
             f(msg)
         except Exception:
             log.exception(u"EXCEPTION in callback")
+
+        ## XXX this may be unwanted, but is generally what you would expect.
+        ## Messages deliverd are consumed regardless of success or failure of the processing code
+        ## Other possibility would be: ACK successful processing, NACK on exception
+        msg.channel.basic_ack(msg.delivery_tag)
     return wrapper
 
 def wrap_unpack_json(f):
