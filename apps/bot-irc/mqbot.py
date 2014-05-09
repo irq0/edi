@@ -90,6 +90,8 @@ class MQ(Thread):
         except Exception, e:
             log.exception("Exception in consume handler")
 
+        raw_msg.channel.basic_ack(raw_msg.delivery_tag)
+
     def handle_json_message(self, key, msg):
         if key[2] == "presence":
             self.irc_presence(msg["status"], msg["msg"])
