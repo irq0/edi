@@ -7,7 +7,7 @@
 
 (timbre/refer-timbre)
 
-(def ^:dynamic *db-file* (or (System/getenv "ETA_FILE") "/tmp/eta.edn"))
+(def ^:dynamic *db-file* (or (System/getenv "EDI_ETA_FILE") "/tmp/eta.edn"))
 
 (def ^:dynamic *db* (atom {}))
 
