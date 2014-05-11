@@ -24,7 +24,7 @@
           b (tl/to-local-date-time (tc/today-at 20 42 00))]
       (testing "Valid time spans"
         (is (= (format-time-span a b) (* 10 60)))
-        (is (= (format-time-span b a) (* 10 60)))))))
+        (is (= (format-time-span b a) (- (* 10 60))))))))
 
 
 (deftest ul-format-tests
@@ -36,6 +36,6 @@
 
   (testing "User with ETA"
     (is (= (format-user-list with-eta)
-          (format "%s (%s: %s [%s min])" "Malaclypse_the_Younger" "ETA"
+          (format "%s (%s: %s [%s min ago])" "Malaclypse_the_Younger" "ETA"
             (format-eta (tc/date-time 2000 5 20 20 00))
             (str (tc/in-minutes (tc/interval (tc/date-time 2000 5 20 20 00) now)))))))))

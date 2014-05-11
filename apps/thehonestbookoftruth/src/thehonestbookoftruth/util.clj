@@ -1,7 +1,7 @@
 (ns thehonestbookoftruth.util
-  (:require [clj-time.core     :as tc]
-            [clj-time.coerce   :as to]
-            [clj-time.local    :as tl]
+  (:use [clj-time.coerce :only [from-date]]
+        [clj-time.local :only [local-now to-local-date-time]])
+  (:require [clj-time.core     :as time]
             [clojure.string    :as str]
             [clj-time.format   :as tf]))
 
@@ -9,40 +9,46 @@
 
 (defn- expand-special-etas [x]
   (if (some #{(str/upper-case x)} ["SOON" "GLEICH"])
-    (format-eta (tc/plus (tl/local-now) (tc/minutes 43)))
+    (format-eta (time/plus (local-now) (time/minutes 43)))
     x))
 
 (defn parse-eta [x]
   (let [eta (expand-special-etas x)
-        date (tf/unparse (tf/formatter "yyyyMMdd" (tc/default-time-zone)) (tc/now))
+        date (tf/unparse (tf/formatter "yyyyMMdd" (time/default-time-zone)) (time/now))
         form ["yyyyMMdd HHmm"
               "yyyyMMdd HHmmss"
               "yyyyMMdd HH:mm"
               "yyyyMMdd HH:mm:ss"]]
 
-    (tl/to-local-date-time
-      (tf/parse (apply tf/formatter (tc/default-time-zone) form) (str date " " eta)))))
+    (to-local-date-time
+      (tf/parse (apply tf/formatter (time/default-time-zone) form) (str date " " eta)))))
 
 (defn format-eta [^org.joda.time.DateTime d]
-  (tf/unparse (tf/formatter "HH:mm" (tc/default-time-zone)) d))
+  (tf/unparse (tf/formatter "HH:mm" (time/default-time-zone)) d))
 
 (defn format-time-span [^org.joda.time.DateTime a ^org.joda.time.DateTime b]
-  (let [to   (or (and (tc/after? a b) a) b)
-        from (or (and (tc/after? a b) b) a)]
+  (let [to   (or (and (time/after? a b) a) b)
+        from (or (and (time/after? a b) b) a)]
     (try
-      (tc/in-minutes (tc/interval from to))
+      (let [span (time/in-minutes (time/interval from to))]
+        (if (time/after? b a)
+          (+ span)
+          (- span)))
     (catch java.lang.IllegalArgumentException _))))
 
 (defmacro swallow-exceptions [& body]
     `(try ~@body (catch Exception e#)))
 
-
 (defn- format-ul-time [kind user time]
-  (format "%s (%s: %s [%s min])"
+  (let [date (format-eta (from-date time))
+        span (format-time-span (local-now) (from-date time))]
+  (format "%s (%s: %s [%s])"
     user
     kind
-    (format-eta (to/from-date time))
-    (format-time-span (tl/local-now) (to/from-date time))))
+    date
+    (if (pos? span)
+      (str "in " span " min")
+      (str (- span) " min ago")))))
 
 (defn- format-ul-user [[user vals]]
   (let [{:keys [eta ts]} vals]
@@ -53,4 +59,5 @@
 (defn format-user-list [users]
   (apply str
     (interpose ", "
-      (map format-ul-user users))))
+      (filter (complement str/blank?)
+        (map format-ul-user users)))))
