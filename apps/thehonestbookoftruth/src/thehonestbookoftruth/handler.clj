@@ -53,9 +53,9 @@
       (and (state/logout! user) (str "Cya. You subraumed for " span " mins" )))
     "Hmm, you are not logged in. So, no logout ;)"))
 
-(defmethod handler :logout-all
+(defmethod handler :clear-all-etas-and-logins
   [_]
-  (and (state/logout-all!)
+  (and (state/clear!)
     "Na, kuchen backen?"))
 
 (defmethod handler :eta
