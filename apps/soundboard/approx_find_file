@@ -2,7 +2,7 @@
 
 INDEXPATH="$(dirname "$0")/index"
 FILEPATH="$(dirname "$0")/files"
-key="$(printf "%s " "${@}")"
+key="${@}"
 
 file="$(tre-agrep \
     --best-match \
