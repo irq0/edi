@@ -42,6 +42,11 @@
   (info (str "[STATE] Logout: " user))
   (swap! *db* (fn [old] (assoc-in old [:user user] nil))))
 
+(defn clear! []
+  "Remove entries having :eta or login :ts set"
+  (info (str "[STATE] Clear all ETAs and logins"))
+  (swap! *db* #(assoc % :user (into {} (filter (complement (fn [[_ data]] (or (:eta data) (:ts data)))) (:user %))))))
+
 (defn logout-all! []
   (info (str "[STATE] Logout: ALL"))
   (swap! *db* #(assoc % :user (into {} (filter (complement (fn [[_ data]] (:ts data))) (:user %))))))

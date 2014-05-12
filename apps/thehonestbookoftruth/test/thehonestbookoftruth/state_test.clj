@@ -43,3 +43,17 @@
       (is (not (has-eta? usr)))
       (logout! usr)
       (is (not (has-eta? usr))))))
+
+(deftest clear-test
+  (let [usrs ["a" "b" "c"]
+        eta (tc/date-time 2000 5 20 20 00)]
+    (testing "login some users, clear, db should be clean afterwards"
+      (doseq [u usrs]
+        (login! (str "login_" u)))
+      (doseq [u usrs]
+        (set-eta! (str "eta_" u) eta))
+      (clear!)
+      (doseq [u usrs]
+        (is (not (has-eta? (str "eta_" u))))
+        (is (not (logged-in? (str "login_" u)))))
+      (is (empty? (:user @*db*))))))
