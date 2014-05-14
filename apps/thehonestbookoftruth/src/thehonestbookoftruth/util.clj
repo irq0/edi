@@ -8,7 +8,7 @@
 (declare format-eta)
 
 (defn- expand-special-etas [x]
-  (if (some #{(str/upper-case x)} ["SOON" "GLEICH"])
+  (if (some #{(str/upper-case x)} ["SOON" "GLEICH" "BALD"])
     (format-eta (time/plus (local-now) (time/minutes 43)))
     x))
 
