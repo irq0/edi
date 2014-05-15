@@ -16,8 +16,10 @@ SCRIPTPATH="$(dirname $0)"
 
 export APPDIR="$(readlink -f ${SCRIPTPATH}/apps)"
 export LOGDIR="$(readlink -f ${SCRIPTPATH}/log)"
+export CONFDIR="$(readlink -f ${SCRIPTPATH}/conf)"
 export ENVDIR="$(readlink -f ${SCRIPTPATH}/conf/env)"
 export BINDIR="$(readlink -f ${SCRIPTPATH}/bin)"
+export LIBDIR="$(readlink -f ${SCRIPTPATH}/lib)"
 
 export PATH="${PATH}:${BINDIR}"
 
