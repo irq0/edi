@@ -35,9 +35,10 @@
       (str
         "Bestellungen (gestartet: " f " von " (deref +started-by+) "):\n"
         (apply str
-               (map (fn [x] (str
-                              (first x) ": " (second x)))
-                    (deref +orders+)))))))
+               (interpose "\n"
+                           (map (fn [x] (str
+                                          (first x) ": " (second x)))
+                                (deref +orders+))))))))
 
 (defn handle-request [msg]
   (let [args (:args msg)
