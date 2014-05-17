@@ -1,0 +1,30 @@
+#!/bin/bash -x
+
+set -o errexit
+set -o nounset
+
+readonly SCRIPTPATH="$(dirname "$0")"
+
+readonly SCRIPTS_DEFAULT="$SCRIPTPATH/DEFAULT"
+readonly SCRIPTS_USER="$SCRIPTPATH/users"
+
+find_script () {
+    local geeting="$1"
+    local user_script="${SCRIPTS_USER}/${EDI_USER}/${geeting}"
+    local default_script="${SCRIPTS_DEFAULT}/${geeting}"
+
+    if [[ -x $user_script ]]; then
+	echo "$user_script"
+	return 0
+    elif [[ -x $default_script ]]; then
+	echo "$default_script"
+	return 0
+    else
+	return 1
+    fi
+}
+
+if [[ $EDI_CMD_ARGS =~ ^[a-z]+$ && $EDI_USER =~ ^[a-zA-Z0-9]+$ ]]; then
+    echo "SUP: user=$EDI_USER greeting=$EDI_CMD_ARGS" >&2
+    exec "$(find_script $EDI_CMD_ARGS)"
+fi
