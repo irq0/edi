@@ -1,8 +1,8 @@
-(defproject pizzamaschine "1"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
+(defproject pizzamaschine "0.3"
+  :description "Pizza order collection service for the benevolent Subraum AI"
+  :url "https://git.c3pb.de/gbe/pizzamaschine"
+  :license {:name "ISC"
+            :url "http://en.wikipedia.org/wiki/ISC_license"}
   :main pizzamaschine.core
   :aot [pizzamaschine.core]
   :dependencies [[org.clojure/clojure "1.5.1"]
