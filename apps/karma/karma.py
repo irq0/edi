@@ -13,7 +13,8 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-jsoned_memory = os.path.abspath(os.path.join(os.path.dirname(__file__), 'karma.json'))
+jsoned_memory = os.path.abspath(os.getenv("EDI_KARMA_FILE") or
+                         os.path.abspath(os.path.join(os.path.dirname(__file__), 'karma.json')))
 
 if os.path.isfile(jsoned_memory):
     memory = json.load( open( jsoned_memory, "rb" ) )
