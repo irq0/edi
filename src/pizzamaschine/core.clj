@@ -2,13 +2,14 @@
 ;;;; TODO:
 ;;;; - i18n? Maybe not.
 
-(ns edi-test.core
+(ns pizzamaschine.core
   (:require [langohr.core :as rmq]
             [langohr.channel :as lch]
             [langohr.queue :as lq]
             [langohr.consumers :as lc]
             [langohr.basic :as lb]
-            [clojure.data.json :as json]))
+            [clojure.data.json :as json])
+  (:gen-class))
 
 (defn make-url []
   (get (System/getenv)
