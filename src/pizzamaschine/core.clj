@@ -95,6 +95,19 @@
              (alter +first-order+ (fn [x] ""))
              "\nBestelliste wurde geleert.")))))
 
+(defn debug [msg]
+  ;; XXX: Backdoor incoming.
+  (if (not= "farhaven" (:user msg))
+    "Nope."
+    (str
+      (try
+        (load-string
+          (str "(in-ns 'pizzamaschine.core)\n"
+               (:args msg)))
+        (catch Exception e
+          (str "Exception: "
+               (str e)))))))
+
 (defn dispatch-command [msg]
   (let [args (:args msg)
         user (:user msg)
@@ -104,6 +117,8 @@
       (reset-orders!)
       (= cmd "pizza-list")
       (list-orders)
+      (= cmd "pizza-debug")
+      (debug msg)
       (or (= cmd "pizza-help")
           (empty? args))
       +help-message+
