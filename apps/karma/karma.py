@@ -11,14 +11,14 @@ import re
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 jsoned_memory = os.path.abspath(os.getenv("EDI_KARMA_FILE") or
                          os.path.abspath(os.path.join(os.path.dirname(__file__), 'karma.json')))
 
 if os.path.isfile(jsoned_memory):
     memory = json.load( open( jsoned_memory, "rb" ) )
-    print(memory)
+    log.debug(memory)
 else:
     memory = dict()
 
@@ -39,7 +39,7 @@ def mod_karma(thing, operator):
     else:
         memory[thing] = operator(0, 1)
 
-    print("%s's new karma: %s" % (thing, memory[thing]))
+    log.info("%s's new karma: %s" % (thing, memory[thing]))
     with open( jsoned_memory, "wb" ) as f:
         json.dump( memory, f )
 
