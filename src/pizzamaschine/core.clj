@@ -30,21 +30,33 @@
 (def +started-by+ (ref ""))
 
 (defn list-orders []
+  (dosync
   (let [f @+first-order+]
     (if (empty? f)
       "Keine Bestellungen :/"
       (str
-        "Bestellungen (gestartet: " f " von " @+started-by+ "):\n"
         (apply str
                (interpose "\n"
                            (map #(str (first %) ": " (second %))
-                                @+orders+)))))))
+                                @+orders+)))
+        "\n(gestartet: " f " von " @+started-by+ ")\n"
+        )))))
 
-(defn handle-request [msg]
+(defn add-order [user order]
+  (dosync
+    (when (empty? @+first-order+)
+      (alter +first-order+ (fn [x] (str (now))))
+      (alter +started-by+ (fn [x] user)))
+    (alter +orders+ #(assoc % user order))
+    (str "Ack: "
+         order)))
+
+(defn dispatch-command [msg]
   (let [args (:args msg)
-        user (:user msg)]
+        user (:user msg)
+        cmd  (:cmd msg)]
     (cond
-      (= args "-reset")
+      (= cmd "pizza-reset")
       (dosync
         (let [o (list-orders)]
           (alter +orders+ (fn [x] '{}))
@@ -52,28 +64,20 @@
                (when-not (empty? @+first-order+)
                  (alter +first-order+ (fn [x] ""))
                  "\nBestelliste wurde geleert."))))
-      (or (= args "-list")
+      (= cmd "pizza-list")
+      (list-orders)
+      (or (= cmd "pizza-help")
           (empty? args))
-      (dosync
-        (list-orders))
-      (or (= args "-help")
-        (.startsWith args "-"))
       +help-message+
       :else
-      (dosync
-        (when (empty? @+first-order+)
-          (alter +first-order+ (fn [x] (str (now))))
-          (alter +started-by+ (fn [x] user)))
-        (alter +orders+ #(assoc % user args))
-        (str "Ack: "
-          args)))))
+      (add-order user args))))
 
 (defn message-handler
   [ch {:keys [content-type delivery-tag] :as meta} ^bytes payload]
   (let [msg (json/read-str (String. payload "UTF-8")
                            :key-fn keyword)
         dst (.replace (:src msg) "recv" "send")
-        reply (handle-request msg)]
+        reply (dispatch-command msg)]
     (println
       (str "[recv] " msg))
     (lb/publish ch "msg" dst
