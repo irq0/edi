@@ -83,17 +83,21 @@
       (alter +first-order+ (fn [x] (str (now))))
       (alter +started-by+ (fn [x] user)))
     (alter +orders+ #(assoc % user order))
+    (store-state)
     (str "Ack: "
          order)))
 
 (defn reset-orders! []
   (dosync
-    (let [o (list-orders)]
-      (alter +orders+ (fn [x] '{}))
-      (str o
-           (when-not (empty? @+first-order+)
-             (alter +first-order+ (fn [x] ""))
-             "\nBestelliste wurde geleert.")))))
+    (let [o (list-orders)
+          rv (str o
+                  (when-not (empty? @+orders+)
+                    (alter +first-order+ (fn [x] ""))
+                    (alter +orders+ (fn [x] '{}))
+                    (alter +started-by+ (fn [x] ""))
+                    "\nBestelliste wurde geleert."))]
+      (store-state)
+      rv)))
 
 (defn debug [msg]
   ;; XXX: Backdoor incoming.
