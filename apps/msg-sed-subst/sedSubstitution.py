@@ -121,4 +121,5 @@ with edi.Manager(name="Sed", descr="Sed lets you correct yourself, as well as ev
 
         publish(msg, new_phrase)
 
+    e.register_inspect_command()
     e.run()
