@@ -1,6 +1,6 @@
-# edi-test
+# pizzamaschine
 
-A Clojure library designed to ... well, that part is up to you.
+Pizza ordering service for the most benevolent Subraum AI.
 
 ## Usage
 
