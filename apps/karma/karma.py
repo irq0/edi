@@ -30,7 +30,7 @@ def handle_get_karma(args, thing):
         to_send = "%s: %s" % (thing, memory[thing])
     else:
         to_send = "%s? .. What's that supposed to be?!" % (thing)
-    
+
     edi.emit.msg_reply(e.chan,
                        src=args["src"],
                        user=args["user"],
@@ -65,4 +65,5 @@ with edi.Manager(name="Karma", descr="Rate what you love and hate.") as e:
         elif action[0] == "-":
             mod_karma(thing, operator.sub)
 
+    e.register_inspect_command()
     e.run()
