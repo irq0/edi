@@ -22,9 +22,6 @@ if os.path.isfile(jsoned_memory):
 else:
     memory = dict()
 
-def words(string):
-    return re.split(r"\s+", string)
-
 def handle_get_karma(args, thing):
     if thing in memory:
         to_send = "%s: %s" % (thing, memory[thing])
@@ -49,10 +46,22 @@ def mod_karma(thing, operator):
 with edi.Manager(name="Karma", descr="Rate what you love and hate.") as e:
 
     @edi.edi_cmd(e, "karma",
-        descr="Get karma of $thing")
+                 args="TEXT",
+                 descr="Get karma of $arg")
     def get_karma_recv(**args):
-        for thing in words(args["args"]):
-            handle_get_karma(args, thing)
+        handle_get_karma(args, args["args"])
+
+    @edi.edi_cmd(e, "kinc",
+                 args="TEXT",
+                 descr="Increment Karma of $arg")
+    def inc_karma(args, **rest):
+        mod_karma(args, operator.add)
+
+    @edi.edi_cmd(e, "kdec",
+                 args="TEXT",
+                 descr="Decrement Karma of $arg")
+    def inc_karma(args, **rest):
+        mod_karma(args, operator.sub)
 
     @edi.edi_msg(e, "#.recv.*")
     @edi.edi_filter_matches(r"\b(\S+?)\s?(\+\++|--+)")
