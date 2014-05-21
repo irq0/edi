@@ -1,6 +1,8 @@
 ;;;; Pizza plugin for the benevolent Subraum-AI
 ;;;; TODO:
-;;;; - i18n? Maybe not.
+;;;; - persistence
+;;;; - order timestamps
+;;;; - appending to existing orders
 
 (ns pizzamaschine.core
   (:require [langohr.core :as rmq]
