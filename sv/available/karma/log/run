@@ -1,6 +1,6 @@
 #!/bin/sh
 
-name="bot_karma"
+name="karma"
 dir="${LOGDIR}/${name}"
 
 mkdir -p "${dir}"

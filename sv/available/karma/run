@@ -3,4 +3,4 @@
 exec 2>&1
 
 exec chpst -e "$ENVDIR" \
-     "${APPDIR}/bot_karma/karma.py"
+     "${APPDIR}/karma/karma.py"
