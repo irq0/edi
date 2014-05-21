@@ -53,22 +53,14 @@ with edi.Manager(name="Karma", descr="Rate what you love and hate.") as e:
     def get_karma_recv(**args):
         for thing in words(args["args"]):
             handle_get_karma(args, thing)
-  
+
     @edi.edi_msg(e, "#.recv.*")
     @edi.edi_filter_matches(r"\b(\S+?)\s?(\+\++|--+)")
     def mod_karma_recv(regroups, **msg):
         assert len(regroups) == 2
         thing, action = regroups
 
-        if thing in ["space", "snowball", "seri"] and action == "--": 
-            edi.emit.cmd(e.chan,
-                cmd="sob",
-                args="ruhe dahinten",
-                user=msg["user"],
-                src=msg["rkey"])
-
-
-        elif action[0] == "+":
+        if action[0] == "+":
             mod_karma(thing, operator.add)
         elif action[0] == "-":
             mod_karma(thing, operator.sub)
