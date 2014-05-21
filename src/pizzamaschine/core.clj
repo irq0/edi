@@ -105,9 +105,10 @@
     "Nope."
     (str
       (try
-        (load-string
-          (str "(in-ns 'pizzamaschine.core)\n"
-               (:args msg)))
+        (dosync
+          (load-string
+            (str "(in-ns 'pizzamaschine.core)\n"
+                 (:args msg))))
         (catch Exception e
           (str "Exception: "
                (str e)))))))
