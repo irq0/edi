@@ -62,7 +62,7 @@
       :else
       (dosync
         (when (empty? @+first-order+)
-          (alter +first-order+ #(str (now)))
+          (alter +first-order+ (fn [x] (str (now))))
           (alter +started-by+ (fn [x] user)))
         (alter +orders+ #(assoc % user args))
         (str "Ack: "
