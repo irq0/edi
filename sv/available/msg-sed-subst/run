@@ -3,4 +3,4 @@
 exec 2>&1
 
 exec chpst -e "$ENVDIR" \
-     "${APPDIR}/msg-sed-subst/sedSubstituion.py"
+     "${APPDIR}/msg-sed-subst/sedSubstitution.py"
