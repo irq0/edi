@@ -41,7 +41,7 @@ def publish(inc_msg, message):
            msg=message)
 
 def substitutionFailed(inc_msg):
-    to_send = u"Sorry, %s. I don't know what you are talking about." % (msg["user"])
+    to_send = u"Sorry, %s. I don't know what you are talking about." % (inc_msg["user"])
     publish(inc_msg, to_send)
 
 
@@ -50,6 +50,10 @@ with edi.Manager(name="Sed", descr="Sed lets you correct yourself, as well as ev
     @edi.edi_msg(e, "#.recv.*")
     @edi.edi_filter_matches("(?!" + SUBSTITUTION_RE + ")")
     def collect_message(r, **msg):
+
+        if re.match(SUBSTITUTION_RE, msg["msg"]):
+            return # The edi_filter_matches decorator doesn't like my inversed regex.
+
         user = msg["user"]
         if user in memory:
             memory[user] += [msg["msg"]]
@@ -113,7 +117,8 @@ with edi.Manager(name="Sed", descr="Sed lets you correct yourself, as well as ev
         # output
         if msg["type"] != "action": # no "/me ..." command
             new_phrase = '\x02meant\x02 to say: ' + new_phrase
-        elif regroups[0]:  # correcting another user
+
+        if regroups[0]:  # correcting another user
             new_phrase = '%s thinks %s %s' % (msg["user"], rnick, new_phrase)
         else:
             new_phrase = '%s %s' % (msg["user"], new_phrase)
