@@ -1,8 +1,7 @@
 ;;;; Pizza plugin for the benevolent Subraum-AI
 ;;;; TODO:
-;;;; - persistence
-;;;; - order timestamps
 ;;;; - appending to existing orders
+;;;; - announce closing of the order in #c3pb
 
 (ns pizzamaschine.core
   (:require [langohr.core :as rmq]
@@ -72,7 +71,10 @@
       (str
         (apply str
                (interpose "\n"
-                          (map #(str (first %) ": " (second %))
+                          (map #(str (first %) ": "
+                                     (first (second %)) " at "
+                                     (second (second %))
+                                     )
                                @+orders+)))
         "\n(gestartet: " @+first-order+ " von " @+started-by+ ")\n"
         ))))
@@ -82,7 +84,7 @@
     (when (empty? @+first-order+)
       (alter +first-order+ (fn [x] (str (now))))
       (alter +started-by+ (fn [x] user)))
-    (alter +orders+ #(assoc % user order))
+    (alter +orders+ #(assoc % user (list order (str (now)))))
     (store-state)
     (str "Ack: "
          order)))
@@ -99,20 +101,6 @@
       (store-state)
       rv)))
 
-(defn debug [msg]
-  ;; XXX: Backdoor incoming.
-  (if (not= "farhaven" (:user msg))
-    "Nope."
-    (str
-      (try
-        (dosync
-          (load-string
-            (str "(in-ns 'pizzamaschine.core)\n"
-                 (:args msg))))
-        (catch Exception e
-          (str "Exception: "
-               (str e)))))))
-
 (defn dispatch-command [msg]
   (let [args (:args msg)
         user (:user msg)
@@ -122,8 +110,6 @@
       (reset-orders!)
       (= cmd "pizza-list")
       (list-orders)
-      (= cmd "pizza-debug")
-      (debug msg)
       (or (= cmd "pizza-help")
           (empty? args))
       +help-message+
@@ -151,7 +137,7 @@
          ch    (lch/open conn)
          qname (:queue (lq/declare ch))
          exchange "cmd"
-         keys ["pizza" "pizza-reset" "pizza-list" "pizza-help" "pizza-debug"]]
+         keys ["pizza" "pizza-reset" "pizza-list" "pizza-help"]]
      (doseq [k keys]
        (println "Binding to" exchange "/" k)
        (lq/bind ch qname exchange :routing-key k))

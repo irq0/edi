@@ -1,4 +1,4 @@
-(defproject pizzamaschine "0.3"
+(defproject pizzamaschine "5"
   :description "Pizza order collection service for the benevolent Subraum AI"
   :url "https://git.c3pb.de/gbe/pizzamaschine"
   :license {:name "ISC"
