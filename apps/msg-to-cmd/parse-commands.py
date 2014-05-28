@@ -44,7 +44,7 @@ with edi.Manager() as e:
                         edi.emit.msg_reply(e.chan,
                                            src=msg["rkey"],
                                            user=msg["user"],
-                                           msg="No OP. No commands :P")
+                                           msg="No OP. No commands :P (Hint: https://www.c3pb.de/_media/wiki/documents/mitgliedsantrag.pdf)")
         e.register_inspect_command()
 
         e.run()
