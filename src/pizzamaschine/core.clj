@@ -1,6 +1,5 @@
 ;;;; Pizza plugin for the benevolent Subraum-AI
 ;;;; TODO:
-;;;; - appending to existing orders
 ;;;; - announce closing of the order in #c3pb
 
 (ns pizzamaschine.core
@@ -55,9 +54,12 @@
    (dosync
      (try
        (let [data (json/read-str (slurp path))]
-         (alter +orders+ (fn [x] (get data "orders")))
-         (alter +first-order+ (fn [x] (get data "first-order")))
-         (alter +started-by+ (fn [x] (get data "started-by")))
+         (alter +orders+
+                (fn [x] (get data "orders")))
+         (alter +first-order+
+                (fn [x] (get data "first-order")))
+         (alter +started-by+
+                (fn [x] (get data "started-by")))
          true)
        (catch Exception e
          (println (str "Could not load state from " path ":\n"
@@ -76,7 +78,8 @@
                                      (second (second %))
                                      )
                                @+orders+)))
-        "\n(gestartet: " @+first-order+ " von " @+started-by+ ")\n"
+        "\n(gestartet: " @+first-order+
+        " von " @+started-by+ ")\n"
         ))))
 
 (defn add-order! [user order]
