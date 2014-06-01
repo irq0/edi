@@ -91,9 +91,10 @@ class Manager(object):
     consumer_tags = []
 
     metadata = {
-        "app" : "unknown-" + binascii.b2a_hex(os.urandom(6)),
+        "app" : "unknown",
         "descr" : "unnamed pyedi app",
-        "cmds" : {}
+        "cmds" : {},
+        "instance" : binascii.b2a_hex(os.urandom(5)),
     }
 
     def __init__(self, name=None, descr=None, amqp_server=(os.getenv("AMQP_SERVER") or "localhost")):
@@ -159,10 +160,9 @@ class Manager(object):
                   cmd, args, descr, attribs)
 
     def _make_queue_name(self, suffix):
-        app = self.metadata["app"]
-
-        return "pyedi_{}__{}".format(
-            re.sub(r"[^\w]", "", app),
+        return "pyedi-{}__{}__{}".format(
+            self.metadata["instance"],
+            re.sub(r"[^\w]", "", self.metadata["app"]),
             suffix)
 
     def register_inspect_command(self):
