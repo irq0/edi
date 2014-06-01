@@ -91,7 +91,7 @@ class Manager(object):
     consumer_tags = []
 
     metadata = {
-        "app" : "unknown",
+        "app" : "unknown-" + binascii.b2a_hex(os.urandom(6)),
         "descr" : "unnamed pyedi app",
         "cmds" : {}
     }
@@ -106,17 +106,23 @@ class Manager(object):
     def __enter__(self):
         log.info("Connecting to AMQP Server: %r", self.amqp_server)
 
-        self.conn = amqp.Connection(self.amqp_server)
-        self.chan = self.conn.channel()
+        try:
+            self.conn = amqp.Connection(self.amqp_server)
+            self.chan = self.conn.channel()
 
-        self.chan.exchange_declare("cmd", "topic", auto_delete=False, durable=True)
-        self.chan.exchange_declare("msg", "topic", auto_delete=False, durable=True)
+            self.chan.exchange_declare("cmd", "topic", auto_delete=False, durable=True)
+            self.chan.exchange_declare("msg", "topic", auto_delete=False, durable=True)
+        except:
+            log.exception("")
 
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        for tag in self.consumer_tags:
-            self.chan.basic_cancel(tag)
+        try:
+            for tag in self.consumer_tags:
+                self.chan.basic_cancel(tag)
+        except:
+            log.error("Error in canceling consumers")
 
         self.chan.close()
         self.conn.close()
@@ -128,10 +134,10 @@ class Manager(object):
             try:
                 self.chan.wait()
             except KeyboardInterrupt:
-                log.info("Shutting down")
                 self.__exit__(None, None, None)
             except:
                 log.exception("Exception in edi run loop")
+        log.info("Shutting down")
 
     def set_app_name(self, name):
         self.metadata["app"] = name
@@ -153,8 +159,10 @@ class Manager(object):
                   cmd, args, descr, attribs)
 
     def _make_queue_name(self, suffix):
+        app = self.metadata["app"]
+
         return "pyedi_{}__{}".format(
-            re.sub(r"[^\w]", "", self.metadata["app"]),
+            re.sub(r"[^\w]", "", app),
             suffix)
 
     def register_inspect_command(self):
