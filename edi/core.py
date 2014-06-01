@@ -91,7 +91,7 @@ class Manager(object):
     consumer_tags = []
 
     metadata = {
-        "app" : "unknown",
+        "app" : "unknown-" + binascii.b2a_hex(os.urandom(6)),
         "descr" : "unnamed pyedi app",
         "cmds" : {}
     }
@@ -153,8 +153,10 @@ class Manager(object):
                   cmd, args, descr, attribs)
 
     def _make_queue_name(self, suffix):
+        app = self.metadata["app"]
+
         return "pyedi_{}__{}".format(
-            re.sub(r"[^\w]", "", self.metadata["app"]),
+            re.sub(r"[^\w]", "", app),
             suffix)
 
     def register_inspect_command(self):
