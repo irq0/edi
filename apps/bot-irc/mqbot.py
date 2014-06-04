@@ -93,6 +93,9 @@ class MQ(Thread):
         raw_msg.channel.basic_ack(raw_msg.delivery_tag)
 
     def handle_json_message(self, key, msg):
+        if not "user" in msg:
+            msg["user"] = None
+
         if key[2] == "presence":
             self.irc_presence(msg["status"], msg["msg"])
         elif key[2] == "send":
@@ -133,6 +136,9 @@ class MQ(Thread):
         self.bot.me(dest.encode("utf-8"), msg.encode("utf-8"))
 
     def irc_send(self, dest, user, msg):
+        if user == None:
+            user = config["channel"]
+
         dest = dest.replace(u"_channel_", config["channel"])
         user = user.replace(u"_channel_", config["channel"])
 
