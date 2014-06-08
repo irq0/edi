@@ -6,6 +6,7 @@ set -o nounset
 readonly SCRIPTPATH="$(dirname "$0")"
 
 readonly SCRIPTS_DEFAULT="$SCRIPTPATH/DEFAULT"
+readonly SCRIPTS_ALWAYS="$SCRIPTPATH/ALWAYS"
 readonly SCRIPTS_USER="$SCRIPTPATH/users"
 
 find_script () {
@@ -13,6 +14,11 @@ find_script () {
     local event="$2"
     local user_script="${SCRIPTS_USER}/${user}/${event}"
     local default_script="${SCRIPTS_DEFAULT}/${event}"
+    local always_script="${SCRIPTS_ALWAYS}/${event}"
+
+    if [[ -x $always_script ]];then
+	echo "$always_script"
+    fi
 
     if [[ -x $user_script ]]; then
 	echo "$user_script"
@@ -26,16 +32,15 @@ find_script () {
 }
 
 main () {
-    if [[ $EDI_CMD_ARGS =~ ^[a-z]+$ && $EDI_USER =~ ^[a-zA-Z0-9]+$ ]]; then
+    if [[ $EDI_CMD =~ ^[a-z\.-]+$ && $EDI_USER =~ ^[a-zA-Z0-9]+$ ]]; then
 	local event="${EDI_CMD#*.}"
-	echo "SUP: user=$EDI_USER for_user=$EDI_CMD_ARGS event=$event" >&2
-	local script="$(find_script "$EDI_CMD_ARGS" "$event")"
-	if [[ -n $script ]]; then
+	echo "SUP: for_user=$EDI_USER event=$event" >&2
+	local scripts="$(find_script "$EDI_USER" "$event")"
+
+	for script in $scripts; do
 	    echo "SUP: exec $script" >&2
 	    exec "$script"
-	else
-	    echo "SUP: No script for event \"$event\"" >&2
-	fi
+	done
     fi
 }
 
