@@ -24,10 +24,14 @@ def make_cmd_exec(chan, cmd, app, autoreply=True):
 
         stdin = output_formatter(data)
 
+        data_r, data_w = os.pipe()
+        log.debug("Using data FDs: r=%r w=%r", data_r, data_w)
+
         env = os.environ
         env["EDI_CMD"] = cmd
         env["EDI_USER"] = data.get("user", "")
         env["EDI_CMD_ARGS"] = data.get("args", "")
+        env["EDI_DATA_FD"] = str(data_w)
 
         log.info("Calling app %r", app)
         log.debug("Calling app with environment: %r", env)
@@ -37,10 +41,20 @@ def make_cmd_exec(chan, cmd, app, autoreply=True):
                              stderr=subprocess.PIPE,
                              stdin=subprocess.PIPE,
                              env=env)
+        os.close(data_w)
 
         stdout, stderr = p.communicate(input=stdin)
 
         stdout, stderr = (x.decode("utf-8") for x in (stdout, stderr))
+
+        try:
+	        dataout = os.fdopen(data_r).read().decode("utf-8")
+	except:
+		dataout = None
+
+        log.info("#### Command %r output: DATA OUT (fd=%d)", cmd, data_r)
+        if dataout:
+	        log.info("%s", dataout)
 
         log.info("#### Command %r output: STDOUT", cmd)
         if stdout:
