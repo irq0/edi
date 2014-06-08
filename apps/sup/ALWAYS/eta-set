@@ -1,0 +1,3 @@
+#!/bin/sh
+
+emit_msg_action "recvd ETA for ${EDI_USER}: ${EDI_CMD_ARGS}"
