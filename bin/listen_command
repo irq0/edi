@@ -48,13 +48,14 @@ def make_cmd_exec(chan, cmd, app, autoreply=True):
         stdout, stderr = (x.decode("utf-8") for x in (stdout, stderr))
 
         try:
-	        dataout = os.fdopen(data_r).read().decode("utf-8")
+	    dataout = parse_data_out(os.fdopen(data_r).read().decode("utf-8"))
 	except:
-		dataout = None
+	    log.exception("Failed to parse dataout")
+	    dataout = None
 
         log.info("#### Command %r output: DATA OUT (fd=%d)", cmd, data_r)
         if dataout:
-	        log.info("%s", dataout)
+	    log.info("%r", dataout)
 
         log.info("#### Command %r output: STDOUT", cmd)
         if stdout:
@@ -69,10 +70,14 @@ def make_cmd_exec(chan, cmd, app, autoreply=True):
             edi.emit.msg_reply(chan,
                                src=data["src"],
                                user=data["user"],
+                               data=dataout,
                                msg=stdout)
 
 
     return do_exec
+
+def parse_data_out(x):
+    return json.loads(x)
 
 def output_formatter(x):
     return json.dumps(x)
