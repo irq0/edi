@@ -161,6 +161,7 @@ class Manager(object):
         def inspect(src, **args):
             emit.msg_reply(self.chan,
                            src=src,
+                           data=self.metadata,
                            msg=json.dumps(self.metadata))
 
         self.register_command(inspect, "inspect", descr="pyedi default inspect")
