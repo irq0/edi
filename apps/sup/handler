@@ -9,9 +9,10 @@ readonly SCRIPTS_DEFAULT="$SCRIPTPATH/DEFAULT"
 readonly SCRIPTS_USER="$SCRIPTPATH/users"
 
 find_script () {
-    local geeting="$1"
-    local user_script="${SCRIPTS_USER}/${EDI_USER}/${geeting}"
-    local default_script="${SCRIPTS_DEFAULT}/${geeting}"
+    local user="$1"
+    local event="$2"
+    local user_script="${SCRIPTS_USER}/${user}/${event}"
+    local default_script="${SCRIPTS_DEFAULT}/${event}"
 
     if [[ -x $user_script ]]; then
 	echo "$user_script"
@@ -24,7 +25,18 @@ find_script () {
     fi
 }
 
-if [[ $EDI_CMD_ARGS =~ ^[a-z]+$ && $EDI_USER =~ ^[a-zA-Z0-9]+$ ]]; then
-    echo "SUP: user=$EDI_USER greeting=$EDI_CMD_ARGS" >&2
-    exec "$(find_script $EDI_CMD_ARGS)"
-fi
+main () {
+    if [[ $EDI_CMD_ARGS =~ ^[a-z]+$ && $EDI_USER =~ ^[a-zA-Z0-9]+$ ]]; then
+	local event="${EDI_CMD#*.}"
+	echo "SUP: user=$EDI_USER for_user=$EDI_CMD_ARGS event=$event" >&2
+	local script="$(find_script "$EDI_CMD_ARGS" "$event")"
+	if [[ -n $script ]]; then
+	    echo "SUP: exec $script" >&2
+	    exec "$script"
+	else
+	    echo "SUP: No script for event \"$event\"" >&2
+	fi
+    fi
+}
+
+main
