@@ -59,7 +59,7 @@
       (do
         (emit/cmd ch
           :cmd "ev.login"
-          :args user
+          :args nil
           :user user
           :src src)
         "Hi!"))))
@@ -72,7 +72,7 @@
         (do
           (emit/cmd ch
             :cmd "ev.logout"
-            :args user
+            :args nil
             :user user
             :data {:span span}
             :src src)
@@ -93,7 +93,7 @@
           (do
             (emit/cmd ch
               :cmd "ev.eta-set"
-              :args user
+              :args (str (format-eta eta) " [" span " min]")
               :user user
               :data {:eta (to-date eta)}
               :src src)
@@ -109,7 +109,7 @@
       (do
         (emit/cmd ch
           :cmd "ev.eta-unset"
-          :args user
+          :args nil
           :user user
           :src src)
         "Schade :("))
