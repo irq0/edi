@@ -7,7 +7,7 @@ export PATH="${PATH}:/usr/games"
 exec chpst -e "$ENVDIR" \
      listen_command \
      --cmd "ev.#" \
-     --cmd-descr say="Greet myself" \
+     --cmd-descr say="Simple event handler" \
      --data onlyargs \
      --name "sup" \
      --description "Sup, a slur and informal greeting of the phrase what\'s up?" \
