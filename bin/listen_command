@@ -17,7 +17,7 @@ import edi
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("listen_command")
 
-def make_cmd_exec(chan, cmd, app, autoreply=True):
+def make_cmd_exec(chan, app, autoreply=True):
     def do_exec(**data):
         log.debug("do_exec data: %r", data)
         log.debug("using output formatter %r", output_formatter)
@@ -28,7 +28,7 @@ def make_cmd_exec(chan, cmd, app, autoreply=True):
         log.debug("Using data FDs: r=%r w=%r", data_r, data_w)
 
         env = os.environ
-        env["EDI_CMD"] = cmd
+        env["EDI_CMD"] = data["cmd"]
         env["EDI_USER"] = data.get("user", "")
         env["EDI_CMD_ARGS"] = data.get("args", "")
         env["EDI_DATA_FD"] = str(data_w)
@@ -53,15 +53,15 @@ def make_cmd_exec(chan, cmd, app, autoreply=True):
 	    log.exception("Failed to parse dataout")
 	    dataout = None
 
-        log.info("#### Command %r output: DATA OUT (fd=%d)", cmd, data_r)
+        log.info("#### Command %r output: DATA OUT (fd=%d)", data["cmd"], data_r)
         if dataout:
 	    log.info("%r", dataout)
 
-        log.info("#### Command %r output: STDOUT", cmd)
+        log.info("#### Command %r output: STDOUT", data["cmd"])
         if stdout:
             log.info("%s", stdout)
 
-        log.info("#### Command %r output: STDERR", cmd)
+        log.info("#### Command %r output: STDERR", data["cmd"])
         if stderr:
             log.info("%s", stderr)
 
@@ -108,7 +108,7 @@ def parse_args(args=None):
 
        parser.add_argument("--cmd",
                            action='append',
-                           type=NameString,
+                           type=str,
                            required=True,
                            help="Command to register. Repeat for multiple commands")
        parser.add_argument("--cmd-arg",
@@ -178,7 +178,6 @@ def main():
     with edi.Manager(name=args.name, descr=args.description) as e:
         for cmd, meta in args.cmds.iteritems():
             e.register_command(make_cmd_exec(e.chan,
-                                             cmd,
                                              args.exe,
                                              autoreply=args.autoreply),
                                cmd,
