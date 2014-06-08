@@ -29,8 +29,8 @@ def make_cmd_exec(chan, app, autoreply=True):
 
         env = os.environ
         env["EDI_CMD"] = data["cmd"]
-        env["EDI_USER"] = data.get("user", "")
-        env["EDI_CMD_ARGS"] = data.get("args", "")
+        env["EDI_USER"] = data.get("user", "") or ""
+        env["EDI_CMD_ARGS"] = data.get("args", "") or ""
         env["EDI_DATA_FD"] = str(data_w)
 
         log.info("Calling app %r", app)
