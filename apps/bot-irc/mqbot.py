@@ -160,7 +160,21 @@ class MQ(Thread):
 
         log.debug("SEND: dest=%r msg=%r", dest, msg)
 
-        self.bot.msg(dest.encode("utf-8"), msg.encode("utf-8"))
+        msg = msg.encode("utf-8")
+        dest= dest.encode("utf-8")
+
+        lines = msg.split("\n")
+        send_at_a_time = 120
+
+        # if we have multi-line content assume that each line doesn't hit the IRC server's limit
+        if len(lines) > 1:
+            send_at_a_time = None
+        else:
+            send_at_a_time = 120
+
+        for line in lines:
+            log.debug("SEND: dest=%r line=%r", dest, line)
+            self.bot.msg(dest, line, send_at_a_time)
 
 
     def user_flags(self, user):
@@ -265,7 +279,7 @@ class MQBot(NamesIRCClient):
     username = config["nick"]
     password = config["passwd"]
     realname = """Uh, my name's EDI, uh, I'm not an addict."""
-    lineRate = 0.5
+    lineRate = 1.0
 
     ops = set()
 
