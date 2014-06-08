@@ -1,5 +1,6 @@
 (ns thehonestbookoftruth.handler
   (:use [clj-time.local :only [local-now]]
+        [clj-time.coerce :only [to-date]]
         [clojurewerkz.serialism.core :as s]
         [thehonestbookoftruth.util :only [parse-eta format-eta format-time-span format-user-list]])
   (:require [thehonestbookoftruth.state :as state]
@@ -53,12 +54,29 @@
 (defmethod  handler :login [ch {:keys [user src]}]
   (if (state/logged-in? user)
     (str "Already logged in!")
-    (and (state/login! user) "Hi!")))
+    (and
+      (state/login! user)
+      (do
+        (emit/cmd ch
+          :cmd "ev.login"
+          :args user
+          :user user
+          :src src)
+        "Hi!"))))
 
 (defmethod handler :logout [ch {:keys [user src]}]
   (if (state/logged-in? user)
     (let [span (format-time-span (state/get-login-time user) (local-now))]
-      (and (state/logout! user) (str "Cya. You subraumed for " span " mins" )))
+      (and
+        (state/logout! user)
+        (do
+          (emit/cmd ch
+            :cmd "ev.logout"
+            :args user
+            :user user
+            :data {:span span}
+            :src src)
+          (str "Cya. You subraumed for " span " mins" ))))
     "Hmm, you are not logged in. So, no logout ;)"))
 
 (defmethod handler :clear-all-etas-and-logins [_]
@@ -70,15 +88,31 @@
     (try
       (let [eta (parse-eta args)
             span (format-time-span (local-now) eta)]
-        (and (state/set-eta! user eta)
-          (str "Cya in " span " minutes")))
+        (and
+          (state/set-eta! user eta)
+          (do
+            (emit/cmd ch
+              :cmd "ev.eta-set"
+              :args user
+              :user user
+              :data {:eta (to-date eta)}
+              :src src)
+            (str "Cya in " span " minutes"))))
       (catch java.lang.IllegalArgumentException e
+        (error e "ETA failed:")
         (str "Hmpf. \"" args "\" isn't a valid ETA")))))
 
-(defmethod handler :uneta [ch {:keys [user]}]
+(defmethod handler :uneta [ch {:keys [user src]}]
   (if (state/has-eta? user)
-    (and (state/unset-eta! user)
-      "Schade :(")
+    (and
+      (state/unset-eta! user)
+      (do
+        (emit/cmd ch
+          :cmd "ev.eta-unset"
+          :args user
+          :user user
+          :src src)
+        "Schade :("))
     "No ETA set :P"))
 
 (defmethod handler :default [ch args]

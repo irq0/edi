@@ -10,7 +10,10 @@
   (s/serialize x :json))
 
 (defn cmd [ch &{:as body}]
-  {:pre [(contains? body :cmd) (contains? body :args)]}
+  {:pre [(contains? body :cmd)
+         (contains? body :args)
+         (contains? body :user)
+         (contains? body :src)]}
 
   (let [json (jsonify body)]
     (debug (format "---> CMD[%s]: orig=%s json=%s" (:cmd body) body json))
