@@ -13,6 +13,7 @@ exec chpst -e "$ENVDIR" \
      --cmd-arg sob=TEXT \
      --cmd-description sob="Approx match argument to soundboad's index. Always play something" \
      --data onlyargs \
+     --autoreply \
      --name "soundboard" \
      --description "SOundBoard" \
      --exe "${APPDIR}/soundboard/edimq-handler"
