@@ -22,12 +22,8 @@ find_script () {
 
     if [[ -x $user_script ]]; then
 	echo "$user_script"
-	return 0
     elif [[ -x $default_script ]]; then
 	echo "$default_script"
-	return 0
-    else
-	return 1
     fi
 }
 
@@ -37,10 +33,15 @@ main () {
 	echo "SUP: for_user=$EDI_USER event=$event" >&2
 	local scripts="$(find_script "$EDI_USER" "$event")"
 
-	for script in $scripts; do
+	echo -e "SUP: Executing: $scripts" >&2
+	while read -r script; do
 	    echo "SUP: exec $script" >&2
-	    exec "$script"
-	done
+	    if "$script"; then
+	        echo "SUP: Success" >&2
+	    else
+	        echo "SUP: FAIL return=$?" >&2
+	    fi
+	done <<< "$scripts"
     fi
 }
 
