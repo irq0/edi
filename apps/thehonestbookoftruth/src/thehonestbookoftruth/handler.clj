@@ -79,7 +79,7 @@
           (str "Cya. You subraumed for " span " mins" ))))
     "Hmm, you are not logged in. So, no logout ;)"))
 
-(defmethod handler :clear-all-etas-and-logins [_]
+(defmethod handler :clear-all-etas-and-logins [_ _]
   (state/clear!))
 
 (defmethod handler :eta [ch {:keys [user args src]}]
