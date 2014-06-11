@@ -36,20 +36,37 @@ def edi_filter_matches(regex, field="msg"):
         return wrapper
     return decorator
 
-def edi_filter_msg_with_uflag(uflag):
+def edi_filter_msg_with_uflag_any(uflags):
+    """ Calls the wrapped function if any of the flags are in the users flag
+        list.
+    """
     def decorator(f):
         @wraps(f)
         def wrapper(**args):
-            if uflag in args["uflags"]:
-                return f(**args)
+            for f in uflags:
+                try:
+                    if args["uflags"].index(f) is not None:
+                        return f(**args)
+                except:
+                    pass
         return wrapper
     return decorator
 
-def edi_filter_msg_without_uflag(uflag):
+def edi_filter_msg_with_uflag_none(uflags):
+    """ Calls the wrapped function if none of the flags are in the users flag
+        list.
+    """
     def decorator(f):
         @wraps(f)
         def wrapper(**args):
-            if not uflag in args["uflags"]:
+            doit = False
+            for f in uflags:
+                try:
+                    if args["uflags"].index(f) is not None:
+                        doit = True
+                except KeyError:
+                    pass
+            if doit:
                 return f(**args)
         return wrapper
     return decorator
