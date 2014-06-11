@@ -8,33 +8,33 @@
             [clojure.string    :as str]
             [taoensso.timbre :as timbre]
             [clojurewerkz.serialism.core :as s]
+            [thehonestbookoftruth.emit :as emit]
             [thehonestbookoftruth.state :as state])
   (:gen-class))
 
 (timbre/refer-timbre)
 
-(defn reply [ch orig reply]
-  (let [dst (str/replace (:src orig) #"recv" "send")
-        msg (s/serialize {:user (:user orig) :msg reply} :json)]
-    (info (format "---> Handler reply orig_msg=%s key=%s: %s" orig dst msg))
-    (lb/publish ch "msg" dst msg :content-type "application/json")))
-
 (defn message-handler [ch {:keys [content-type delivery-tag] :as meta} ^bytes payload]
+  "Forward incoming messages to handler methods. Run handler as future. Do msg-reply if
+   handler returns string"
+
   (info (format "<--- Received message: %s, content type: %s"
           (String. payload "UTF-8") content-type))
 
   (when (= content-type "application/json")
     (try
-      (let [msg (s/deserialize payload :json)
-            result (handler msg)]
-        (when-not (empty? result)
-          (reply ch msg result)))
+      (let [msg (s/deserialize payload :json)]
+        (future (let [result (handler ch msg)]
+                  (when (string? result)
+                    (debug (str "Handler returned string, replying: " result))
+                    (emit/msg-reply ch (:src msg)
+                      :user (:user msg)
+                      :msg result)))))
       (catch com.fasterxml.jackson.core.JsonParseException e
         (error "[HANDLER] json decode failed :("))
       (catch Exception e
         (error e))))
   (lb/ack ch delivery-tag))
-
 
 (defn amqp-url [& args]
   (let [server (or (first args) (System/getenv "AMQP_SERVER") "localhost")]

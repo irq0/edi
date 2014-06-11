@@ -171,7 +171,7 @@ conf = [
                      ("mpd playpls http://www.bassdrive.com/v2/streams/BassDrive3.pls",)),
                     ("lunico",
                      "L'Unico",
-                     ("mpd clear","mpd add http://lunico-stream.upb.de:8001/lunico_high_mp3", "mpd play",)),
+                     ("mpd playthis http://lunico-stream.upb.de:8001/lunico_high_mp3",)),
                     ("technobase",
                      "TechnoBase.FM",
                      ("mpd playpls http://listen.technobase.fm/aacplus.pls",)),
@@ -180,7 +180,7 @@ conf = [
                      ("mpd playpls http://listen.trancebase.fm/aacplus.pls",)),
                     ("equinoxe",
                      "Radio Equinoxe",
-                     ("mpd clear","mpd add http://streaming.radionomy.com/Radio-Equinoxe", "mpd play",)),
+                     ("mpd playthis http://streaming.radionomy.com/Radio-Equinoxe",)),
                 ]),
 
     FourThreeThreeMhzActor("sofaleds", "LEDs am Sofa", "11111 1"),

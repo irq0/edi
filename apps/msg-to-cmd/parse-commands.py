@@ -16,10 +16,12 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("parse-commands")
 
+CMD_REGEX = r"^!([\w-]+)\s?(.*?)$"
+
 with edi.Manager() as e:
         @edi.edi_msg(e, "#.recv.*")
         @edi.edi_filter_msg_with_uflag("op")
-        @edi.edi_filter_matches(r"^!(\w+)\s?(.*?)$")
+        @edi.edi_filter_matches(CMD_REGEX)
         def parse_cmds(regroups, **msg):
                 cmd, args = regroups
 
@@ -36,11 +38,13 @@ with edi.Manager() as e:
 
         @edi.edi_msg(e, "#.recv.*")
         @edi.edi_filter_msg_without_uflag("op")
-        @edi.edi_filter_matches(r"^!(\w+)\s?(.*?)$")
+        @edi.edi_filter_matches(CMD_REGEX)
         def reply_unauthorized(regroups, **msg):
                 if msg.has_key("user"):
                         edi.emit.msg_reply(e.chan,
                                            src=msg["rkey"],
                                            user=msg["user"],
-                                           msg="No OP. No commands :P")
+                                           msg="No OP. No commands :P (Hint: https://www.c3pb.de/_media/wiki/documents/mitgliedsantrag.pdf)")
+        e.register_inspect_command()
+
         e.run()

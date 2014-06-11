@@ -16,5 +16,5 @@ read search
 echo "Search keyword: $search"
 file="$(${SCRIPTPATH}/approx_find_file ${search})"
 
-emit_msg_action "plays $(file_info "$file") from her soundboard"
+echo "Soundboard: $(file_info "$file")"
 emit_notification "$file"

@@ -1,0 +1,48 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+
+readonly SCRIPTPATH="$(dirname "$0")"
+
+readonly SCRIPTS_DEFAULT="$SCRIPTPATH/DEFAULT"
+readonly SCRIPTS_ALWAYS="$SCRIPTPATH/ALWAYS"
+readonly SCRIPTS_USER="$SCRIPTPATH/users"
+
+find_script () {
+    local user="$1"
+    local event="$2"
+    local user_script="${SCRIPTS_USER}/${user}/${event}"
+    local default_script="${SCRIPTS_DEFAULT}/${event}"
+    local always_script="${SCRIPTS_ALWAYS}/${event}"
+
+    if [[ -x $always_script ]];then
+	echo "$always_script"
+    fi
+
+    if [[ -x $user_script ]]; then
+	echo "$user_script"
+    elif [[ -x $default_script ]]; then
+	echo "$default_script"
+    fi
+}
+
+main () {
+    if [[ $EDI_CMD =~ ^[a-z\.-]+$ && $EDI_USER =~ ^[a-zA-Z0-9]+$ ]]; then
+	local event="${EDI_CMD#*.}"
+	echo "SUP: for_user=$EDI_USER event=$event" >&2
+	local scripts="$(find_script "$EDI_USER" "$event")"
+
+	echo -e "SUP: Executing: $scripts" >&2
+	while read -r script; do
+	    echo "SUP: exec $script" >&2
+	    if "$script"; then
+	        echo "SUP: Success" >&2
+	    else
+	        echo "SUP: FAIL return=$?" >&2
+	    fi
+	done <<< "$scripts"
+    fi
+}
+
+main

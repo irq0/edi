@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LOCATION="edlp"
+readonly LOCATION="edlp"
 
 subraum () {
     curl -s "http://${GRAPHITE_SERVER:-localhost}/render?target=summarize(sens.subraum.temp_1.degree_c,\"10min\",\"avg\")&format=raw&from=-10min" \
@@ -11,10 +11,8 @@ BEGIN {
 {
    FS=",";
    $0=$2;
-   if ($2 == "None") {
-      print "NA"
-   } else {
-      printf "%.1f°C", $2;
+   if ($2 != "None") {
+      printf "%.1f", $2;
    }
    exit 0;
 }'
@@ -30,9 +28,12 @@ BEGIN {
    temp=$2
 }
 END {
-   printf "%.1f°C", temp
+   printf "%.1f", temp
 }'
 }
 
+readonly sub="$(subraum)"
+readonly dra="$(draussen)"
 
-echo "subraum: $(subraum) draußen: $(draussen)"
+echo "{\"subraum\":${sub:-null}, \"draussen\":${dra:-null}}" > /dev/fd/"${EDI_DATA_FD}"
+echo "subraum: ${sub:-NA}°C draußen: ${dra:-NA}°C"
