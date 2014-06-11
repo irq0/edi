@@ -43,12 +43,15 @@ def edi_filter_msg_with_uflag_any(uflags):
     def decorator(f):
         @wraps(f)
         def wrapper(**args):
+            doit = False
             for f in uflags:
                 try:
                     if args["uflags"].index(f) is not None:
-                        return f(**args)
+                        doit = True
                 except:
                     pass
+            if doit:
+                return f(**args)
         return wrapper
     return decorator
 
@@ -59,11 +62,11 @@ def edi_filter_msg_with_uflag_none(uflags):
     def decorator(f):
         @wraps(f)
         def wrapper(**args):
-            doit = False
+            doit = True
             for f in uflags:
                 try:
                     if args["uflags"].index(f) is not None:
-                        doit = True
+                        doit = False
                 except KeyError:
                     pass
             if doit:
