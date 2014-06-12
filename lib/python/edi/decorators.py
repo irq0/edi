@@ -40,8 +40,8 @@ def edi_filter_msg_with_uflag_any(uflags):
     """ Calls the wrapped function if any of the flags are in the users flag
         list.
     """
-    def decorator(f):
-        @wraps(f)
+    def decorator(fn):
+        @wraps(fn)
         def wrapper(**args):
             doit = False
             for f in uflags:
@@ -51,7 +51,7 @@ def edi_filter_msg_with_uflag_any(uflags):
                 except:
                     pass
             if doit:
-                return f(**args)
+                return fn(**args)
         return wrapper
     return decorator
 
@@ -59,17 +59,17 @@ def edi_filter_msg_with_uflag_none(uflags):
     """ Calls the wrapped function if none of the flags are in the users flag
         list.
     """
-    def decorator(f):
-        @wraps(f)
+    def decorator(fn):
+        @wraps(fn)
         def wrapper(**args):
             doit = True
             for f in uflags:
                 try:
                     if args["uflags"].index(f) is not None:
                         doit = False
-                except KeyError:
+                except:
                     pass
             if doit:
-                return f(**args)
+                return fn(**args)
         return wrapper
     return decorator
