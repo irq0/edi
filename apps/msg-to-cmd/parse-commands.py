@@ -40,7 +40,7 @@ with edi.Manager() as e:
         @edi.edi_filter_msg_with_uflag_none(["op", "voice"])
         @edi.edi_filter_matches(CMD_REGEX)
         def reply_unauthorized(regroups, **msg):
-            m="No OP/voice, No commands :P (Hint: https://www.c3pb.de/_media/wiki/documents/mitgliedsantrag.pdf)")
+            m="No OP/voice, No commands :P (Hint: https://www.c3pb.de/_media/wiki/documents/mitgliedsantrag.pdf)"
             if msg.has_key("user"):
                 edi.emit.msg_reply(e.chan,
                         src=msg["rkey"],
