@@ -308,6 +308,9 @@ class MQBot(NamesIRCClient):
             self.fetch_chan_ops()
 
     def modeChanged(self, user, chan, do_set_modes, modes, users):
+	log.debug("modeChanged: by_user=%r chan=%r users=%r modes=%r do_set_modes=%r",
+	          user, chan, users, modes, do_set_modes)
+
         if chan != config["channel"]:
             return
 
