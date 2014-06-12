@@ -181,6 +181,7 @@ class MQ(Thread):
         """Return set of user flags"""
         flags = {
             [None, "op"][user in self.bot.ops],
+            [None, "voice"][user in self.bot.voices]
         }
 
         flags.discard(None)
@@ -282,6 +283,7 @@ class MQBot(NamesIRCClient):
     lineRate = 1.0
 
     ops = set()
+    voices = set()
 
     def connectionMade(self):
         log.info("Connection established")
@@ -306,20 +308,34 @@ class MQBot(NamesIRCClient):
             self.fetch_chan_ops()
 
     def modeChanged(self, user, chan, do_set_modes, modes, users):
-        if chan == config["channel"] and "o" in modes:
-            log.debug("IRC OP change for users %r to %r", users, do_set_modes)
+        if chan != config["channel"]:
+            return
 
-            if do_set_modes:
-                for u in users:
-                    self.ops.add(u)
+        for (u, m) in zip(users, list(modes)):
+            log.debug(("" if do_set_modes else "un") + "setting mode %r for user %r", m, u)
+
+            if m == "o":
+                try:
+                    if do_set_modes:
+                        self.ops.add(u)
+                    else:
+                        self.ops.remove(u)
+                except KeyError:
+                    pass
+            elif m == "v":
+                try:
+                    if do_set_modes:
+                        self.voices.add(u)
+                    else:
+                        self.voices.remove(u)
+                except KeyError:
+                    pass
             else:
-                for u in users:
-                    self.ops.remove(u)
+                log.debug("modeChanged: unknown mode %r", m)
+                continue
 
     def userLeft(self, user, chan):
         if chan == config["channel"]:
-
-
             self.fetch_chan_ops()
 
     def privmsg(self, user, chan, msg):
@@ -335,9 +351,11 @@ class MQBot(NamesIRCClient):
 
     def fetch_chan_ops(self):
         def parseOps(names):
+            self.voices = set(( n[1:] for n in names
+                if n.startswith("+")))
             self.ops = set(( n[1:] for n in names
-                             if n.startswith("@")))
-        self.names(config["channel"]).addCallback(parseOps)
+                if n.startswith("@")))
+            self.names(config["channel"]).addCallback(parseOps)
 
     def me(self, channel, action):
         """
