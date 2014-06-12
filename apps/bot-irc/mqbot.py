@@ -355,7 +355,7 @@ class MQBot(NamesIRCClient):
                 if n.startswith("+")))
             self.ops = set(( n[1:] for n in names
                 if n.startswith("@")))
-            self.names(config["channel"]).addCallback(parseOps)
+        self.names(config["channel"]).addCallback(parseOps)
 
     def me(self, channel, action):
         """
