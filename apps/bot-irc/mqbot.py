@@ -136,23 +136,26 @@ class MQ(Thread):
         self.bot.me(dest.encode("utf-8"), msg.encode("utf-8"))
 
     def irc_send(self, dest, user, msg):
-
-        if user == None:
-            user = "NA"
-
         dest = dest.replace(u"_channel_", config["channel"])
-        user = user.replace(u"_channel_", config["channel"])
 
-        is_channel_user_msg = (dest == config["channel"] and user != config["channel"])
-        is_bot_user_msg = (dest == self.bot.nickname and user != self.bot.nickname)
+        is_channel_user_msg = (user != None and
+                               dest == config["channel"] and
+                               user != config["channel"])
+        is_bot_user_msg = (user != None and
+                           dest == self.bot.nickname and
+                           user != self.bot.nickname)
+        is_dest_unknown = (user == None and
+                           dest == self.bot.nickname)
 
-        log.debug("SEND: user=%r dest=%r msg=%r channel_user_msg=%r bot_user_msg=%r",
-                  user, dest, msg, is_channel_user_msg, is_bot_user_msg)
+        log.debug("SEND: user=%r dest=%r msg=%r channel_user_msg=%r bot_user_msg=%r dest_unk=%r",
+                  user, dest, msg, is_channel_user_msg, is_bot_user_msg, is_dest_unknown)
 
         if is_channel_user_msg:
             self.irc_send_notice(user, msg)
         elif is_bot_user_msg:
             self.irc_send_msg(dest, msg)
+        elif is_dest_unknown:
+            log.error("Message dest/user invalid: Discarding")
         else:
             self.irc_send_msg(config["channel"], msg)
 
