@@ -138,7 +138,7 @@ class MQ(Thread):
     def irc_send(self, dest, user, msg):
 
         if user == None:
-            user = config["channel"]
+            user = "NA"
 
         dest = dest.replace(u"_channel_", config["channel"])
         user = user.replace(u"_channel_", config["channel"])
@@ -152,10 +152,9 @@ class MQ(Thread):
         if is_channel_user_msg:
             self.irc_send_notice(user, msg)
         elif is_bot_user_msg:
-            self.irc_send_msg(user, msg)
+            self.irc_send_msg(dest, msg)
         else:
             self.irc_send_msg(config["channel"], msg)
-            dest = config["channel"]
 
     def irc_send_msg(self, dest, msg):
         msg = msg.encode("utf-8")
