@@ -136,30 +136,28 @@ class MQ(Thread):
         self.bot.me(dest.encode("utf-8"), msg.encode("utf-8"))
 
     def irc_send(self, dest, user, msg):
+
         if user == None:
             user = config["channel"]
 
         dest = dest.replace(u"_channel_", config["channel"])
         user = user.replace(u"_channel_", config["channel"])
 
-        # long message with user intended for channel -> msg user
-        if len(msg) > 120 and dest == config["channel"] and user != config["channel"]:
-            self.bot.msg(dest.encode("utf-8"), u"{}: Lots of data.. Sending you a msg".format(user).encode("utf-8"))
-            dest = user
-        # message for channel with known user -> prefix with 'user:'
-        elif dest == config["channel"] and user != config["channel"]:
-            msg = user + u": " + msg
+        is_channel_user_msg = (dest == config["channel"] and user != config["channel"])
+        is_bot_user_msg = (dest == self.bot.nickname and user != self.bot.nickname)
 
-        # dest is bot (irc recv from /msg) -> map to user
-        elif dest == self.bot.nickname and user != self.bot.nickname:
-            dest = user
+        log.debug("SEND: user=%r dest=%r msg=%r channel_user_msg=%r bot_user_msg=%r",
+                  user, dest, msg, is_channel_user_msg, is_bot_user_msg)
 
-        # fallback to channel
+        if is_channel_user_msg:
+            self.irc_send_notice(user, msg)
+        elif is_bot_user_msg:
+            self.irc_send_msg(user, msg)
         else:
+            self.irc_send_msg(config["channel"], msg)
             dest = config["channel"]
 
-        log.debug("SEND: dest=%r msg=%r", dest, msg)
-
+    def irc_send_msg(self, dest, msg):
         msg = msg.encode("utf-8")
         dest= dest.encode("utf-8")
 
@@ -176,6 +174,15 @@ class MQ(Thread):
             log.debug("SEND: dest=%r line=%r", dest, line)
             self.bot.msg(dest, line, send_at_a_time)
 
+    def irc_send_notice(self, dest, msg):
+        msg = msg.encode("utf-8")
+        dest = dest.encode("utf-8")
+
+        lines = msg.split("\n")
+
+        for line in lines:
+            log.debug("SEND: dest=%r line=%r", dest, line)
+            self.bot.notice(dest, line)
 
     def user_flags(self, user):
         """Return set of user flags"""
