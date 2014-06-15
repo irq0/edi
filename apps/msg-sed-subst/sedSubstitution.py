@@ -37,7 +37,6 @@ SUBSTITUTION_RE = r"""^(?:(\S+)[:,]\s*)?s/((?:\\/|[^/])+)/((?:\\/|[^/])+)(?:/(\S
 def publish(inc_msg, message):
     edi.emit.msg_reply(e.chan,
            src=inc_msg["rkey"],
-           user=inc_msg["user"],
            msg=message)
 
 def substitutionFailed(inc_msg):
@@ -63,7 +62,7 @@ with edi.Manager(name="Sed", descr="Sed lets you correct yourself, as well as ev
         # keep only 50 lines
         del memory[user][:-50]
 
-  
+
     @edi.edi_msg(e, "#.recv.*")
     @edi.edi_filter_matches(SUBSTITUTION_RE)
     def substitute(regroups, **msg):
