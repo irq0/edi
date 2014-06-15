@@ -4,7 +4,6 @@ mediainfo "$1" |
     gawk '
 BEGIN {
    FS="[[:space:]]+:[[:space:]]+";
-   OFS="\x1E";
    delete tags[0];
 }
 function add(X) {
@@ -19,8 +18,9 @@ function add(X) {
 END {
    if (filename) {
       for (i=1; i<=length(tags);i++) {
-#         print filename, tags[i]
-         print tags[i]
+         if (tags[i] !~ /^[[:space:]]*$/) {
+            print tags[i]
+         }
       }
    }
 }'
