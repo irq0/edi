@@ -153,7 +153,7 @@ class MQ(Thread):
         if is_channel_user_msg:
             self.irc_send_notice(user, msg)
         elif is_bot_user_msg:
-            self.irc_send_msg(dest, msg)
+            self.irc_send_msg(user, msg)
         elif is_dest_unknown:
             log.error("Message dest/user invalid: Discarding")
         else:
