@@ -98,9 +98,8 @@
       (alter +first-order+ (fn [x] (str (now))))
       (alter +started-by+ (fn [x] user)))
     (alter +orders+ #(assoc % user (list order (str (now)))))
-    (store-state)
-    (str "Ack: "
-         order)))
+    (store-state))
+  order)
 
 (defn reset-orders! []
   (dosync
@@ -133,9 +132,7 @@
       :msg json)))
 
 (defn dispatch-command [ch msg]
-  (let [args (:args msg)
-        user (:user msg)
-        cmd  (:cmd msg)]
+  (let [{:keys [args user cmd src]} msg]
     (cond
       (= cmd "pizza-reset")
       (reset-orders!)
@@ -146,7 +143,16 @@
       (= cmd "pizza")
       (if (empty? args)
         "Your order?"
-        (add-order! user args)))))
+        (let [order (add-order! user args)]
+          (emit-cmd ch
+            :cmd "ev.pizza.orders-updated"
+            :args nil
+            :user user
+            :data {:orders @+orders+
+                   :added order}
+            :src src)
+          (str "ACK: " order))))))
+
 
 (defn message-handler
   [ch {:keys [content-type delivery-tag] :as meta} ^bytes payload]
