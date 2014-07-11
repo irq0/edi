@@ -3,6 +3,7 @@
         [clj-time.local :only [local-now to-local-date-time]])
   (:require [clj-time.core     :as time]
             [clojure.string    :as str]
+            [thehonestbookoftruth.state :as state]
             [clj-time.format   :as tf]))
 
 (declare format-eta)
@@ -39,25 +40,32 @@
 (defmacro swallow-exceptions [& body]
     `(try ~@body (catch Exception e#)))
 
-(defn- format-ul-time [kind user time]
+(defn- format-ul-time [user time]
   (let [date (format-eta (from-date time))
         span (format-time-span (local-now) (from-date time))]
-  (format "%s (%s: %s [%s])"
+  (format "%s (%s [%s])"
     user
-    kind
     date
     (if (pos? span)
       (str "in " span " min")
       (str (- span) " min ago")))))
 
-(defn- format-ul-user [[user vals]]
-  (let [{:keys [eta ts]} vals]
-    (cond
-      eta (format-ul-time "ETA" user eta)
-      ts (format-ul-time "SINCE" user ts))))
-
 (defn format-user-list [users]
-  (apply str
-    (interpose ", "
-      (filter (complement str/blank?)
-        (map format-ul-user users)))))
+  (let [etas (sort-by #(:eta (second %))
+               (filter #(state/has-eta? (first %)) users))
+        loggedin (sort-by first
+                   (filter #(state/logged-in? (first %)) users))]
+
+    (apply str
+      (interpose "\n"
+        [(if (empty? loggedin)
+           "Nobody"
+           (apply str "Logged in: "
+             (interpose ", "
+               (filter (complement str/blank?)
+                 (keys loggedin)))))
+         (when-not (empty? etas)
+           (apply str "ETAs: "
+             (interpose ", "
+               (filter (complement str/blank?)
+                 (map #(format-ul-time (first %) (:eta (second %))) etas)))))]))))
