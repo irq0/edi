@@ -28,7 +28,7 @@ find_script () {
 }
 
 main () {
-    if [[ $EDI_CMD =~ ^[a-z\.-]+$ && $EDI_USER =~ ^[a-zA-Z0-9]+$ ]]; then
+    if [[ $EDI_CMD =~ ^[a-z\.-]+$ && $EDI_USER =~ ^[a-zA-Z0-9-]+$ ]]; then
 	local event="${EDI_CMD#*.}"
 	echo "SUP: for_user=$EDI_USER event=$event" >&2
 	local scripts="$(find_script "$EDI_USER" "$event")"
