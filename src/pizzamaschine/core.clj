@@ -13,7 +13,7 @@
 
 (defn make-url []
   (get (System/getenv)
-       "AMQP_SERVER" "amqp://guest:guest@mopp"))
+       "AMQP_SERVER" "amqp://guest:guest@localhost"))
 
 (def +state-path+ (or (System/getenv "EDI_PIZZA_FILE") "/tmp/pizza.edn"))
 
