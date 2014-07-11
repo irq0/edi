@@ -58,14 +58,14 @@
 
     (apply str
       (interpose "\n"
-        [(if (empty? loggedin)
-           "Nobody"
-           (apply str "Logged in: "
-             (interpose ", "
-               (filter (complement str/blank?)
-                 (keys loggedin)))))
-         (when-not (empty? etas)
-           (apply str "ETAs: "
-             (interpose ", "
-               (filter (complement str/blank?)
-                 (map #(format-ul-time (first %) (:eta (second %))) etas)))))]))))
+        (filter (complement str/blank?)
+          [(when-not (empty? loggedin)
+             (apply str "Logged in: "
+               (interpose ", "
+                 (filter (complement str/blank?)
+                   (keys loggedin)))))
+           (when-not (empty? etas)
+             (apply str "ETAs: "
+               (interpose ", "
+                 (filter (complement str/blank?)
+                   (map #(format-ul-time (first %) (:eta (second %))) etas)))))])))))
