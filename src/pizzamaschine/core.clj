@@ -13,9 +13,9 @@
 
 (defn make-url []
   (get (System/getenv)
-       "CLOUDAMQP_URL" "amqp://guest:guest@mopp"))
+       "AMQP_SERVER" "amqp://guest:guest@mopp"))
 
-(def +state-path+ "/tmp/pizza.json")
+(def +state-path+ (or (System/getenv "EDI_PIZZA_FILE") "/tmp/pizza.edn"))
 
 (def +help-message+
   (str
