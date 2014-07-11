@@ -16,7 +16,7 @@
   (get (System/getenv)
        "AMQP_SERVER" "amqp://guest:guest@localhost"))
 
-(def +state-path+ (or (System/getenv "EDI_PIZZA_FILE") "/tmp/pizza.edn"))
+(def +state-path+ (or (System/getenv "EDI_PIZZA_FILE") "/tmp/pizza.json"))
 
 (defn now []
   (java.util.Date.))
