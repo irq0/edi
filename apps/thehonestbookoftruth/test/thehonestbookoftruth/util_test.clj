@@ -25,17 +25,3 @@
       (testing "Valid time spans"
         (is (= (format-time-span a b) (* 10 60)))
         (is (= (format-time-span b a) (- (* 10 60))))))))
-
-
-(deftest ul-format-tests
-  (let [with-eta {"Malaclypse_the_Younger"
-                  {:eta (to/to-date (tc/date-time 2000 5 20 20 00))}}
-        with-ts  {"Malaclypse_the_Older"
-                  {:ts (to/to-date (tc/date-time 1941 5 21 20 00 00))}}
-        now      (tl/local-now)]
-
-  (testing "User with ETA"
-    (is (= (format-user-list with-eta)
-          (format "%s (%s: %s [%s min ago])" "Malaclypse_the_Younger" "ETA"
-            (format-eta (tc/date-time 2000 5 20 20 00))
-            (str (tc/in-minutes (tc/interval (tc/date-time 2000 5 20 20 00) now)))))))))
