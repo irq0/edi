@@ -8,6 +8,7 @@
             [langohr.queue :as lq]
             [langohr.consumers :as lc]
             [langohr.basic :as lb]
+            [clojure.string :as str]
             [clojure.data.json :as json])
   (:gen-class))
 
@@ -25,6 +26,22 @@
     "!pizza $something -- Bestellt $something"))
 
 (defn now []
+(defn emit-cmd [ch &{:as body}]
+  {:pre [(contains? body :cmd)
+         (contains? body :args)
+         (contains? body :user)
+         (contains? body :src)]}
+
+  (let [json (json/write-str body)]
+    (lb/publish ch "cmd" (:cmd body) json :content-type "application/json")))
+
+(defn emit-msg-reply [ch src &{:as body}]
+  {:pre [(contains? body :msg) (re-matches #".*\.recv\..*" src)]}
+
+  (let [dst (str/replace src #"recv" "send")
+        json (json/write-str body)]
+    (lb/publish ch "msg" dst json :content-type "application/json")))
+
   (java.util.Date.))
 
 (def +orders+ (ref '{}))
