@@ -13,8 +13,8 @@
   (:gen-class))
 
 (defn make-url []
-  (get (System/getenv)
-       "AMQP_SERVER" "amqp://guest:guest@localhost"))
+  (let [server (or (System/getenv "AMQP_SERVER") "localhost")]
+    (str "amqp://" server)))
 
 (def +state-path+ (or (System/getenv "EDI_PIZZA_FILE") "/tmp/pizza.json"))
 
