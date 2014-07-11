@@ -18,14 +18,13 @@
 
 (def +state-path+ (or (System/getenv "EDI_PIZZA_FILE") "/tmp/pizza.edn"))
 
-(def +help-message+
-  (str
-    "!pizza-reset      -- Leert die Liste mit Bestellungen\n"
-    "!pizza-list       -- Listet Bestellungen\n"
-    "!pizza-help       -- Diese Nachricht\n"
-    "!pizza $something -- Bestellt $something"))
-
 (defn now []
+  (java.util.Date.))
+
+(def +orders+ (ref '{}))
+(def +first-order+ (ref ""))
+(def +started-by+ (ref ""))
+
 (defn emit-cmd [ch &{:as body}]
   {:pre [(contains? body :cmd)
          (contains? body :args)
@@ -41,12 +40,6 @@
   (let [dst (str/replace src #"recv" "send")
         json (json/write-str body)]
     (lb/publish ch "msg" dst json :content-type "application/json")))
-
-  (java.util.Date.))
-
-(def +orders+ (ref '{}))
-(def +first-order+ (ref ""))
-(def +started-by+ (ref ""))
 
 (defn store-state
   ([] (store-state +state-path+))
@@ -121,7 +114,25 @@
       (store-state)
       rv)))
 
-(defn dispatch-command [msg]
+(defn inspect [ch msg]
+  (let [data {:app "pizzamaschiene"
+              :descr "Your order plz?"
+              :cmds {:pizza {:args  "TEXT",
+                             :descr "Place order. Overwrites any placed orders",
+                             :attribs {:user "He/She/It is gonna it the pizza :)"}}
+                     :pizza-list {:args "NONE"
+                                  :descr "List orders"
+                                  :attribs {}}
+                     :pizza-reset {:args "NONE"
+                                   :descr "Reset orders"
+                                   :attribs {}}}}
+        json (json/write-str data)]
+    (emit-msg-reply ch (:src msg)
+      :data data
+      :user (:user msg)
+      :msg json)))
+
+(defn dispatch-command [ch msg]
   (let [args (:args msg)
         user (:user msg)
         cmd  (:cmd msg)]
@@ -130,23 +141,23 @@
       (reset-orders!)
       (= cmd "pizza-list")
       (list-orders)
-      (or (= cmd "pizza-help")
-          (empty? args))
-      +help-message+
-      :else
-      (add-order! user args))))
+      (= cmd "inspect")
+      (inspect ch msg)
+      (= cmd "pizza")
+      (if (empty? args)
+        "Your order?"
+        (add-order! user args)))))
 
 (defn message-handler
   [ch {:keys [content-type delivery-tag] :as meta} ^bytes payload]
   (let [msg (json/read-str (String. payload "UTF-8")
                            :key-fn keyword)
-        dst (.replace (:src msg) "recv" "send")
-        reply (dispatch-command msg)]
+        reply (dispatch-command ch msg)]
     (println
       (str "[recv] " msg))
-    (lb/publish ch "msg" dst
-                (json/write-str {:user (:user msg) :msg reply})
-                :content-type "application/json")
+    (emit-msg-reply ch (:src msg)
+      :msg reply
+      :user (:user msg))
     (lb/ack ch delivery-tag)))
 
 (defn setup
@@ -157,7 +168,7 @@
          ch    (lch/open conn)
          qname (:queue (lq/declare ch))
          exchange "cmd"
-         keys ["pizza" "pizza-reset" "pizza-list" "pizza-help"]]
+         keys ["pizza" "pizza-reset" "pizza-list" "inspect"]]
      (doseq [k keys]
        (println "Binding to" exchange "/" k)
        (lq/bind ch qname exchange :routing-key k))
