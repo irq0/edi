@@ -1,0 +1,337 @@
+#    -*- mode: org -*-
+
+
+Archived entries from file /home/seri/WORKSPACE/edi/doc/README.org
+
+
+* Todos
+
+** DONE Release 1
+:PROPERTIES:
+:ARCHIVE_TIME: 2014-07-12 Sa 10:59
+:ARCHIVE_FILE: ~/WORKSPACE/edi/doc/README.org
+:ARCHIVE_OLPATH: Ideas, Todos
+:ARCHIVE_CATEGORY: README
+:ARCHIVE_TODO: DONE
+:END:
+Release 1 ist abgeschlossen!
+
+
+*** DONE Soundboard                                                 :@irq0:
+!sob ?
+
+git repo mit soundfiles
+
+!sob <file>
+
+file matched files im repo
+
+antwortet mit ID3tags was ist
+*** DONE Wetterbericht
+Wie ist das subraum wetter?
+
+Als email abbonierbar? Erreichbar per Telefon
+
+Content:
+- Temperatur innen. (Mit forecast?)
+- Temperatur aussen
+
+*** DONE parse-commands: parse commands only from users having op uflag :@irq0:r1:
+*** DONE presence: eta login                                     :@irq0:r1:
+Commands: !ul, !eta, !login, !logout
+
+- cmd exchange consumer/producer
+- store login, eta state somewhere
+
+Implemented: [[proc/thehonestbookoftruth]]
+*** DONE music player daemon sink                             :@irq0:r1:c3po:
+- mpd commands als messages
+- Story: Ein EDI MQ command kann verschiedene music player daemons steuern
+- Probleme
+  - Mehrere mpds unterstützen; gleichzeitig steuern?
+**** Implementation
+- shell wrapper around mpc
+- send notifications after play
+- support some extra commands to load playlists from remote sources
+
+*** DONE dmx actor                                       :@grollicus:c3po:r1:
+See: =sink/dmx=. Written in ruby.
+*** DONE scheduled messages                                      :@irq0:r1:
+- hourly audio messages
+- web gui?
+- clojure + quarz scheduler?
+
+Implementation: [[src/shouts]]
+cronjob + amqp-tools + mp3 files
+
+mp3 files found on cube..
+*** DONE shutdown/startup                                        :@irq0:r1:
+Veralgemeinert implementiert: Init mit runlevels.
+
+Reagiert auf Commands:
+- telinit ::  Runlevel ändern
+- runlevel :: Aktuelles runlevel zurückgeben
+
+
+Emitiert Messages auf in der =subinit= Exchange.
+Format: =rc.RUNLEVEL.ACTION=
+
+
+Runleveländerungen (z.B 0 -> 4) generieren Events: 1 start, 2 start, 3
+start, 4 start.
+
+Runlevels sind dazu gedacht, um den Subraum auch nur "halb"
+anzuschalten zu können. Beispielsweise ohne Mamestation.
+
+**** Tool: subinit-rc
+Tool um für subinit Messages Scripts zu starten. Aufgebaut wie rc*.d
+runlevel scripts.
+
+Skripts werden mit run-parts gestartet und bekommen die ACTION als
+ersten Parameter
+
+*** DONE text to speech command                                  :@irq0:r1:
+- listen for tts, say, fortune commands
+- text to speech messages
+- put mp3 files in notify exchange with key audio
+
+Actually two implementations. One pico2wave in the EDI repo and one
+based on the old acapella-group web scripting.
+*** DONE irc bot                                                 :r1:@irq0:
+- IRC receive -> msg exchange with key irc.recv.raw
+- msg exchange with key irc.send.raw -> IRC send
+*** DONE 433MHz actor                                            :r1:@irq0:
+=act_433mhz= exchange
+
+- consumer on raspberrypi
+- message payload = commandline arguments to rcswitch tool
+
+*** DONE ircbot: Add op flag for ops in #c3pb.sh                 :@irq0:r1:
+Ursprünglich: Bot antwortet nur auf OPs.
+
+Bot fügt jetzt ein flag "op" in msg.uflags ein, wenn user op rechte in
+seinem channel hat.
+
+Dieses flag kann dann von msg consumern ausgewertet werden.
+*** Notify sink                                                        :r1:
+**** text
+=routing_key=text= messages.
+
+***** DONE libnotify sink                                         :@irq0:
+***** OPEN text notifications on projector
+**** audio
+=routing_key=audio= messages.
+
+***** DONE mplayer sink                                           :@irq0:
+shell one-liner with amqp-tools
+**** OPEN uri
+=routing_key=uri= messages.
+
+Idea: Play media URIs in messages. Sinilar to the mplayer listener on cube.
+*** Telephony
+**** TEST asterisk prove of concept                             :@irq0:r1:
+- Integrate telephony
+- Read chat messages
+- Add notifications
+
+- (OPEN) SMS -> IRC
+**** OPEN integrate SMS
+SMS -> IRC
+SMS -> TTS
+
+IRC -> SMS?
+**** OPEN Wetterbericht
+Gesprochener Wetterbericht. Siehe oben
+*** DONE edi python library
+- reduce code duplication accross most of the tools
+- start with =listen_commands= tool
+
+#+BEGIN_SRC python
+
+  @edi_cmd("say")
+  def tts(chan, command):
+
+
+  @edi_cmd("help")
+  def help(chan, command):
+      edi.emit_reply(chan, command["src"], "USAGE: say <message>")
+
+
+  @edi_msg_recv_all()
+  def all(frm, msg):
+      edi.msg.reply
+
+  @edi_msg_recv_regex("edi ist doof", key="irc.#")
+  def foo(frm, msg):
+      edi.msg.reply(frm, "fuck you")
+
+
+
+  def main():
+      edi.register_command(tts_callback, "tts")
+
+      edi.recv_msg(callback, "irc.#")
+      edi.emit_msg("irc.send.EDI")
+      edi.cmd.say("fooo")
+      edi.msg.send(to, "msg")
+
+      edi.register_recv_message(callback, "irc.#")
+
+
+
+#+END_SRC
+
+
+#+BEGIN_SRC python
+
+
+  class EdiComand(edi.command):
+      def cmd_help(**args):
+          return "foo"
+      def cmd_say(cmd, args, src, dst="audio"):
+          err = edi.emit_notification(tts.tts(args), dst)
+          if err:
+              return "TTS erro", err
+
+
+
+
+#+END_SRC
+
+*** DONE listen commands doesn't ack messages                           :bug:
+*** DONE subraum start stop knoeppkens
+- python implementierung nicht sehr robust. in c implementieren?
+*** DONE Add generic help command
+- "base commands command"
+- help
+*** DONE parse commands: Add error message for unauthorized users
+*** OPEN edi auf cube umziehen
+*** DONE All EDI subsystems use environment variables to configure..     :r1:
+Alle Subsysteme müssen für generelle Einstellungen Environment
+Variablen benutzen. Ist die Variable nicht gesetzt muss ein sinnvoller
+default Wert verwendet werden.
+
+Warum? Env Variablen vererben sich zu Kindprozessen. Der Service
+Supervisor setzt also Globale Variablen und die einzelnen Subsysteme
+bekommen die Einstellungen mit. Siehe =conf/GLOBALS= und =run=.
+
+Variablen:
+- =AMQP_SERVER=
+
+Für die Service Skripte:
+- =APPDIR=
+- =LOGDIR=
+
+** DONE pizza / essen / f00d                                     :@gbe:c3po:
+:PROPERTIES:
+:ARCHIVE_TIME: 2014-07-12 Sa 10:59
+:ARCHIVE_FILE: ~/WORKSPACE/edi/doc/README.org
+:ARCHIVE_OLPATH: Ideas, Todos/Features
+:ARCHIVE_CATEGORY: README
+:ARCHIVE_TODO: DONE
+:END:
+
+** DONE Begrüssungen
+:PROPERTIES:
+:ARCHIVE_TIME: 2014-07-12 Sa 10:59
+:ARCHIVE_FILE: ~/WORKSPACE/edi/doc/README.org
+:ARCHIVE_OLPATH: Ideas, Todos/Features
+:ARCHIVE_CATEGORY: README
+:ARCHIVE_TODO: DONE
+:END:
+- Vorher: events
+- Verändern durch git repo
+- /Hallo irq0. Wilkommen im Subraum/
+
+- app: 'sup'
+
+** DONE irc reader                                                   :@irq0:
+:PROPERTIES:
+:ARCHIVE_TIME: 2014-07-12 Sa 10:59
+:ARCHIVE_FILE: ~/WORKSPACE/edi/doc/README.org
+:ARCHIVE_OLPATH: Ideas, Todos/Features
+:ARCHIVE_CATEGORY: README
+:ARCHIVE_TODO: DONE
+:END:
+In simpler implementiert. Siehe [[misc/read_msg.py]]. Keine verschiedenen Stimmen.
+*** assign voices to each participant
+**** parameters
+- speed
+- pitch
+- voice: lea, julia, kenny...
+*** participants can change voices
+
+** DONE list, help messages for 'cmd' exchange                    :@irq0:r1:
+:PROPERTIES:
+:ARCHIVE_TIME: 2014-07-12 Sa 10:59
+:ARCHIVE_FILE: ~/WORKSPACE/edi/doc/README.org
+:ARCHIVE_OLPATH: Ideas, Todos/Architecture Changes
+:ARCHIVE_CATEGORY: README
+:ARCHIVE_TODO: DONE
+:END:
+Everyone on the cmd exchange should consume list and help messages.
+
+*** Replies
+- help :: If "args" = "$0" : Reply with brief usage and supported commands
+- list :: Reply with something like "I exist and my name is"
+
+*** Destination
+
+#+BEGIN_SRC clojure
+(str/replace (:src msg) #"recv" "send")
+#+END_SRC
+
+*** Status
+- The newer commands have this build in. Works fine.
+
+** DONE state change exchange / log / events
+:PROPERTIES:
+:ARCHIVE_TIME: 2014-07-12 Sa 10:59
+:ARCHIVE_FILE: ~/WORKSPACE/edi/doc/README.org
+:ARCHIVE_OLPATH: Ideas, Todos/Architecture Changes
+:ARCHIVE_CATEGORY: README
+:ARCHIVE_TODO: DONE
+:END:
+*** Umsetzung
+- events sind commands
+- events haven prefix "ev." um routing key wildcards benutzen zu können
+*** Idee
+Ohne globalen state müssen state veränderungen irgendwie kommuniziert
+werden. Beispiel: user loggt sich ein.
+
+Beispiel:
+- user loggt sich ein
+- tts begrüssung triggern
+- rule engine wertet systemzustand aus
+
+
+Mögliche Umsetzung
+/st/ exchange. User presence manager sendet message mit "userloggedin"
+oder so an den exchange.
+
+Ein event->tts consumer generiert tts commands wenn nötig
+
+Die rule engine verändert ihren systemzustand und wertet rules neu aus.
+
+** DONE integrate daemon supervisor                                  :@irq0:
+:PROPERTIES:
+:ARCHIVE_TIME: 2014-07-12 Sa 10:59
+:ARCHIVE_FILE: ~/WORKSPACE/edi/doc/README.org
+:ARCHIVE_OLPATH: Ideas, Todos/Janitor Tasks
+:ARCHIVE_CATEGORY: README
+:ARCHIVE_TODO: DONE
+:END:
+runit. See =sv/{available, enabled}=
+
+** DONE dhcp lease loest login aus                                    :c3pb:
+:PROPERTIES:
+:ARCHIVE_TIME: 2014-07-12 Sa 10:59
+:ARCHIVE_FILE: ~/WORKSPACE/edi/doc/README.org
+:ARCHIVE_OLPATH: Ideas, Todos/Features
+:ARCHIVE_CATEGORY: README
+:ARCHIVE_TODO: DONE
+:END:
+- private exchange fuer dhcp messages
+  - vom router aus eintueten
+- tool um mac adressen usern zuzuweisen
+- tool um diese user einzuloggen
