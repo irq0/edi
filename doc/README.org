@@ -76,11 +76,6 @@ Retain support for times only. Use today as date
 *** OPEN set irc topics/modeline
 - Calendar events like smalltalks
 - something like the emacs modeline?
-*** DONE dhcp lease loest login aus                                    :c3pb:
-- private exchange fuer dhcp messages
-  - vom router aus eintueten
-- tool um mac adressen usern zuzuweisen
-- tool um diese user einzuloggen
 *** OPEN voice recognition
 **** Idea
 To speech to text. At least in english. Perform natural language
@@ -125,7 +120,7 @@ Running on janelane. Put on some server. Keep sipgate credentials
 private.
 * Documentation
 The core of the architecture is the rabbitmq amqp message server.
-Every pice of code connects in some way to it.
+Every piece of code connects in some way to it.
 
 Most services share a couple of well defined exchanges. See the
 [[Well-defined Exchanges]] for a description.
@@ -135,10 +130,11 @@ In theory(tm). Expect some settings to still be hard coded somewhere.
 
 1. Install AMQP Server. Best use RabbitMQ
 2. git clone this repo
-3. Create symlinks from =sv/available= to =sv/enabled= for the desired
+3. Check configuration in =conf/=. Especially the environment variables
+4. Create symlinks from =sv/available= to =sv/enabled= for the desired
    subsystems to run
-3. ...
-4. Start EDI with =run=
+5. ...
+6. Start EDI with =run=
 
 ** Glossary
 - source :: Apps that only/mainly produce messages
@@ -146,6 +142,7 @@ In theory(tm). Expect some settings to still be hard coded somewhere.
 - processor :: Apps that transform messages. Consume -> Produce.
 - bot :: Consumer/Producer that add external/foreign interfaces to the
          system. Like IRC.
+- app :: EDI application.
 
 ** Well-defined Exchanges
 https://git.c3pb.de/c3pb/subraum-automatisierung/blob/master/doc/exchanges.jpeg
@@ -157,95 +154,176 @@ can be parsed to a command.
 Type: topic
 
 **** Routing Keys
-In general: protocol.bot-name.{send,recv,presence}.channel
+In general: Bots use =protocol.bot-name.{send,recv,presence}.channel=
+Apps listening for msg replies use =app.direction.random_id=.
 
- * irc.EDI.recv.#c3pb.sh
- * irc.EDI.send.#c3pb.sh
- * irc.EDI.presence
+***** Examples
+- =irc.EDI.recv._channel_=
+- =irc.EDI.send._channel_=
+- =irc.EDI.presence=
+- =edish.send.13213=
+- =webappdemo.send.af234fabc234=
+
+***** Message direction
+Imagine the direction, e.g /send/ or /recv/, from the point of an irc
+bot. /recv/ means that the bot received the message from IRC. The bot
+subscribes for the /send/ direction and forwards this messages to IRC.
+
 **** Messages
 ***** #.send.*
-Content-Type: application/json
+Two content types are allowed: /application/json/ and /text/plain/:
 
+****** Content-Type: application/json
+******* Mandatory entries
 - msg :: Message body
 - user :: Destination user
-
-Content-Type: text/plain
-body: Message
+******* Optional entries
+- data :: Machine readable content
+****** Content-Type: text/plain
+- body :: Message
 ***** #.recv.*
-Content-Type: application/json
+****** Mandatory entries
 - msg :: Message body
 - user :: Message sender
-**** Processors
-***** parse-commands.py
+****** Common entries
+- uflags :: User Flags. Bot/App specific properties the /user/ has in
+            the context of the bot. The IRC bot, for example, adds the
+            flag "op" for users with operator status in the bot's channel.
+- bot :: The /user/ name of the bot.
+- chan :: Channel the message originated from
+- type :: Type of message received. e.g "IRC /me", IRC privmesg,
+          Twitter Timeline..
+**** Apps
+***** IRC Bot - mqbot.py
+- IRC Messages \to EDI MSG with direction /recv/
+- Subscribes to =irc.BOT_NAME.{send,presence,action}.*= messages
+  - send :: IRC message, may be directed at a user or a channel
+  - presence :: Set away status
+  - action :: IRC action. "/me".
+***** msg-to-cmd
 Transform =!<command>= to *cmd* Messages. (See *cmd* Exchange)
 
-**** Bots
-***** IRC Bot - mqbot.py
-IRC -> MQ, MQ -> IRC
-
-**** Sinks
-
-**** Sources
 
 *** cmd
 Messages that do something :)
 
 Type: topic
 
-**** Known routing Keys
-
-***** TTS
-- tts
-- say
-- forune
-***** Actor Service
-- act
-***** subinit
-- telinit
-- runlevel
-***** thehonestbookoftruth
-- login
-- logout
-- logout-all
-- ul
-- eta
-- uneta
-***** What every command should implement:
-- list
-- help
-
 **** Messages
 Content-Type: application/json
 
+The following lists standard entries to the body's JSON:
+
+***** Mandatory entries
 - cmd :: Usually the same as the routing key when parsed from *msg*
          Messages. Could be different. Not sure why I include it. The
          clojure tools use the to dispatch handlers..
 - args :: Argument string.
 - user :: User that send the command. The command may use this to log.
-- src :: Command origin. Replies will be send here with the word
-         /recv/ replaced by /send/. If the src is invalid replies will
-         just vanish :)
-- dst :: Where to put the result. This option is strictly optional.
-         Implement a same default like reply based on =src= or default destination.
 
-**** Sources
-**** Sinks
-**** Processors
-***** tts
-Transform /tts/ *cmd* Messages to notification audio messages.
+***** Optional entries
+- src :: Origin. Replies will be send here with the word
+         /recv/ replaced by /send/. See [[Msg Reply Mechanism]] for details
+- dst :: Where to put the result. Implement a same default like reply based on =src= or default
+         destination.
 
-Text -> Audio file.
+**** Inspect
+Every command should be /inspectable/, e.g implement the command
+/inspect/.
 
-***** Simple Actor Service - act.py
-Map /act/ commands to actors.
+A /msg reply/ to /inspect/ contains a machine readable description of the app
+and its commands. Apps can use this description to generate help and
+user interfaces.
 
-Example:
-venti on => 433Mhz sender, payload 11111 1 1
+***** Structure
+- app :: Application short name
+- descr :: Short description of the app
+- cmds :: Object with keys /command/.
+  - Each /command/ contains an object with keys:
+    - descr :: Command description
+    - args :: Data type of the /args/ key in /cmd/ messages
+    - attribs :: Object with keys /attrib/. Key in /cmd/ messages that
+                 the command uses appart from /args/ and /cmd/. Apps
+                 commonly use the /user/ attribute.
+****** args types
+- NONE :: No argument
+- TEXT :: Arbitrary Text
+- TIME :: Time string
+- DATE :: Date string
+- COMPLEX :: Complex Arguments. Maybe handled by getops/argparse in
+             the app.
+- WORD ::
 
-See =act_433mhz= exchange for the 433Mhz actor implementation.
+***** Example
+The app /thehonestbookoftruth/ returns the following on /inspect/:
+
+#+BEGIN_SRC js
+{
+   "app" : "thehonestbookoftruth",
+   "descr" : "Carbon entity presence"
+   "cmds" : {
+      "logout-all" : {
+         "descr" : "Logout all users",
+         "args" : "NONE",
+         "attribs" : {}
+      },
+      "ul" : {
+         "args" : "NONE",
+         "descr" : "Return list of logged in users and ETAs",
+         "attribs" : {}
+      },
+      "uneta" : {
+         "args" : "NONE",
+         "descr" : "Remove ETA",
+         "attribs" : {
+            "user" : "Remove ETA from this user"
+         }
+      },
+      "eta" : {
+         "descr" : "Set ETA. Supports HHMM, HH:MM, HH:MM:SS, HHMMSS",
+         "args" : "TIME",
+         "attribs" : {
+            "user" : "User to set ETA for"
+         }
+      },
+      "logout" : {
+         "attribs" : {
+            "user" : "User to log out"
+         },
+         "descr" : "Logout user",
+         "args" : "NONE"
+      },
+      "login" : {
+         "attribs" : {
+            "user" : "User to log in"
+         },
+         "descr" : "Login user",
+         "args" : "NONE"
+      }
+   },
+}
+
+#+END_SRC
+
+
+**** Msg Reply Mechanism
+To reply data back to the command's origin the /src/ field of the
+command be used. The /src/ field however is optional, the originator
+may no be able/interested in replies.
+
+
+To reply to commands create a edi msg with:
+- Routing key :: cmd.src with string /recv/ replaced with /send/
+- Entries:
+  - user :: User from cmd
+  - msg :: Message payload
+
+Consider adding a /data/ entry with machine readable data.
+
+See also [[#.recv.*]]
 
 *** notify
-*Sink* exchage for notifications.
+*Sink* exchange for notifications.
 
 **** Routing Keys
 - audio
@@ -261,6 +339,26 @@ amqp-consume --url="amqp://mopp" --exchange="notify" --routing-key="audio" mplay
 Content-Type depending on exchange keys. Should be directly usable by
 the sink (e.g mp3 file to hand over to mplayer).
 
+*** subinit                                                       :private:
+*Sink* exchange for subinit messages
+
+Type: topic
+
+**** Messages
+Content-type: text/plain
+
+*Must* always contain the same as the routing key.
+
+***** Payload/Routing Key
+=rc.$level.$action=
+
+- level :: Integer
+- action :: start or stop
+
+***** Example Payloads
+- rc.2.start :: Execute start scripts for runlevel 2
+- rc.4.stop :: Execute stop scripts for runlevel 4
+
 *** =act_433mhz=                                                  :private:
 *Sink* exchange to signal 433mhz transmitter.
 
@@ -269,29 +367,96 @@ Type: fanout
 **** Messages
 Commandline arguments for `rcswitch-pi`.
 
-**** Sinks
-*** subinit                                                       :private:
-*Sink* exchange for subinit messages
+*** =act_mpd=                                                     :private:
+*Sink* exchange. Forwards payload to local =mpc= tool.
 
-Type: topic
-**** Messages
-Content-type: text/plain
 
-Must always contain the same as the routing key.
-**** Sinks
-***** subinit-rc
-Launch scripts on subinit messages consumed. Feel similar to sysvinit
-scripts and runlevels
+Type: direct
+Routing key: Instance name, e.g "subraum"
+*** =act_dmx=                                                     :private:
+*Sink* exchange for DMX.
+
+**** Routing Keys and Payloads
+***** =dmx.lamp.$INSTANCE.control=
+Payload: =on= or =off=
+
+
+***** =dmx.lamp.$INSTANCE.$ID=
+Payload regex: =(\d,\d,\d|html-farbe|programmname)=
+
+**** Example
+Routing key: =dmx.lamp.subraum.8=, Payload: =background=. Run DMX
+program /background/ for lamp with id 8.
+
+*** =sens_token=                                                  :private:
+Token = Something someone has. Think of smart card ids, Ethernet MAC
+addresses, etc.
+
+The exchange is for producers, like smart card readers or DHCP servers,
+to communicate with processors like /token login/.
+
+**** Routing Key
+=location.protocol.action=
+
+Actions: /add, /del/
+Example: /subraum.ethernet.add/
+
+**** Payload
+Token in a format specific to the /protocol/ field in the routing key.
+
+Example: For protocol /ethernet/ the payload is the mac address in
+colon hex format.
+
+
+** Libraries and Tools
+*** =listen_commands=
+Helper tool to connect arbitrary tools to edi without using AMQP
+directly. Executes an app for every command received.
+
+The commands payload is passed in a format specified with =--data= via stdin.
+
+**** Environment Variables
+=listen_commands= passes some command data through environment variables:
+
+- =EDI_CMD= :: cmd entry in cmd message
+- =EDI_USER= :: user entry in cmd message
+- =EDI_CMD_ARGS= :: args entry in cmd message
+- =EDI_DATA_FD= :: When =--autoreply= is specified =listen_commands=
+                   reads machine readable reply data on this ft.
+
+**** Example
+#+BEGIN_SRC sh
+  listen_command \
+      --cmd wetter \
+      --autoreply \
+      --name "weather" \
+      --description "Wetterbericht - Subraum und das da draussen" \
+      --exe "weather.sh"
+#+END_SRC
+
+Executes the shell script =weather.sh= for every command =wetter=
+received. It also registers a /inspect/ command from the meta data
+provided.
+
+Note the =--autoreply=: The programs stdout is captured and replied
+back using the msg reply mechanism.
+
+
+*** pyedi
+Pyedi is a utility library for python that supports registering
+commands, message handlers and emitting various defined message types.
+
+See it's documentation in lib/python/README.org
+
+** Example Code
 
 ** Software, Libs, etc.
 *** Debian packages
-- rabbitmq-server (debian testing ist aktuell genug)
-- python-pika
+- rabbitmq-server
 - python-amqplib
 - amqp-tools
-
 *** docker
-For development docker seemes a good choice:
+For development docker seems a good choice:
 #+BEGIN_SRC sh
 sudo docker run -p :5672 -p :15672 -v /scratch/docker-data/rabbitmq:/var/lib/rabbitmq/mnesia f04150b0661e
 sudo docker build github.com/mikaelhg/docker-rabbitmq.git
@@ -300,24 +465,19 @@ sudo docker build github.com/mikaelhg/docker-rabbitmq.git
 Note that the exchanges are configured by hand..
 
 Use =mopp=, running on the dell netbook.
-*** Useful libraries
-
 ** Development
 Install requirements. Setup exchanges in rabbitmq. The web interfaces
 comes in handy here ;)
 
 *** Repository Organization
-- src :: Tools that only *publish* messages
-- sink :: Tools that only *consume* messages
-- proc :: Tools that *consume* and *publish* with some kind of
-          processing going on
-- bot :: Adapter to other protocols like IRC. *publisher* and *consumer*
-- misc :: Useful stuff for testing, reference, whatever. Configuration
-          files for external tools like asterisk
-- sv :: Contains =available= and =enabled= directories. When EDI is
-        started with the =run= script, start subsystems linked to
-        =enabled= directory.
+- apps :: EDI applications
+- bin :: Common EDI tools
+- conf :: Configuration for apps
+- doc :: Documentation
+- etc :: Misc tools and example code
+- lib :: EDI helper libraries like pyedi
 - log :: Log output for =sv/enabled= daemons.
+- sv :: Scripts to run EDI apps
 
 Most larger tools are subtree merged from elsewhere. This repo is kind
 of the collected deployment branch.
@@ -332,6 +492,7 @@ Have something to add? Let me pull your repo!
 - pika :: http://pika.readthedocs.org/en/latest/ Documented, Async lib
 - amqplib :: simpler non-threaded library; documentation shipped in
              the .py files. Which are quite readable ;)
+- pyedi :: See [[Libraries and Tools]]
 
 **** Commandline
 - amqp-tools :: Make sure you get the recent ones. Debian testing
