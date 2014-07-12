@@ -1,4 +1,4 @@
-#+TITLE: EDI
+#+TITLE: EDI README
 #+OPTIONS: creator:nil author:nil H:4 toc:2 num:2
 #+SEQ_TODO: OPEN IDEA ASSIGNED TEST | DONE
 #+HTML_HEAD: <link href="css/bootstrap.css" rel="stylesheet">
@@ -6,118 +6,6 @@
 #+HTML_HEAD: <link href="css/jquery.tocify.css" rel="stylesheet">
 #+HTML_HEAD: <link href="css/custom.css" rel="stylesheet" media="screen">
 
-* Ideas, Todos
-:PROPERTIES:
-:ARCHIVE: %s_archive::* Todos
-:END:
-** Features
-*** OPEN hubelmeter                                                    :c3po:
-*** OPEN jabber bot
-- user same msg exchange as irc bot
-
-- Possible routing keys: "jabber.recv.raw" "jabber.send.raw"
-
-*** OPEN mail bot
-- wie jabber bot nur ueber email
-- nuetzlich auch fuer den notify: user service
-- unauthenticated mail?!
-
-*** OPEN calendar integration: source
-- Repeadedly parse calendar files. Idealy ics. Load from caldav?
-  google calendar?
-
-**** Variants
-***** Calendar Commands
-- Im Kallender stehen edi commands. Diese zu den eingestellten Zeiten
-  injecten.
-
-Quasi alternative zu CRON.
-
-irq0: Damit koennte ich mir meinen Wecker bauen..
-
-***** Events
-- Event :: Something is going to happen at a point in time. Wie das
-           digitale Zeitalter..
-
-Per TTS, Text notification, IRC, Jabber whatever hinweisen
-*** OPEN calendar integration: sink/proc
-- siehe auch [[(conj 'seri hackerfyhstuck)]]
-- daily events im irc topic
-- events auf wallhack anzeigen
-- notification mails?
-  - hackerfryhstyck automatisch ankuendigen
-- kallender abonierbar
-- [[(conj 'seri hackerfyhstuck)]] traegt leute zum event ein
-- ETAs als calendar events
-*** OPEN graphite integration
-Es macht sinn sensoren an ein graphite zu knoten. Dadruch bekommt man
-gleich daten über zeit und eine ganze reihe von funktionen über diese
-daten.
-
-Daten aus graphite gekommt man über die =?render= HTTP Schnittstelle
-in den gängigsten formaten wie JSON, CSV, SVG, PNG.
-
-**** Mögliche Umsetzungen
-***** RPC
-AMQP RPC Pattern implementieren
-***** PubSub
-Subscribe periodic sensor updates
-***** Nicht integrieren
-Direkt mit Graphite sprechen
-*** OPEN thehonestbookoftruth: support !eta with dates
-Support:
-- !eta 2014-03-12 20:00
-- !eta Tomorrow 20:00
-- !eta Morgen 20:00
-- !eta Mittwoch 20:00
-
-Retain support for times only. Use today as date
-- !eta 20:00
-*** OPEN set irc topics/modeline
-- Calendar events like smalltalks
-- something like the emacs modeline?
-*** OPEN voice recognition
-**** Idea
-To speech to text. At least in english. Perform natural language
-processing to extract meaning. Generate commands.
-
-**** Tools
-***** pocketsphinx
-pocketsphinx is a cpp implementation of sphinx, smaller and not java.
-
-- debian/ubuntu packages: https://launchpad.net/~dhuggins/+archive/cmusphinx
-- transformations:
-  - we can't recognize users by voice.
-  - "!say" not nice to say. instead:
-    - "user command <user> <command>"
-    - "UC <user> <command>"
-    - "command <command>
-    - "do <command>"
-
-- "EDI: command say foo"
-- "EDI: user command seri login"
-- "EDI: user command seri logout"
-- "EDI <TONE> "
-
-***** wit.io
-- natural language processing web app
-- does the text -> meaning part
-- exports sphinx language models
-
-**** integration
-***** msg
-- recv :: voice recognition with some custom transformations
-- send :: notify.audio?
-***** asterisk
-- .. we can recocnize users by callerid
-- login by phone?
-- desktop edi voice clients based on SIP
-
-** Architecture Changes
-** Janitor Tasks
-*** ASSIGNED put asterisk container somewhere                       :@irq0:
-Running on janelane. Put on some server. Keep sipgate credentials
-private.
 * Documentation
 The core of the architecture is the rabbitmq amqp message server.
 Every piece of code connects in some way to it.
@@ -359,7 +247,7 @@ Content-type: text/plain
 - rc.2.start :: Execute start scripts for runlevel 2
 - rc.4.stop :: Execute stop scripts for runlevel 4
 
-*** =act_433mhz=                                                  :private:
+*** act_433mhz                                                       :private:
 *Sink* exchange to signal 433mhz transmitter.
 
 Type: fanout
@@ -367,13 +255,13 @@ Type: fanout
 **** Messages
 Commandline arguments for `rcswitch-pi`.
 
-*** =act_mpd=                                                     :private:
+*** act_mpd                                                          :private:
 *Sink* exchange. Forwards payload to local =mpc= tool.
 
 
 Type: direct
 Routing key: Instance name, e.g "subraum"
-*** =act_dmx=                                                     :private:
+*** act_dmx                                                          :private:
 *Sink* exchange for DMX.
 
 **** Routing Keys and Payloads
@@ -388,7 +276,7 @@ Payload regex: =(\d,\d,\d|html-farbe|programmname)=
 Routing key: =dmx.lamp.subraum.8=, Payload: =background=. Run DMX
 program /background/ for lamp with id 8.
 
-*** =sens_token=                                                  :private:
+*** sens_token                                                      :private:
 Token = Something someone has. Think of smart card ids, Ethernet MAC
 addresses, etc.
 
@@ -409,7 +297,7 @@ colon hex format.
 
 
 ** Libraries and Tools
-*** =listen_commands=
+*** listen_commands
 Helper tool to connect arbitrary tools to edi without using AMQP
 directly. Executes an app for every command received.
 
@@ -510,3 +398,115 @@ Have something to add? Let me pull your repo!
 <script src="js/custom.js"></script>
 #+END_HTML
 n
+* Ideas, Todos
+:PROPERTIES:
+:ARCHIVE: %s_archive::* Todos
+:END:
+** Features
+*** OPEN hubelmeter                                                    :c3po:
+*** OPEN jabber bot
+- user same msg exchange as irc bot
+
+- Possible routing keys: "jabber.recv.raw" "jabber.send.raw"
+
+*** OPEN mail bot
+- wie jabber bot nur ueber email
+- nuetzlich auch fuer den notify: user service
+- unauthenticated mail?!
+
+*** OPEN calendar integration: source
+- Repeadedly parse calendar files. Idealy ics. Load from caldav?
+  google calendar?
+
+**** Variants
+***** Calendar Commands
+- Im Kallender stehen edi commands. Diese zu den eingestellten Zeiten
+  injecten.
+
+Quasi alternative zu CRON.
+
+irq0: Damit koennte ich mir meinen Wecker bauen..
+
+***** Events
+- Event :: Something is going to happen at a point in time. Wie das
+           digitale Zeitalter..
+
+Per TTS, Text notification, IRC, Jabber whatever hinweisen
+*** OPEN calendar integration: sink/proc
+- siehe auch [[(conj 'seri hackerfyhstuck)]]
+- daily events im irc topic
+- events auf wallhack anzeigen
+- notification mails?
+  - hackerfryhstyck automatisch ankuendigen
+- kallender abonierbar
+- [[(conj 'seri hackerfyhstuck)]] traegt leute zum event ein
+- ETAs als calendar events
+*** OPEN graphite integration
+Es macht sinn sensoren an ein graphite zu knoten. Dadruch bekommt man
+gleich daten über zeit und eine ganze reihe von funktionen über diese
+daten.
+
+Daten aus graphite gekommt man über die =?render= HTTP Schnittstelle
+in den gängigsten formaten wie JSON, CSV, SVG, PNG.
+
+**** Mögliche Umsetzungen
+***** RPC
+AMQP RPC Pattern implementieren
+***** PubSub
+Subscribe periodic sensor updates
+***** Nicht integrieren
+Direkt mit Graphite sprechen
+*** OPEN thehonestbookoftruth: support !eta with dates
+Support:
+- !eta 2014-03-12 20:00
+- !eta Tomorrow 20:00
+- !eta Morgen 20:00
+- !eta Mittwoch 20:00
+
+Retain support for times only. Use today as date
+- !eta 20:00
+*** OPEN set irc topics/modeline
+- Calendar events like smalltalks
+- something like the emacs modeline?
+*** OPEN voice recognition
+**** Idea
+To speech to text. At least in english. Perform natural language
+processing to extract meaning. Generate commands.
+
+**** Tools
+***** pocketsphinx
+pocketsphinx is a cpp implementation of sphinx, smaller and not java.
+
+- debian/ubuntu packages: https://launchpad.net/~dhuggins/+archive/cmusphinx
+- transformations:
+  - we can't recognize users by voice.
+  - "!say" not nice to say. instead:
+    - "user command <user> <command>"
+    - "UC <user> <command>"
+    - "command <command>
+    - "do <command>"
+
+- "EDI: command say foo"
+- "EDI: user command seri login"
+- "EDI: user command seri logout"
+- "EDI <TONE> "
+
+***** wit.io
+- natural language processing web app
+- does the text -> meaning part
+- exports sphinx language models
+
+**** integration
+***** msg
+- recv :: voice recognition with some custom transformations
+- send :: notify.audio?
+***** asterisk
+- .. we can recocnize users by callerid
+- login by phone?
+- desktop edi voice clients based on SIP
+
+** Architecture Changes
+** Janitor Tasks
+*** ASSIGNED put asterisk container somewhere                       :@irq0:
+Running on janelane. Put on some server. Keep sipgate credentials
+private.
