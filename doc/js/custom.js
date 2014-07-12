@@ -1,33 +1,67 @@
 $(document).ready(function() {
     $('.src').addClass("pre-scrollable");
 
-    $('#content').addClass("container-fluid");
+    $('#content').addClass("container").attr("role", "main");
+    $('#content').prepend('<div class="page-header"><h1>' + $("h1.title").text() + '</h1></div>');
 
-    $('h1.title').wrapAll('<div class="row-fluid"/>');
-    $('h1.title').wrapAll('<div class="page-header"/>');
+    $('h1.title').wrapAll('<div id="nb" class="navbar navbar-inverse navbar-fixed-top" role="navigation"/>');
+    $('h1.title').wrapAll('<div class="container"/>');
+    $('h1.title').wrapAll('<div class="navbar-header"/>');
+    $("h1.title").replaceWith('<a class="navbar-brand" href="#">' + $("h1.title").text() + "</a>");
+
+    $('#table-of-contents h2').remove();
+    $('#text-table-of-contents').appendTo("#nb .container");
+    $('#text-table-of-contents').addClass("collapse navbar-collapse");
+    $('#text-table-of-contents > ul').addClass("nav navbar-nav");
+    $('#text-table-of-contents > ul > li > ul').remove();
 
     $('#table-of-contents').remove();
+
+    $('#nb').prependTo("body");
+
     $('#postamble').remove();
 
     $('.org-dl').addClass('dl-horizontal');
+
     $('.OPEN').addClass('label label-info');
     $('.IDEA').addClass('label label-info');
     $('.TEST').addClass('label label-important');
     $('.ASSIGNED').addClass('label label-warning');
     $('.DONE').addClass('label label-success');
 
-    $('.tag').addClass('text-right text-info');
+    $('.tag').addClass('muted');
 
-    $('.outline-2').wrapAll('<div id="main" class="row-fluid"/>');
-    $('.outline-2').wrapAll('<div class="span9"/>');
 
-    $('#main').prepend('<div id="toc"/>');
-    $('#toc').wrapAll('<div class="span3"/>');
-    $('#toc').tocify({
-	context: "#main",
-	selectors: "h2,h3",
-    });
+    // https://gist.github.com/ivos/4055810
+    if($(document).width()>979){  // Required if "viewport" content is "width=device-width, initial-scale=1.0": navbar is not fixed on lower widths.
 
-    $('#toc').affix();
+	var hash = window.location.hash;
 
+	// Code below fixes the issue if you land directly onto a page section (http://domain/page.html#section1)
+
+	if(hash!=""){
+	    $(document).scrollTop(($(hash).offset().top) - $(".navbar-fixed-top").height());
+	}
+
+	// Here's the fix, if any <a> element points to a page section an offset function is called
+
+	var locationHref = window.location.protocol + '//' + window.location.host + $(window.location).attr('pathname');
+	var anchorsList = $('a').get();
+
+	for(i=0;i<anchorsList.length;i++){
+	    var hash = anchorsList[i].href.replace(locationHref,'');
+	    if (hash[0] == "#" && hash != "#"){
+		var originalOnClick = anchorsList[i].onclick; // Retain your pre-defined onClick functions
+		setNewOnClick(originalOnClick,hash);
+	    }
+	}
+    }
+
+    function setNewOnClick(originalOnClick,hash){
+	anchorsList[i].onclick=function(){
+	    $(originalOnClick);
+	    $(document).scrollTop(($(hash).offset().top) - $(".navbar-fixed-top").height());
+	    return false;
+	};
+    }
 });
