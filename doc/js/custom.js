@@ -41,7 +41,7 @@ $(document).ready(function() {
     $('.ASSIGNED').addClass('label label-warning');
     $('.DONE').addClass('label label-success');
 
-    $('.tag').addClass('muted');
+    $('.tag').addClass('badge');
 
     $('table').addClass('table');
     $('img').addClass('img-responsive');
