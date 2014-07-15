@@ -23,13 +23,19 @@ $(document).ready(function() {
 
     $('.org-dl').addClass('dl-horizontal');
 
+    $('h2').addClass('page-header');
+
+    $('.TODO').addClass('label label-info');
     $('.OPEN').addClass('label label-info');
     $('.IDEA').addClass('label label-info');
     $('.TEST').addClass('label label-important');
     $('.ASSIGNED').addClass('label label-warning');
     $('.DONE').addClass('label label-success');
 
-    $('.tag').addClass('muted');
+    $('.tag').addClass('badge');
+
+    $('table').addClass('table');
+
 
 
     // https://gist.github.com/ivos/4055810

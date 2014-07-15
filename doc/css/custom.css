@@ -3155,14 +3155,6 @@ h2, h3, h4, h5, h6 {
   /* special-keyword-face */
   color: #e0cf9f;
 }
-.table {
-  /* table */
-  color: #9fc59f;
-}
-.table-1 {
-  /* table-face */
-  color: #9fc59f;
-}
 .tag {
   /* tag */
   font-weight: bold;
