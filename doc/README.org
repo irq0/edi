@@ -33,7 +33,7 @@ In theory(tm). Expect some settings to still be hard coded somewhere.
 - app :: EDI application.
 
 ** Well-defined Exchanges
-https://git.c3pb.de/c3pb/subraum-automatisierung/blob/master/doc/exchanges.jpeg
+[[./img/exchanges.png]]
 
 *** msg
 Raw messages received from somewhere. This should be something that
@@ -90,7 +90,6 @@ Two content types are allowed: /application/json/ and /text/plain/:
   - action :: IRC action. "/me".
 ***** msg-to-cmd
 Transform =!<command>= to *cmd* Messages. (See *cmd* Exchange)
-
 
 *** cmd
 Messages that do something :)
