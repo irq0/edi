@@ -2,7 +2,7 @@ $(document).ready(function() {
     $('.src').addClass("pre-scrollable");
 
     $('#content').addClass("container").attr("role", "main");
-    $('#content').prepend('<div class="page-header"><h1>' + $("h1.title").text() + '</h1></div>');
+    var title = $("h1.title").text();
 
     $('h1.title').wrapAll('<div id="nb" class="navbar navbar-inverse navbar-fixed-top" role="navigation"/>');
     $('h1.title').wrapAll('<div class="container"/>');
@@ -10,10 +10,19 @@ $(document).ready(function() {
     $("h1.title").replaceWith('<a class="navbar-brand" href="#">' + $("h1.title").text() + "</a>");
 
     $('#table-of-contents h2').remove();
-    $('#text-table-of-contents').appendTo("#nb .container");
-    $('#text-table-of-contents').addClass("collapse navbar-collapse");
-    $('#text-table-of-contents > ul').addClass("nav navbar-nav");
-    $('#text-table-of-contents > ul > li > ul').remove();
+
+    var navtoc = $('#text-table-of-contents').clone();
+    var toc = $('#text-table-of-contents').clone();
+
+    navtoc.appendTo("#nb .container");
+    navtoc.addClass("collapse navbar-collapse");
+    navtoc.find("ul").addClass("nav navbar-nav");
+    navtoc.find("ul > li > ul").remove();
+
+    toc.attr("id", "content-toc");
+    toc.prependTo("#content");
+
+    $('#content').prepend('<div class="page-header"><h1>' + title + '</h1></div>');
 
     $('#table-of-contents').remove();
 
@@ -32,7 +41,7 @@ $(document).ready(function() {
     $('.ASSIGNED').addClass('label label-warning');
     $('.DONE').addClass('label label-success');
 
-    $('.tag').addClass('badge');
+    $('.tag').addClass('muted');
 
     $('table').addClass('table');
 

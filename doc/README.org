@@ -1,5 +1,5 @@
 #+TITLE: EDI README
-#+OPTIONS: creator:nil author:nil H:4 toc:2 num:2
+#+OPTIONS: creator:nil author:nil H:4 toc:2 num:nil
 #+SEQ_TODO: OPEN IDEA ASSIGNED TEST | DONE
 #+HTML_HEAD: <link href="css/bootstrap.css" rel="stylesheet">
 #+HTML_HEAD: <link href="css/bootstrap-responsive.css" rel="stylesheet">
