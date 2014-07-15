@@ -44,6 +44,7 @@ $(document).ready(function() {
     $('.tag').addClass('muted');
 
     $('table').addClass('table');
+    $('img').addClass('img-responsive');
 
 
 
