@@ -14,9 +14,10 @@
 
 (timbre/refer-timbre)
 
-(defn message-handler [ch {:keys [content-type delivery-tag] :as meta} ^bytes payload]
+(defn message-handler
   "Forward incoming messages to handler methods. Run handler as future. Do msg-reply if
    handler returns string"
+  [ch {:keys [content-type delivery-tag] :as meta} ^bytes payload]
 
   (info (format "<--- Received message: %s, content type: %s"
           (String. payload "UTF-8") content-type))

@@ -1,7 +1,6 @@
 (ns thehonestbookoftruth.handler
   (:use [clj-time.local :only [local-now]]
         [clj-time.coerce :only [to-date]]
-        [clojurewerkz.serialism.core :as s]
         [thehonestbookoftruth.util :only [parse-eta format-eta format-time-span format-user-list]])
   (:require [thehonestbookoftruth.state :as state]
             [thehonestbookoftruth.emit :as emit]

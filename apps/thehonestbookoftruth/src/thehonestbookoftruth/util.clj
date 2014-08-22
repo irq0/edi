@@ -33,7 +33,7 @@
     (try
       (let [span (time/in-minutes (time/interval from to))]
         (if (time/after? b a)
-          (+ span)
+          span
           (- span)))
     (catch java.lang.IllegalArgumentException _))))
 
