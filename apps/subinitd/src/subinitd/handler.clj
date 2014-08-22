@@ -1,6 +1,6 @@
 (ns subinitd.handler
   (:use [subinitd.runlevel :only [runlevel telinit!]]
-        [clojurewerkz.serialism.core :as s])
+        [clojurewerkz.serialism.core :only [serialize]])
   (:require [taoensso.timbre :as timbre]))
 
 (timbre/refer-timbre)
@@ -12,7 +12,7 @@
   (fn [args] (keyword (args :cmd))))
 
 (defmethod handler :inspect [_]
-  (s/serialize
+  (serialize
     {:app "subinitd"
      :descr "Subraum distributed init system"
      :cmds {:runlevel {:args  "NONE",

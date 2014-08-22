@@ -30,8 +30,9 @@
     (publish key (str key "\n"))))
 
 
-(defn telinit! [to]
+(defn telinit!
   "Change runlevel. Side effects: Publishes runlevel change messages"
+  [to]
   (let [from @runlevel]
     (doseq [ch (change-seq from to)]
       (apply change-runlevel! ch))
