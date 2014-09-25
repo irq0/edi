@@ -28,30 +28,26 @@ connect shell scripts.
 - Subsystems can run /anywhere/
 
 ** Features
-*** IRC Bot
-**** sed substitution
-**** karma
-*** User Presence
+- IRC Bot
+  - sed substitution
+  - karma
+- User Presence
 - login
 - logout
-- eta
-*** Help
-*** Automation
-**** DMX Lamp control
-**** 433Mhz
-**** MPD
-*** Text-to-speech
-*** Init System
-- Room shutdown, startup
-*** Greetings
-- TTS: /Hello User/ once a user logs in
-*** Gimmicks
-**** Weather
-**** Fortune
-
-** Who runs EDI?
-*** Subraum
-
+  - eta
+- Help
+- Automation
+  - DMX Lamp control
+  - 433Mhz
+  - MPD
+- Text-to-speech
+- Init System
+  - Room shutdown, startup
+- Greetings
+  - TTS: /Hello User/ once a user logs in
+- Gimmicks
+  - Weather
+  - Fortune
 
 * Documentation
 

@@ -11,9 +11,9 @@ end
 sms_tts_callees = Set({"01930100"})
 
 user_db = {}
-user_db["***REMOVED***"] = { nick = "irq0" }
-user_db["***REMOVED***"] = { nick = "irq0" }
-user_db["***REMOVED***"] = { nick = "snowball" }
+user_db["foo"] = { nick = "irq0" }
+user_db["foo"] = { nick = "irq0" }
+user_db["foo"] = { nick = "snowball" }
 
 menu = {}
 
