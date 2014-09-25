@@ -1,0 +1,9 @@
+#!/bin/bash
+
+case "$1" in
+
+    stop)
+	emit_cmd clear-all-etas-and-logins
+	;;
+
+esac

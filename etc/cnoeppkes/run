@@ -1,0 +1,7 @@
+#!/bin/sh
+exec 2>&1
+
+export AMQP_SERVER="mopp"
+export PYTHONPATH="/home/pi/pyedi"
+
+exec /home/pi/cnoeppkes.py

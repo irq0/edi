@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# EDI Soundboard
+# Author: Marcel Lauhoff <ml@irq0.org>
+
+mediainfo "$1" |
+    gawk '
+BEGIN {
+   FS="[[:space:]]+:[[:space:]]+";
+   delete tags[0];
+}
+function add(X) {
+   tags[length(tags)+1] = X
+}
+/Complete name/ {
+   filename = $2
+}
+/(Track name|Performer|Description|Comment|Album)/ {
+   add($2);
+}
+END {
+   if (filename) {
+      for (i=1; i<=length(tags);i++) {
+         if (tags[i] !~ /^[[:space:]]*$/) {
+            print tags[i]
+         }
+      }
+   }
+}'

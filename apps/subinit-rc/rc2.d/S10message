@@ -1,0 +1,12 @@
+#!/bin/bash
+
+case "$1" in
+    start)
+	emit_cmd say Subraum startet
+	emit_cmd sob subraum_startup
+	;;
+    stop)
+	emit_cmd say Subraum faehrt runter
+	emit_cmd sob subraum_shutdown
+        ;;
+esac

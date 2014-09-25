@@ -1,0 +1,12 @@
+#!/bin/bash
+
+case "$1" in
+
+    start)
+	emit_cmd act dmx all background
+	;;
+
+    stop)
+	emit_cmd act dmx all alarm
+	;;
+esac

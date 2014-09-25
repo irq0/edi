@@ -1,0 +1,4 @@
+#!/bin/sh
+
+emit_cmd sob Mass Effect 3 Start Sound
+emit_cmd fortune

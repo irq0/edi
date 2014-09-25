@@ -1,0 +1,11 @@
+#!/bin/bash
+
+
+case "$1" in
+	start)
+		emit_cmd act music spacestation
+		;;
+	stop)
+		emit_cmd act mpd stop
+		;;
+esac

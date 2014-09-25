@@ -1,0 +1,202 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# ✓
+
+"""
+EDI Command listener and executor
+
+Registers edi commands and executes handlers with command
+date passed through ENV and ARGV
+"""
+
+from __future__ import unicode_literals
+
+import argparse
+import sys
+import time
+import re
+import json
+import os
+import subprocess
+import logging
+
+import edi
+
+__author__  = "Marcel Lauhoff"
+__email__   = "ml@irq0.org"
+__license__ = "GPL"
+
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger("listen_command")
+
+def make_cmd_exec(chan, app, autoreply=True):
+    def do_exec(**data):
+        log.debug("do_exec data: %r", data)
+        log.debug("using output formatter %r", output_formatter)
+
+        stdin = output_formatter(data)
+
+        data_r, data_w = os.pipe()
+        log.debug("Using data FDs: r=%r w=%r", data_r, data_w)
+
+        env = os.environ
+        env["EDI_CMD"] = data["cmd"]
+        env["EDI_USER"] = data.get("user", "") or ""
+        env["EDI_CMD_ARGS"] = data.get("args", "") or ""
+        env["EDI_DATA_FD"] = str(data_w)
+
+        log.info("Calling app %r", app)
+        log.debug("Calling app with environment: %r", env)
+
+        p = subprocess.Popen(app,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE,
+                             stdin=subprocess.PIPE,
+                             env=env)
+        os.close(data_w)
+
+        stdout, stderr = p.communicate(input=stdin)
+
+        stdout, stderr = (x.decode("utf-8") for x in (stdout, stderr))
+
+        try:
+	    dataout = parse_data_out(os.fdopen(data_r).read().decode("utf-8"))
+	except:
+	    log.exception("Failed to parse dataout")
+	    dataout = None
+
+        log.info("#### Command %r output: DATA OUT (fd=%d)", data["cmd"], data_r)
+        if dataout:
+	    log.info("%r", dataout)
+
+        log.info("#### Command %r output: STDOUT", data["cmd"])
+        if stdout:
+            log.info("%s", stdout)
+
+        log.info("#### Command %r output: STDERR", data["cmd"])
+        if stderr:
+            log.info("%s", stderr)
+
+
+        if autoreply and stdout:
+            edi.emit.msg_reply(chan,
+                               src=data["src"],
+                               user=data["user"],
+                               data=dataout,
+                               msg=stdout)
+
+
+    return do_exec
+
+def parse_data_out(x):
+    return json.loads(x)
+
+def output_formatter(x):
+    return json.dumps(x)
+
+def output_formatter_awkfriendly(x):
+    return "\n".join("{}\x1E{}".format(k,str(v)) for k,v in x.iteritems())
+
+def output_formatter_onlyargs(x):
+    return x["args"]
+
+def NameString(v):
+    regex = r"^(\w+)$"
+    try:
+        return re.match(regex, v).group(0)
+    except:
+        raise argparse.ArgumentTypeError("Must match {}".format(regex))
+
+def AssignmentString(v):
+    regex = r'^(\w+)="?(.+)"?$'
+    try:
+        m = re.match(regex, v)
+        return (m.group(1), m.group(2),)
+    except:
+        raise argparse.ArgumentTypeError("Must match {}".format(regex))
+
+def parse_args(args=None):
+       parser =argparse.ArgumentParser()
+
+       parser.add_argument("--cmd",
+                           action='append',
+                           type=str,
+                           required=True,
+                           help="Command to register. Repeat for multiple commands")
+       parser.add_argument("--cmd-arg",
+                           action="append",
+                           type=AssignmentString,
+                           required=False,
+                           help="Specify command's argument type. Default is 'none'. Currently this option only changes the data returned by the implicit 'inspect' command. Example: --cmd-args weather=none")
+
+       parser.add_argument("--cmd-description",
+                           action="append",
+                           type=AssignmentString,
+                           required=False,
+                           help="Specify command's description. Default is value of --description")
+       parser.add_argument("--name",
+                           required=True,
+                           type=NameString,
+                           help="Name of the command handler")
+       parser.add_argument("--description",
+                           required=True,
+                           help="Help command text")
+       parser.add_argument("--data",
+                           choices=("json", "awkfriendly", "onlyargs"),
+                           default="json",
+                           help="Format of data the handler script gets through stdin. Default: json")
+       parser.add_argument("--exe",
+                           required=True,
+                           help="Program to call for each recvd command")
+
+       parser.add_argument("--autoreply",
+                           required=False,
+                           action="store_true",
+                           help="Disable automatic reply of program's stdout back to src?")
+
+       result = parser.parse_args(args)
+
+       # transform lists to dict with missing set to defaults
+       result.cmd_arg = dict(result.cmd_arg or [])
+       result.cmd_description = dict(result.cmd_description or [])
+
+       for cmd in set(result.cmd) - set(result.cmd_arg.keys()):
+           result.cmd_arg[cmd] = "NONE"
+
+       for cmd in set(result.cmd) - set(result.cmd_description.keys()):
+           result.cmd_description[cmd] = result.description
+
+       result.cmds = {
+           cmd : {
+               "descr" : result.cmd_description[cmd],
+               "args" : result.cmd_arg[cmd],
+               "attribs" : {},
+           }
+           for cmd in result.cmd
+       }
+
+       return result
+
+def main():
+    args = parse_args()
+    log.debug("Args: %r", args)
+
+    global output_formatter
+    if args.data == 'awkfriendly':
+        output_formatter = output_formatter_awkfriendly
+    elif args.data == 'onlyargs':
+        output_formatter = output_formatter_onlyargs
+
+    with edi.Manager(name=args.name, descr=args.description) as e:
+        for cmd, meta in args.cmds.iteritems():
+            e.register_command(make_cmd_exec(e.chan,
+                                             args.exe,
+                                             autoreply=args.autoreply),
+                               cmd,
+                               **meta)
+        e.register_inspect_command()
+
+        e.run()
+
+if __name__ == "__main__":
+    main()

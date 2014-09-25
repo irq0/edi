@@ -1,0 +1,7 @@
+* Requirements
+** Software
+- [[https://github.com/r10r/rcswitch-pi][rcswitch-pi]]
+- [[https://github.com/WiringPi/WiringPi][wiringPi]]
+** Hardware
+- 433MHz sender an GPIO 17.
+- http://dx.com/en/hotsale/433mhz-wireless.html

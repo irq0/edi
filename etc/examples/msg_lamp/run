@@ -1,0 +1,4 @@
+#!/bin/sh
+exec 2>&1
+
+exec amqp-consume -s 'mopp' -e 'msg' -r '#' /home/pi/lamp_netz.sh

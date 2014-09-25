@@ -1,0 +1,14 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# ✓
+
+import sys
+import json
+
+data = sys.stdin.read()
+
+try:
+    print json.loads(data)["msg"]
+
+except:
+    print data

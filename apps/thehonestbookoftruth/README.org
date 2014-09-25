@@ -1,0 +1,5 @@
+* Test
+
+#+BEGIN_SRC sh
+amqp-publish -u 'amqp://localhost' -e cmd -r eta --content-type="application/json" -b '{"cmd":"ul","args":"thehonestbookoftruth","user":"fooobar","src":"test"}' 
+#+END_SRC

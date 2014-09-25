@@ -1,0 +1,31 @@
+#!/bin/bash
+
+#
+# Run EDI subsystems
+#
+# depends: runit
+#
+# author: Marcel Lauhoff <ml@irq0.org>
+#
+
+set -o errexit
+
+SCRIPTNAME="$(basename $0)"
+SCRIPTPATH="$(dirname $0)"
+
+
+export APPDIR="$(readlink -f ${SCRIPTPATH}/apps)"
+export LOGDIR="$(readlink -f ${SCRIPTPATH}/log)"
+export CONFDIR="$(readlink -f ${SCRIPTPATH}/conf)"
+export ENVDIR="$(readlink -f ${SCRIPTPATH}/conf/env)"
+export BINDIR="$(readlink -f ${SCRIPTPATH}/bin)"
+export LIBDIR="$(readlink -f ${SCRIPTPATH}/lib)"
+
+export PATH="${PATH}:${BINDIR}"
+
+readonly RUNSVDIR="${SCRIPTPATH}/sv/enabled"
+
+$CONFDIR/make_env
+
+echo "Running EDI systems from ${RUNSVDIR}"
+runsvdir -P "${RUNSVDIR}"

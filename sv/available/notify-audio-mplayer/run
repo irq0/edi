@@ -1,0 +1,11 @@
+#!/bin/sh
+
+exec 2>&1
+
+exec chpst -e "$ENVDIR" \
+     amqp-consume \
+     --url="amqp://${AMQP_SERVER:-localhost}" \
+     --exchange="notify" \
+     --queue="audio-$(hostname)" \
+     --routing-key="audio" \
+     notify-audio-mplayer-helper cache
