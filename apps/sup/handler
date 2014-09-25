@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# 'sup EDI?
+#
+# Handle user related events like login.
+# Execute scripts, for example greeting messages
+#
+# Author: Marcel Lauhoff <ml@irq0.org>
+
 set -o errexit
 set -o nounset
 

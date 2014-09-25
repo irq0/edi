@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# EDI Shell
+#
+# Author: Marcel Lauhoff <ml@irq0.org>
+
 readonly USERNAME="$(whoami)"
 readonly SRC="edish.recv.$RANDOM"
 

@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# ✓
+
+"""
+EDI actor service - EDI message handler
+"""
 
 from __future__ import unicode_literals
 
@@ -14,6 +19,10 @@ import logging
 import edi
 
 from config import db, export_as_cmd, UnknownFooException, ParseException
+
+__author__  = "Marcel Lauhoff"
+__email__   = "ml@irq0.org"
+__license__ = "GPL"
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("actor-service")

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Fortune cookie app
+# Author: Marcel Lauhoff <ml@irq0.org>
+
 fortune="$(fortune)"
 echo "$fortune"
 emit_cmd tts --lang en-US --voice queenelizabeth "$fortune"

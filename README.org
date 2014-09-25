@@ -1,0 +1,122 @@
+#+TITLE: EDI
+#+OPTIONS: creator:nil author:nil H:4 toc:2 num:nil
+#+SEQ_TODO: OPEN IDEA ASSIGNED TEST | DONE
+
+* What is EDI?
+EDI is a hackerspace automation system designed to be, well, hacker
+friendly :)
+
+Build around an AMQP Server and small /Apps/. Customize EDI by
+editing code not XML files.
+
+Most Apps are written in python followed by bash and Clojure. A
+library for python is included as well as a helper tool to easily
+connect shell scripts.
+
+** Concept
+*** Open
+- Develop with /any/ programming language
+- No access control to keep people out
+*** KISS
+- Loosely coupled subsystems with simple tasks
+- Keep state local
+- Each subsystem runs as own process
+*** Message-based
+- Subsystem communicate via messages
+- Broker routes messages
+*** Distributed
+- Subsystems can run /anywhere/
+
+** Features
+- IRC Bot
+  - sed substitution
+  - karma
+- User Presence
+- login
+- logout
+  - eta
+- Help
+- Automation
+  - DMX Lamp control
+  - 433Mhz
+  - MPD
+- Text-to-speech
+- Init System
+  - Room shutdown, startup
+- Greetings
+  - TTS: /Hello User/ once a user logs in
+- Gimmicks
+  - Weather
+  - Fortune
+
+* Documentation
+
+In =doc/= folder or as html:
+
+http://files.irq0.org/c3pb/edi-doc/doc/doc.html
+
+
+* Ideas, Todos
+** Features
+*** OPEN jabber bot
+- user same msg exchange as irc bot
+- Possible routing keys: "jabber.recv.raw" "jabber.send.raw"
+*** OPEN calendar integration: source
+- Repeatedly parse calendar files. Ideally iCalendar. Load from Caldav?
+  google calendar?
+
+**** Variants
+***** Calendar Commands
+- Calendar contains EDI commands. Tool emits commands at specified
+  times.
+- Alternative to cron + emit_cmd script
+- Could be useful to build an alarm clock
+***** Events
+- Event :: Something is going to happen at a point in time. Wie das
+           digitale Zeitalter..
+
+*** OPEN set irc topics/modeline
+- Calendar events like Smalltalks
+- Something like the emacs modeline?
+*** OPEN Voice Recognition
+**** Idea
+Speech to text. At least in english. Perform natural language
+processing to extract meaning. Generate commands.
+
+**** Tools, Ideas
+***** pocketsphinx
+pocketsphinx is a cpp implementation of sphinx, smaller and not java.
+
+- debian/ubuntu packages: https://launchpad.net/~dhuggins/+archive/cmusphinx
+- transformations:
+  - we can't recognize users by voice.
+  - "!say" not nice to say. instead:
+    - "user command <user> <command>"
+    - "UC <user> <command>"
+    - "command <command>
+    - "do <command>"
+
+- "EDI: command say foo"
+- "EDI: user command seri login"
+- "EDI: user command seri logout"
+- "EDI <TONE> "
+
+***** wit.io
+- natural language processing web app
+- does the text -> meaning part
+- exports sphinx language models
+
+**** integration
+***** msg
+- recv :: voice recognition with some custom transformations
+- send :: notify.audio?
+***** asterisk
+- .. we can recocnize users by callerid
+- login by phone?
+- desktop edi voice clients based on SIP
+* License
+Distributed under the GPLv3 unless otherwise specified.
+
+* Contact
+- seri on hackint; irq0 on freenode; Ask around in #c3pb
+- /Reference/ EDI setup runs in #c3pb on hackint and in the [[http://c3pb.de][Subraum]] hackerspace

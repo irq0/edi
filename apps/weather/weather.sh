@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# EDI weather app
+#
+# Author: Marcel Lauhoff <ml@irq0.org>
+
 readonly LOCATION="edlp"
 
 subraum () {

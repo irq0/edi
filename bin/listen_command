@@ -1,5 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# ✓
+
+"""
+EDI Command listener and executor
+
+Registers edi commands and executes handlers with command
+date passed through ENV and ARGV
+"""
 
 from __future__ import unicode_literals
 
@@ -13,6 +21,10 @@ import subprocess
 import logging
 
 import edi
+
+__author__  = "Marcel Lauhoff"
+__email__   = "ml@irq0.org"
+__license__ = "GPL"
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("listen_command")

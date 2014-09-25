@@ -1,8 +1,7 @@
 (defproject edinitd "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :description "EDI init system"
+  :license {:name "GPLv3"
+            :url "http://www.gnu.org/licenses/gpl-3.0-standalone.html"}
   :main subinitd.core
   :aot [subinitd.core]
   :dependencies [[org.clojure/clojure "1.5.1"]

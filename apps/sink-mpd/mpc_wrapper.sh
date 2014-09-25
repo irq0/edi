@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# EDI MPD Sink
+# Author: Marcel Lauhoff <ml@irq0.org>
+
 SCRIPTPATH="$(dirname $0)"
 export MPC="mpc"
 

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# EDI Soundboard
+# Author: Marcel Lauhoff <ml@irq0.org>
+
 SCRIPTPATH="$(dirname $0)"
 
 filename_tags () {

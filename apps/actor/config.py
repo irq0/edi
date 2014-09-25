@@ -1,12 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# ✓
+
+"""
+EDI actor service - configuration and customization
+"""
 
 from __future__ import unicode_literals
-
 
 import xml.etree.cElementTree as ET
 import requests
 import re
+
+__author__  = "Marcel Lauhoff"
+__email__   = "ml@irq0.org"
+__license__ = "GPL"
 
 class BaseActor(object):
     exchange = ""

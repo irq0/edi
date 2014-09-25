@@ -1,11 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# ✓
+
+"""
+EDI python library
+"""
 
 from __future__ import unicode_literals
 
 import logging
 import json
 import amqplib.client_0_8 as amqp
+
+__author__  = "Marcel Lauhoff"
+__email__   = "ml@irq0.org"
+__license__ = "GPL"
+
 
 log = logging.getLogger("edi.emit")
 
