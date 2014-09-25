@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# EDI Soundboard
+#
+# Find file from index based on keywords. Use approx matching to
+# always return something
+#
+# Author: Marcel Lauhoff <ml@irq0.org>
+
+INDEXPATH="$(dirname "$0")/index"
+FILEPATH="$(dirname "$0")/files"
+key="${@}"
+
+file="$(tre-agrep \
+    --best-match \
+    --ignore-case \
+    --files-with-matches \
+    "$key" \
+    ${INDEXPATH}/* \
+| sort -R \
+| head -1)"
+
+echo "${FILEPATH}/$(basename "$file")"

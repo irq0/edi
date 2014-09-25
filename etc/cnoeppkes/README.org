@@ -1,0 +1,8 @@
+* Requirements
+** Software
+- pyedi
+  - python-amqplib
+- RPi.GPIO
+
+** Hardware
+- GPIOs 23, 24, 25

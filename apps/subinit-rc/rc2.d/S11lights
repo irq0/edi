@@ -1,0 +1,17 @@
+#!/bin/bash
+
+case "$1" in
+
+    start)
+	emit_cmd act bulb on
+	emit_cmd act sofaleds on
+	emit_cmd act dmx all green
+	;;
+
+    stop)
+	emit_cmd act bulb off
+	emit_cmd act sofaleds off
+	emit_cmd act dmx all black
+	;;
+
+esac

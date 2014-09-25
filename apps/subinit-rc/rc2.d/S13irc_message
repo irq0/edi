@@ -1,0 +1,12 @@
+#!/bin/bash
+
+case "$1" in
+
+    start)
+	emit_msg_action "starts Subraum 🌅 "
+	;;
+
+    stop)
+	emit_msg_action "shuts down Subraum 🌆 "
+	;;
+esac

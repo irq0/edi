@@ -1,0 +1,31 @@
+<s> EDI </s>
+<s> ACT DMX SOFA RED </s>
+<s> ACT DMX </s>
+<s> TELL INIT ZERO </s>
+<s> TELL INIT ONE </s>
+<s> TELL INIT TWO </s>
+<s> TELL INIT THREE </s>
+<s> TELL INIT FOUR </s>
+<s> RUNLEVEL </s>
+<s> WEATHER </s>
+<s> TIME </s>
+<s> FORTUNE </s>
+<s> RED </s>
+<s> GREEN </s>
+<s> BLUE </s>
+<s> WHITE </s>
+<s> ORANGE </s>
+<s> BACKGROUND </s>
+<s> MUSIC BASSDRIVE </s>
+<s> MUSIC RANDOM </s>
+<s> MPD NEXT </s>
+<s> MPD PREVIOUS </s>
+<s> MPD PLAY </s>
+<s> MPD STOP </s>
+<s> MPD PAUSE </s>
+<s> MPD NEXT </s>
+<s> USER LIST </s>
+<s> ETA </s>
+<s> LOGIN </s>
+<s> LOGOUT </s>
+<s> UN ETA </s>

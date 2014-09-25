@@ -1,0 +1,3 @@
+#!/bin/sh
+
+emit_msg_action "$(sort -R "$(dirname $0)/emoticons/goodbye" | head -1) ${EDI_USER}"

@@ -1,0 +1,17 @@
+[general]
+textsupport=yes                                                                                                                                                                               
+accept_outofcall_message = yes                                                                                                                                  
+outofcall_message_context = messages
+context=unauthorized
+nat=yes
+transport=udp
+sipdebug=no
+allowguest=no
+alwaysauthreject=yes
+
+register => ***REMOVED***@sipgate.de:ysWYm5@sipgate.de/***REMOVED***
+
+[sipgate_incomming]
+type=friend
+context=from-sipgate
+host=sipgate.de

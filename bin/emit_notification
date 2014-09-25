@@ -1,0 +1,10 @@
+#!/bin/bash
+
+filename="$1"
+destination="${2:-audio}"
+
+if [[ ! -r $filename ]]; then
+    echo "$0: File error" >&2
+else
+    amqp-publish -u "amqp://${AMQP_SERVER:-localhost}" -e notify -r "${destination}" <  "${filename}"
+fi

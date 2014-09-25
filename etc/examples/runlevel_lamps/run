@@ -1,0 +1,6 @@
+#!/bin/sh
+
+cd /home/pi
+
+export AMQP_SERVER=mopp
+exec ./subinit-consume.sh

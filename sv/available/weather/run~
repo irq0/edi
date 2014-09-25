@@ -1,0 +1,14 @@
+#!/bin/sh
+
+exec 2>&1
+
+export PATH="${PATH}:${APPDIR}/misc:."
+
+cd ${APPDIR}/proc/weather
+
+exec ${APPDIR}/misc/listen_command \
+     --cmd weather \
+     --cmd wetter \
+     --name "Wetterbericht" \
+     --description "Wetterbericht - Subraum und das da draussen" \
+     --exe "${APPDIR}/proc/weather/weather-to-msg.sh"

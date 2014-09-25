@@ -1,0 +1,15 @@
+#!/bin/sh
+
+exec 2>&1
+
+export PATH="${PATH}:/usr/games"
+
+exec chpst -e "$ENVDIR" \
+     listen_command \
+     --cmd sup \
+     --cmd-arg sup='["login","logout","poke"]' \
+     --cmd-descr say="Greet myself" \
+     --data onlyargs \
+     --name "sup" \
+     --description "Sup, a slur and informal greeting of the phrase what\'s up?"
+     --exe "${APPDIR}/sup/handler"

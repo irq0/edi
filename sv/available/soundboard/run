@@ -1,0 +1,19 @@
+#!/bin/sh
+
+exec 2>&1
+
+cd ${APPDIR}/soundboard
+
+echo "Generating index"
+./make_index
+
+exec chpst -e "$ENVDIR" \
+     listen_command \
+     --cmd sob \
+     --cmd-arg sob=TEXT \
+     --cmd-description sob="Approx match argument to soundboad's index. Always play something" \
+     --data onlyargs \
+     --autoreply \
+     --name "soundboard" \
+     --description "SOundBoard" \
+     --exe "${APPDIR}/soundboard/edimq-handler"

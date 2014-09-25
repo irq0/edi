@@ -1,0 +1,12 @@
+#!/bin/bash
+
+case "$1" in
+
+    start)
+	emit_presence online "Subraum down"
+	;;
+
+    stop)
+	emit_presence away "Subraum down"
+	;;
+esac

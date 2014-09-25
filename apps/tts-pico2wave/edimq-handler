@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# EDI TTS
+#
+# This is the "fallback" TTS based around pico2wave
+#
+# Author: Marcel Lauhoff <ml@irq0.org>
+
+
+read args
+
+source $(dirname $0)/tts.sh
+
+filename=""
+
+case "$EDI_CMD" in
+    tts)
+	if ! parsed="$(cli $args)"; then
+	    echo "$parsed"
+	else
+	    filename="$(tts $parsed)"
+	fi
+	;;
+    say)
+	filename="$(tts de-DE "$args")"
+	;;
+    *)
+	echo "Unknown command $EDI_CMD"
+	;;
+esac
+
+
+if [[ -n $filename ]]; then
+    echo "Filename: $filename" >&2
+    emit_notification "$filename"
+fi

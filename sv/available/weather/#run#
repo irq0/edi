@@ -1,0 +1,15 @@
+#!/bin/sh
+
+exec 2>&1
+
+cd ${APPDIR}/weather
+
+exec chpst -e "$ENVDIR" \
+     listen_command \
+     --cmd weather \
+     --cmd-args weather=none \ default = none
+     --cmd-descr weather=default \ default = --description
+     --cmd wetter \
+     --name "weather" \
+     --description "Wetterbericht - Subraum und das da draussen" \
+     --exe "${APPDIR}/weather/weather.sh"

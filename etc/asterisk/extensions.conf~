@@ -1,0 +1,10 @@
+[general]
+[globals]
+
+
+[from-sipgate]
+exten => _X.,1,Answer()
+	same => n,Record("/tmp/call.%d.wav",5,0)
+;	same => n,Playback(tt-monkeys)
+	same => n,Hangup()
+
