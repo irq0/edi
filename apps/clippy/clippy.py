@@ -1,20 +1,27 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# ✓
 
-#
-# Provide basic help and inspection commands. Uses the inspect command to gather data
-#
+"""
+Clippy
+
+Basic help and inspection commands. Uses the inspect command to gather data.
+"""
 
 from __future__ import unicode_literals
 
 import os
 import binascii
-import edi
 import sys
 import time
 import json
-
 import logging
+
+import edi
+
+__author__  = "Marcel Lauhoff"
+__email__   = "ml@irq0.org"
+__license__ = "GPL"
 
 logging.basicConfig(level=logging.WARNING)
 log = logging.getLogger("clippy")

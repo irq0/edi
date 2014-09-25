@@ -1,19 +1,29 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# ✓
 
-from __future__ import unicode_literals
+"""
+Command Parser
 
-import edi
-import logging
+Parse commands from messages (think of irc, jabber,..)
+"""
 
-logging.basicConfig(level=logging.INFO)
-log = logging.getLogger("msg-to-cmd")
-
-
-# Parse commands from messages (think of irc, jabber,..).
 # Two access levels:
 # full: All commands allowed
 # guest: Only whitelisted commands allowed
+
+from __future__ import unicode_literals
+
+import logging
+
+import edi
+
+__author__  = "Marcel Lauhoff"
+__email__   = "ml@irq0.org"
+__license__ = "GPL"
+
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger("msg-to-cmd")
 
 CMD_REGEX = r"^!([\w-]+)\s?(.*?)$"
 

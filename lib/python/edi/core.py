@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# ✓
+
+"""
+EDI python library
+"""
 
 from __future__ import unicode_literals
 
@@ -15,6 +20,10 @@ from functools import wraps
 import emit
 
 from threading import Thread
+
+__author__  = "Marcel Lauhoff"
+__email__   = "ml@irq0.org"
+__license__ = "GPL"
 
 log = logging.getLogger("edi.util")
 

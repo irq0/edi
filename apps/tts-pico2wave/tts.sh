@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# EDI TTS
+#
+# This is the "fallback" TTS based around pico2wave
+#
+# Author: Marcel Lauhoff <ml@irq0.org>
+
 readonly TMPDIR="$(mktemp -dt "tts.XXXXXXXXXX")"
 readonly ERRLOG="$TMPDIR/err.log"
 

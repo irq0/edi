@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# EDI init script executor
+# Author: Marcel Lauhoff <ml@irq0.org>
+
 IFS="." read -r rc level action
 
 export SUBINIT_LEVEL="$level"

@@ -1,10 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# ✓
+
+"""
+EDI python library
+"""
 
 from __future__ import unicode_literals
 
 import re
 from functools import wraps
+
+
+__author__  = "Marcel Lauhoff"
+__email__   = "ml@irq0.org"
+__license__ = "GPL"
+
 
 def edi_cmd(edi, cmd_name, **args):
     "Register EDI command"

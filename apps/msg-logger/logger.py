@@ -1,20 +1,30 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# ✓
+
+"""
+Message logger
+
+Log everything on msg exchange to sqlite database
+"""
 
 from __future__ import unicode_literals
 
-#
-# Log messages on msg exchange
-#
-
-import edi
 import sys
 import os
 import time
 import json
-import sqlite3
 import time
 import logging
+
+import sqlite3
+
+import edi
+
+__author__  = "Marcel Lauhoff"
+__email__   = "ml@irq0.org"
+__license__ = "GPL"
+
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("msglogger")

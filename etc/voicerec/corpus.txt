@@ -1,0 +1,31 @@
+EDI
+act dmx sofa red
+act dmx
+tell init zero
+tell init one
+tell init two
+tell init three
+tell init four
+runlevel
+weather
+time
+fortune
+red
+green
+blue
+white
+orange
+background
+music bassdrive
+music random
+MPD next
+MPD previous
+MPD play
+MPD stop
+MPD pause
+MPD next
+user list
+ETA
+login
+logout
+un ETA

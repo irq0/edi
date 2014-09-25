@@ -1,24 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # ✓
-#
-# IRC<->AMQP bot
-#
+
+"""
+EDI IRC bot
+"""
 
 # Note: Twisted irc supports multiple joined channels per irc connection.
 # To keep things easier the bot only supports one channel. See config["channel"]
 
 # Encoding Note: Expects IO to be in utf-8. Will break otherwise.
-
-from twisted.words.protocols import irc
-from twisted.internet import reactor, protocol, ssl, defer
-from twisted.python import log
-
-from threading import Thread
-
-from config import AMQP_SERVER, config
-
-from amqplib import client_0_8 as amqp
 
 import time
 import traceback
@@ -28,6 +19,22 @@ import json
 import re
 import codecs
 import logging
+
+from threading import Thread
+
+from twisted.words.protocols import irc
+from twisted.internet import reactor, protocol, ssl, defer
+from twisted.python import log
+
+from amqplib import client_0_8 as amqp
+
+from config import AMQP_SERVER, config
+
+
+__author__  = "Marcel Lauhoff"
+__email__   = "ml@irq0.org"
+__license__ = "GPL"
+
 
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger("irc-bot")
