@@ -127,22 +127,20 @@ class MQ(Thread):
             log.error("Received unknown status: %r", status)
 
     def irc_action(self, dest, msg):
-        if u"_channel_" in dest:
-            for chan in config["channels"]:
-                self.irc_action(dest.replace(u"_channel_", chan), msg)
+        for chan_key in config["channels"]:
+            dest = dest.replace(chan_key, config["channels"][chan_key])
 
         log.debug("ACTION: dest=%r msg=%r", dest, msg)
 
         self.bot.me(dest.encode("utf-8"), msg.encode("utf-8"))
 
     def irc_send(self, dest, user, msg):
-        if u"_channel_" in dest:
-            for chan in config["channels"]:
-                self.irc_send(dest.replace(u"_channel_", chan), user, msg)
+        for chan_key in config["channels"]:
+            dest = dest.replace(chan_key, config["channels"][chan_key])
 
         is_channel_user_msg = (user != None and
-                               dest in config["channels"] and
-                               user not in config["channels"])
+                               dest in config["channels"].values() and
+                               user not in config["channels"].values())
         is_bot_user_msg = (user != None and
                            dest == self.bot.nickname and
                            user != self.bot.nickname)
@@ -159,8 +157,7 @@ class MQ(Thread):
         elif is_dest_unknown:
             log.error("Message dest/user invalid: Discarding")
         else:
-            for chan in config["channels"]:
-                self.irc_send_msg(chan, msg)
+            self.irc_send_msg(dest, msg)
 
     def irc_send_msg(self, dest, msg):
         msg = msg.encode("utf-8")
@@ -220,9 +217,8 @@ class MQ(Thread):
         amsg.properties["delivery_mode"] = 2
         amsg.properties["app_id"] = u"edi-irc"
 
-        masq_chan = chan # TODO: Why masquarade the channel?
-        for c in config["channels"]:
-            masq_chan.replace(c,u"_channel_")
+
+        masq_chan = config["channels"].keys()[config["channels"].values().index(chan)]
 
         key = u".".join((u"irc",
                         self.bot.nickname,
@@ -315,19 +311,19 @@ class MQBot(NamesIRCClient):
 
         self.msg("NickServ", "IDENTIFY {}".format(self.password))
 
-        for chan in config["channels"]:
+        for chan in config["channels"].values():
             log.info("IRC: join chan: %s", chan)
             self.join(chan)
 
     def joined(self, chan):
-        if chan in config["channels"]:
+        if chan in config["channels"].values():
             self.fetch_chan_ops(chan)
 
     def modeChanged(self, user, chan, do_set_modes, modes, users):
         log.debug("modeChanged: by_user=%r chan=%r users=%r modes=%r do_set_modes=%r",
                   user, chan, users, modes, do_set_modes)
 
-        if chan not in config["channels"]:
+        if chan not in config["channels"].values():
             return
 
         for (u, m) in zip(users, list(modes)):
@@ -354,7 +350,7 @@ class MQBot(NamesIRCClient):
                 continue
 
     def userLeft(self, user, chan):
-        if chan in config["channels"]:
+        if chan in config["channels"].values():
             self.fetch_chan_ops(chan)
 
     def privmsg(self, user, chan, msg):
