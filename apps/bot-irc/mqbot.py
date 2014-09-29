@@ -194,15 +194,35 @@ class MQ(Thread):
             self.bot.notice(dest, line)
 
     def user_flags(self, user, chan):
-        """Return set of user flags"""
-        flags = {
-            [None, "op"][user in self.bot.ops[chan]],
-            [None, "voice"][user in self.bot.voices[chan]]
-        }
 
-        flags.discard(None)
+        if chan == self.bot.nickname:
+            op_union = list()
+            for chan_key in self.bot.ops:
+                op_union.extend(self.bot.ops[chan_key])
+            voice_union = list()
+            for chan_key in self.bot.ops:
+                op_union.extend(self.bot.ops[chan_key])
 
-        return flags
+            """Return set of user flags"""
+            flags = {
+                [None, "op"][user in op_union],
+                [None, "voice"][user in voice_union]
+            }
+
+            flags.discard(None)
+
+            return flags
+
+        else:
+            """Return set of user flags"""
+            flags = {
+                [None, "op"][user in self.bot.ops[chan]],
+                [None, "voice"][user in self.bot.voices[chan]]
+            }
+
+            flags.discard(None)
+
+            return flags
 
     def irc_recvd(self, user, msg, chan, type):
         """Called whenever something was received from irc"""
@@ -224,8 +244,10 @@ class MQ(Thread):
         amsg.properties["delivery_mode"] = 2
         amsg.properties["app_id"] = u"edi-irc"
 
-
-        masq_chan = config["channels"].keys()[config["channels"].values().index(chan)]
+        if chan == self.bot.nickname:
+            masq_chan = chan
+        else:
+            masq_chan = config["channels"].keys()[config["channels"].values().index(chan)]
 
         key = u".".join((u"irc",
                         self.bot.nickname,
