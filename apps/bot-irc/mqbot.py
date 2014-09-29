@@ -194,35 +194,25 @@ class MQ(Thread):
             self.bot.notice(dest, line)
 
     def user_flags(self, user, chan):
+        """Return set of user flags"""
 
+        # query
         if chan == self.bot.nickname:
-            op_union = list()
-            for chan_key in self.bot.ops:
-                op_union.extend(self.bot.ops[chan_key])
-            voice_union = list()
-            for chan_key in self.bot.ops:
-                op_union.extend(self.bot.ops[chan_key])
-
-            """Return set of user flags"""
-            flags = {
-                [None, "op"][user in op_union],
-                [None, "voice"][user in voice_union]
-            }
-
-            flags.discard(None)
-
-            return flags
-
+            ops = set.union(*self.bot.ops.values())
+            voices = set.union(*self.bot.voices.values())
+        # channel
         else:
-            """Return set of user flags"""
-            flags = {
-                [None, "op"][user in self.bot.ops[chan]],
-                [None, "voice"][user in self.bot.voices[chan]]
-            }
+            ops = set(self.bot.ops[chan])
+            voices = set(self.bot.voices[chan])
 
-            flags.discard(None)
+        flags = {
+            [None, "op"][user in ops],
+            [None, "voice"][user in voices]
+        }
 
-            return flags
+        flags.discard(None)
+
+        return flags
 
     def irc_recvd(self, user, msg, chan, type):
         """Called whenever something was received from irc"""
