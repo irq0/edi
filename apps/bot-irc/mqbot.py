@@ -9,19 +9,13 @@ EDI IRC bot
 # Encoding Note: Expects IO to be in utf-8. Will break otherwise.
 
 import time
-import traceback
-import sys
-import os
 import json
-import re
-import codecs
 import logging
 
 from threading import Thread
 
 from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol, ssl, defer
-from twisted.python import log
 
 from amqplib import client_0_8 as amqp
 
@@ -91,7 +85,7 @@ class MQ(Thread):
             else:
                 log.error("Message with unknown content type: %r", body)
 
-        except Exception, e:
+        except Exception:
             log.exception("Exception in consume handler")
 
         raw_msg.channel.basic_ack(raw_msg.delivery_tag)
@@ -252,7 +246,7 @@ class MQ(Thread):
             self.chan.basic_publish(exchange=self.exchange,
                                     routing_key=key,
                                     msg=amsg)
-        except Exception, e:
+        except Exception:
             log.exception("Exception while publishing message")
 
     def run(self):
@@ -265,7 +259,7 @@ class MQ(Thread):
     def close(self):
         try:
             self.conn.close()
-        except IOError, e:
+        except IOError:
             log.exception("Error while closing amqp connection")
 
 class NamesIRCClient(irc.IRCClient):
