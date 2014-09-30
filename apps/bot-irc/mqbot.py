@@ -22,8 +22,8 @@ from amqplib import client_0_8 as amqp
 from config import AMQP_SERVER, config
 
 
-__author__  = "Marcel Lauhoff"
-__email__   = "ml@irq0.org"
+__author__  = "Marcel Lauhoff, Patrick Meyer"
+__email__   = "edi@irq0.org"
 __license__ = "GPL"
 
 
