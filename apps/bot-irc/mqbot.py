@@ -6,9 +6,6 @@
 EDI IRC bot
 """
 
-# Note: Twisted irc supports multiple joined channels per irc connection.
-# To keep things easier the bot only supports one channel. See config["channel"]
-
 # Encoding Note: Expects IO to be in utf-8. Will break otherwise.
 
 import time
@@ -137,17 +134,20 @@ class MQ(Thread):
             log.error("Received unknown status: %r", status)
 
     def irc_action(self, dest, msg):
-        dest = dest.replace(u"_channel_", config["channel"])
+        for chan_key in config["channels"]:
+            dest = dest.replace(chan_key, config["channels"][chan_key])
+
         log.debug("ACTION: dest=%r msg=%r", dest, msg)
 
         self.bot.me(dest.encode("utf-8"), msg.encode("utf-8"))
 
     def irc_send(self, dest, user, msg):
-        dest = dest.replace(u"_channel_", config["channel"])
+        for chan_key in config["channels"]:
+            dest = dest.replace(chan_key, config["channels"][chan_key])
 
         is_channel_user_msg = (user != None and
-                               dest == config["channel"] and
-                               user != config["channel"])
+                               dest in config["channels"].values() and
+                               user not in config["channels"].values())
         is_bot_user_msg = (user != None and
                            dest == self.bot.nickname and
                            user != self.bot.nickname)
@@ -164,7 +164,7 @@ class MQ(Thread):
         elif is_dest_unknown:
             log.error("Message dest/user invalid: Discarding")
         else:
-            self.irc_send_msg(config["channel"], msg)
+            self.irc_send_msg(dest, msg)
 
     def irc_send_msg(self, dest, msg):
         msg = msg.encode("utf-8")
@@ -193,11 +193,21 @@ class MQ(Thread):
             log.debug("SEND: dest=%r line=%r", dest, line)
             self.bot.notice(dest, line)
 
-    def user_flags(self, user):
+    def user_flags(self, user, chan):
         """Return set of user flags"""
+
+        # query
+        if chan == self.bot.nickname:
+            ops = set.union(*self.bot.ops.values())
+            voices = set.union(*self.bot.voices.values())
+        # channel
+        else:
+            ops = set(self.bot.ops[chan])
+            voices = set(self.bot.voices[chan])
+
         flags = {
-            [None, "op"][user in self.bot.ops],
-            [None, "voice"][user in self.bot.voices]
+            [None, "op"][user in ops],
+            [None, "voice"][user in voices]
         }
 
         flags.discard(None)
@@ -215,7 +225,7 @@ class MQ(Thread):
             "chan" : chan,
             "type" : type,
             "bot" : self.bot.nickname,
-            "uflags" : list(self.user_flags(user)),
+            "uflags" : list(self.user_flags(user, chan)),
         })
         log.debug("RECV: user=%r chan=%r msg=%r type=%r jmsg=%r", user, chan, msg, type, jmsg)
 
@@ -224,11 +234,17 @@ class MQ(Thread):
         amsg.properties["delivery_mode"] = 2
         amsg.properties["app_id"] = u"edi-irc"
 
+        # query
+        if chan == self.bot.nickname:
+            masq_chan = chan
+        # channel
+        else:
+            masq_chan = config["channel-aliases"][chan]
+
         key = u".".join((u"irc",
                         self.bot.nickname,
                         u"recv",
-                        chan.replace(config["channel"],u"_channel_")))
-
+                        masq_chan))
 
         try:
             log.debug("PUBLISH: routing_key=%r msg=%r", key, amsg)
@@ -298,8 +314,8 @@ class MQBot(NamesIRCClient):
     realname = """Uh, my name's EDI, uh, I'm not an addict."""
     lineRate = 1.0
 
-    ops = set()
-    voices = set()
+    ops = dict()
+    voices = dict()
 
     def connectionMade(self):
         log.info("Connection established")
@@ -316,18 +332,19 @@ class MQBot(NamesIRCClient):
 
         self.msg("NickServ", "IDENTIFY {}".format(self.password))
 
-        log.info("IRC: join chan: %s", config["channel"])
-        self.join(config["channel"])
+        for chan in config["channels"].values():
+            log.info("IRC: join chan: %s", chan)
+            self.join(chan)
 
     def joined(self, chan):
-        if chan == config["channel"]:
-            self.fetch_chan_ops()
+        if chan in config["channels"].values():
+            self.fetch_chan_ops(chan)
 
     def modeChanged(self, user, chan, do_set_modes, modes, users):
-	log.debug("modeChanged: by_user=%r chan=%r users=%r modes=%r do_set_modes=%r",
-	          user, chan, users, modes, do_set_modes)
+        log.debug("modeChanged: by_user=%r chan=%r users=%r modes=%r do_set_modes=%r",
+                  user, chan, users, modes, do_set_modes)
 
-        if chan != config["channel"]:
+        if chan not in config["channels"].values():
             return
 
         for (u, m) in zip(users, list(modes)):
@@ -336,17 +353,17 @@ class MQBot(NamesIRCClient):
             if m == "o":
                 try:
                     if do_set_modes:
-                        self.ops.add(u)
+                        self.ops[chan].add(u)
                     else:
-                        self.ops.remove(u)
+                        self.ops[chan].remove(u)
                 except KeyError:
                     pass
             elif m == "v":
                 try:
                     if do_set_modes:
-                        self.voices.add(u)
+                        self.voices[chan].add(u)
                     else:
-                        self.voices.remove(u)
+                        self.voices[chan].remove(u)
                 except KeyError:
                     pass
             else:
@@ -354,8 +371,8 @@ class MQBot(NamesIRCClient):
                 continue
 
     def userLeft(self, user, chan):
-        if chan == config["channel"]:
-            self.fetch_chan_ops()
+        if chan in config["channels"].values():
+            self.fetch_chan_ops(chan)
 
     def privmsg(self, user, chan, msg):
         log.debug("PRIVMSG: %r %r", user, chan)
@@ -368,13 +385,13 @@ class MQBot(NamesIRCClient):
 
         self.pub.irc_recvd(user, msg, chan, "action")
 
-    def fetch_chan_ops(self):
+    def fetch_chan_ops(self, chan):
         def parseOps(names):
-            self.voices = set(( n[1:] for n in names
+            self.voices[chan] = set(( n[1:] for n in names
                 if n.startswith("+")))
-            self.ops = set(( n[1:] for n in names
+            self.ops[chan] = set(( n[1:] for n in names
                 if n.startswith("@")))
-        self.names(config["channel"]).addCallback(parseOps)
+        self.names(chan).addCallback(parseOps)
 
     def me(self, channel, action):
         """
