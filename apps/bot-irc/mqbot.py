@@ -234,10 +234,12 @@ class MQ(Thread):
         amsg.properties["delivery_mode"] = 2
         amsg.properties["app_id"] = u"edi-irc"
 
+        # query
         if chan == self.bot.nickname:
             masq_chan = chan
+        # channel
         else:
-            masq_chan = config["channels"].keys()[config["channels"].values().index(chan)]
+            masq_chan = config["channel-aliases"][chan]
 
         key = u".".join((u"irc",
                         self.bot.nickname,
