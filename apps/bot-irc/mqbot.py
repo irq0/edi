@@ -139,6 +139,7 @@ class MQ(Thread):
         for chan_key in config["channels"]:
             dest = dest.replace(chan_key, config["channels"][chan_key])
 
+        is_msg_short = len(msg) < 120
         is_channel_user_msg = (user != None and
                                dest in config["channels"].values() and
                                user not in config["channels"].values())
@@ -148,10 +149,12 @@ class MQ(Thread):
         is_dest_unknown = (user == None and
                            dest == self.bot.nickname)
 
-        log.debug("SEND: user=%r dest=%r msg=%r channel_user_msg=%r bot_user_msg=%r dest_unk=%r",
-                  user, dest, msg, is_channel_user_msg, is_bot_user_msg, is_dest_unknown)
+        log.debug("SEND: user=%r dest=%r msg=%r msg_short=%r channel_user_msg=%r bot_user_msg=%r dest_unk=%r",
+                  user, dest, msg, is_msg_short, is_channel_user_msg, is_bot_user_msg, is_dest_unknown)
 
-        if is_channel_user_msg:
+        if is_channel_user_msg and is_msg_short:
+            self.irc_send_msg(dest, u"{}: {}".format(user, msg))
+        elif is_channel_user_msg:
             self.irc_send_notice(user, msg)
         elif is_bot_user_msg:
             self.irc_send_msg(user, msg)
