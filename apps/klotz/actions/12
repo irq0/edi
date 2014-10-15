@@ -1,0 +1,3 @@
+#!/bin/sh
+
+emit_cmd tts --voice willoldman "$(sort -R "$(dirname $0)/chucknorris.txt" | head -1)"
