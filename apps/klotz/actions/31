@@ -1,7 +1,7 @@
 #!/bin/sh
 
 emit_cmd mpd stop
-emit_cmd say "Praesentations Modus - Viel Spass!"
-sleep 10
-amixer set Master mute   
 emit_cmd dmx all white
+emit_cmd say "Praesentations Modus - Viel Spass!"
+sleep 20
+amixer set Master mute   
