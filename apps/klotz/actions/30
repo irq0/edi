@@ -1,0 +1,6 @@
+#!/bin/sh
+
+amixer set Master unmute
+emit_cmd music defcon
+emit_cmd sob "normales bild"
+emit_cmd dmx all background

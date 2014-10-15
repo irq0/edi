@@ -1,0 +1,6 @@
+#!/bin/sh
+
+emit_cmd mpd stop
+emit_cmd say "Praesentations Modus - Viel Spass!"
+amixer set Master mute   
+emit_cmd dmx all white
