@@ -4,6 +4,11 @@ import serial
 import re
 import os
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+
 SCRIPTPATH = os.path.realpath(os.path.dirname(__file__))
 
 def process(line):
@@ -14,6 +19,7 @@ def process(line):
 
     try:
         path = os.path.join(SCRIPTPATH, "actions/%s%s" % (x, y))
+        log.info("executing: %S" % (path))
         os.system(path)
     except Exception, e:
         pass
