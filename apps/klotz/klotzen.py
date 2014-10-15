@@ -3,6 +3,7 @@
 import serial
 import re
 import os
+import subprocess
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -19,10 +20,10 @@ def process(line):
 
     try:
         path = os.path.join(SCRIPTPATH, "actions/%s%s" % (x, y))
-        log.info("executing: %S" % (path))
-        os.system(path)
+        logger.info("executing: %s" % (path))
+        subprocess.call([path])
     except Exception, e:
-        pass
+        logger.exception(":(")
     
 
 def main():
