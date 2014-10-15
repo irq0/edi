@@ -26,7 +26,7 @@ def process(line):
     
 
 def main():
-    s = serial.Serial("/dev/ttyACM1", 9600)
+    s = serial.Serial("/dev/ttyACM0", 9600)
     while True:
         line = s.readline().strip() # blocks
         process(line)
