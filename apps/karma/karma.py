@@ -23,6 +23,10 @@ else:
     memory = dict()
 
 def handle_get_karma(args, thing):
+    thing = thing.strip()
+    if thing == "":
+        thing = args["user"]
+
     if thing in memory:
         to_send = "%s: %s" % (thing, memory[thing])
     else:
@@ -34,6 +38,8 @@ def handle_get_karma(args, thing):
                        msg=to_send)
 
 def mod_karma(thing, operator):
+    thing = thing.strip()
+
     if thing in memory:
         memory[thing] = operator(memory[thing], 1)
     else:
