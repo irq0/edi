@@ -1,4 +1,9 @@
 #!/bin/sh
 
-emit_cmd sob emergency_message
+emit_cmd sob "Civil emergency message intro"
 emit_cmd dmx all alarm
+
+sleep 30
+
+emit_cmd sob "Civil emergency message outro"
+emit_cmd dmx all background

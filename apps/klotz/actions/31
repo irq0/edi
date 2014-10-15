@@ -3,5 +3,5 @@
 emit_cmd mpd stop
 emit_cmd dmx all white
 emit_cmd say "Praesentations Modus - Viel Spass!"
-sleep 20
+sleep 5
 amixer set Master mute   
