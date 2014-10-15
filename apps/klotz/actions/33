@@ -1,4 +1,4 @@
 #!/bin/sh
 
-emit_cmd sob gong
+emit_cmd sob emergency_message
 emit_cmd dmx all alarm
