@@ -11,13 +11,15 @@ INDEXPATH="$(dirname "$0")/index"
 FILEPATH="$(dirname "$0")/files"
 key="${@}"
 
-file="$(tre-agrep \
+candidates="$(tre-agrep \
     --best-match \
     --ignore-case \
     --files-with-matches \
     "$key" \
     ${INDEXPATH}/* \
-| sort -R \
-| head -1)"
+  | sort -R)"
 
-echo "${FILEPATH}/$(basename "$file")"
+file="$(echo "$candidates" | head -1)"
+ncandidates="$(echo "$candidates" | wc -l)"
+
+echo "$ncandidates:${FILEPATH}/$(basename "$file")" 
