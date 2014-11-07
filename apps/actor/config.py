@@ -110,7 +110,7 @@ class DMXLampActor(BaseActor):
             ", ".join(self.groups.keys()))
 
     def args(self):
-        return (self.lamps.keys() + self.groups.keys(), "COLOR")
+        return ("CONCAT", self.lamps.keys() + self.groups.keys(), "COLOR")
 
 
 class PassthroughActor(BaseActor):
