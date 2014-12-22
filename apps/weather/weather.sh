@@ -4,10 +4,8 @@
 #
 # Author: Marcel Lauhoff <ml@irq0.org>
 
-readonly LOCATION="edlp"
-
-subraum () {
-    curl -s "http://${GRAPHITE_SERVER:-localhost}/render?target=summarize(sens.subraum.temp_1.degree_c,\"10min\",\"avg\")&format=raw&from=-10min" \
+graphite () {
+    curl -s "http://${GRAPHITE_SERVER:-localhost}/render?target=summarize(${WEATHER_GRAPHITE_METRIC},\"10min\",\"avg\")&format=raw&from=-10min" \
 	| awk '
 BEGIN {
    FS="|";
@@ -23,7 +21,7 @@ BEGIN {
 }
 
 draussen () {
-    weather --metric "$LOCATION" \
+    weather --metric "$WEATHER_LOCATION" \
 	| awk '
 BEGIN {
    FS=":"
@@ -40,4 +38,4 @@ readonly sub="$(subraum)"
 readonly dra="$(draussen)"
 
 echo "{\"subraum\":${sub:-null}, \"draussen\":${dra:-null}}" > /dev/fd/"${EDI_DATA_FD}"
-echo "subraum: ${sub:-NA}°C draußen: ${dra:-NA}°C"
+echo "${WEATHER_LOCAL_NAME}: ${sub:-NA}°C draußen: ${dra:-NA}°C"
