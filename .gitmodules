@@ -5,3 +5,7 @@
 	path = conf/apps
 	url = git@git.c3pb.de:irq0/edi-conf-subraum.git
 	branch = apps
+[submodule "conf/env"]
+	path = conf/env
+	url = git@git.c3pb.de:irq0/edi-conf-subraum.git
+	branch = env
