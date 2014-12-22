@@ -9,3 +9,6 @@
 	path = conf/env
 	url = git@git.c3pb.de:irq0/edi-conf-subraum.git
 	branch = env
+[submodule "apps/tts-barbershop"]
+	path = apps/tts-barbershop
+	url = git@git.c3pb.de:irq0/tts-barbershop.git
