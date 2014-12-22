@@ -1,1 +1,0 @@
-../../conf/apps/actor/config.py
