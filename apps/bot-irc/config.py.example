@@ -1,0 +1,51 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# ✓
+
+"""
+EDI IRC bot - configuration
+"""
+
+__author__  = "Marcel Lauhoff, Patrick Meyer"
+__email__   = "edi@irq0.org"
+__license__ = "GPL"
+
+import os
+
+# without ssl
+# config = {
+#     "host" : "spaceboyz.net",
+#     "port" : 6667,
+#     "channels" : {"_channel_" : "#subraum",
+#                   "_c3pb_"    : "#c3pb.sh"},
+#     "nick" : "EDI",
+#     "passwd" : "CHANGEME"
+# }
+
+# ssl "simple", no cacert, no client cert, no real checking. you get encryption though..
+# config = {
+#     "ssl" : True,
+#     "host" : "spaceboyz.net",
+#     "port" : 9999,
+#     "channels" : {"_channel_" : "#subraum",
+#                   "_c3pb_"    : "#c3pb.sh"},
+#     "nick" : "EDI",
+#     "passwd" : "CHANGEME"
+# }
+
+# ssl with ca, client certs
+config = {
+    "ssl" : "cert",
+    "host" : "spaceboyz.net",
+    "port" : 9999,
+    "channels" : {"_channel_" : "#subraum",
+                  "_c3pb_"    : "#c3pb"},
+    "nick" : "EDI",
+    "passwd" : "CHANGEME",
+    "ssl_clicert" : "ssl/hackint-client.pem",
+    "ssl_cacert" : "ssl/hackint-cacert.pem",
+}
+
+config["channel-aliases"] = { v : k for k, v in config["channels"].items() }
+
+AMQP_SERVER = os.getenv("AMQP_SERVER") or "localhost"
