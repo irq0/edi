@@ -13,16 +13,11 @@
 def config
 	$subsystem = "subraum"
 	$program_path = './programs/'
-	$channel_write_interval = 0.1
+	$channel_write_interval = 0.01
 	$debug = false
-	$lamps = {
-	  8  => Color.resolve("background"),
-	  24 => Color.resolve("background"),
-	  96 => Color.resolve("background"),
-	  192 => Color.resolve("background"),
-	}
-	#/config
-end
+	$lamps = [8, 24, 96, 192]
+  $default_colors = ["backgroundA","backgroundB","backgroundB","backgroundB"]
+end  #/config
 
 require "bunny"
 require "serialport"
@@ -128,8 +123,13 @@ class Color
   def self.resolve(color)
     col = simple_resolve(color)
     return Color.new([col]) if col
+    p = File.join($program_path,color+".rb")
+    if File.exist?(p) && File.realpath(p).start_with?($program_path) then
+      c = load_color_subclass(p)
+      return c if c
+    end
     p = File.join($program_path,color)
-    return Color.new(p) if File.exist?(p) && p.start_with?($program_path)
+    return Color.new(p) if File.exist?(p) && File.realpath(p).start_with?($program_path)
     fail "Unbekannte Farbe: #{color}"
   end
   def self.simple_resolve(color)
@@ -140,6 +140,16 @@ class Color
     m = /#([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})/.match(color)
     return m[1..3].map{|e| e.to_i(16)} if m
     JSON.load(color)[0..2].map{ |e| e.to_i } rescue nil
+  end
+  def self.load_color_subclass(path)
+    begin
+      c = eval(IO.read(path)).new
+      puts "loaded Class #{c.class.name} from #{path}"
+      return c
+    rescue
+      puts $!
+      puts $@
+    end
   end
   def self.load_colors
     @@colors = Hash[File.open('colors.txt').each_line.map do |line|
@@ -174,13 +184,16 @@ end
 config
 $program_path = File.realpath($program_path)
 Color.load_colors
+lamps = $lamps
+$lamps = {}
+lamps.each_index { |i| $lamps[lamps[i]] = Color.resolve($default_colors[i])}
 
 if __FILE__ == $0
   rkprefix = "dmx.lamp."+$subsystem+"."
   control = DmxControl.new
   control.on
 
-  conn = Bunny.new(:host => "mopp")
+  conn = Bunny.new(:host => ENV.fetch("AMQP_SERVER", "mopp"))
   conn.start
   ch = conn.create_channel
   xchg = ch.topic("act_dmx", :auto_delete => true)
