@@ -28,4 +28,4 @@ readonly RUNSVDIR="${SCRIPTPATH}/sv/enabled"
 $CONFDIR/make_env
 
 echo "Running EDI systems from ${RUNSVDIR}"
-runsvdir -P "${RUNSVDIR}"
+chpst -P runsvdir -P "${RUNSVDIR}"
