@@ -1,0 +1,8 @@
+#!/bin/sh
+
+exec 2>&1
+
+cd ${APPDIR}/bot-twitter/
+source twitter-env/bin/activate
+exec chpst -e "$ENVDIR" \
+     "./mqbot.py"
