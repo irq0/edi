@@ -13,7 +13,7 @@ m () {
 
 notify () {
     text="$@"
-    if [[ -n $text ]]; then
+    if [[ -n $text && ! ^http ]]; then
        emit_cmd tts --voice willbadguy "Playing: ${text}"
        emit_msg_action "turns on the radio: ${text}" # TODO use loev service!
     fi
