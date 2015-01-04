@@ -39,13 +39,23 @@ END {
 read -r cmd arg
 echo "CMD: $cmd $arg" >&2
 
-if [[ $cmd =~ ^(volume|next|prev|toggle|insert|play|pause|stop|clear)$ ]]; then
+if [[ $cmd =~ ^(next|toggle|play)$ ]]; then
     m "${cmd}" "${arg}"
+    m repeat yes
+    notify "$(stat)"
 elif [[ $cmd = "playthis" ]]; then
     m clear
     m insert "${arg}"
     sleep 2
     m play
+    m repeat yes
+    notify "$(stat)"
+elif [[ $cmd = "playcont" ]]; then
+    m insert "${arg}"
+    sleep 2
+    m next
+    m repeat yes
+    notify "$(stat)"
 elif [[ $cmd = "playpls" ]]; then
     m clear
 
@@ -54,7 +64,8 @@ elif [[ $cmd = "playpls" ]]; then
     done
     sleep 2
     m play
+    m repeat yes
+    notify "$(stat)"
+else
+    m "${cmd}" "${arg}"
 fi
-
-sleep 2
-notify "$(stat)"
