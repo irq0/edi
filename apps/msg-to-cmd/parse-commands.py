@@ -28,6 +28,7 @@ log = logging.getLogger("msg-to-cmd")
 CMD_REGEX = r"^!([\w-]+)\s?(.*?)$"
 
 GUEST_CMD_WHITELIST = (
+    "eta",
     "ul",
     "pizza-list",
     "pizza",
@@ -64,6 +65,8 @@ with edi.Manager(descr="Parse special strings from messages as EDI commands",
         cmd, cmd_args = regroups
 
         is_full = "op" in args["uflags"]
+	is_full = is_full or ("following" in args["uflags"] and
+		args["rkey"].startswith("twitter.sub_edi.recv"))
         is_guest = "voice" in args["uflags"]
         cmd_whitelisted = cmd in GUEST_CMD_WHITELIST
 
