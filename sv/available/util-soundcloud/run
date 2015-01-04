@@ -1,0 +1,14 @@
+#!/bin/sh
+
+exec 2>&1
+
+export PATH="${PATH}:/usr/games"
+
+exec chpst -e "$ENVDIR" \
+     listen_command \
+     --cmd sc \
+     --name soundcloud-util \
+     --description "play soundcloud url on mpd" \
+     --exe apps/utils/soundcloud.sh \
+     --data onlyargs
+
