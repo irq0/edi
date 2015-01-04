@@ -42,6 +42,7 @@ echo "CMD: $cmd $arg" >&2
 if [[ $cmd =~ ^(next|toggle|play)$ ]]; then
     m "${cmd}" "${arg}"
     m repeat yes
+    m consume yes
     notify "$(stat)"
 elif [[ $cmd = "playthis" ]]; then
     m clear
@@ -49,12 +50,15 @@ elif [[ $cmd = "playthis" ]]; then
     sleep 2
     m play
     m repeat yes
+    m consume yes
     notify "$(stat)"
 elif [[ $cmd = "playcont" ]]; then
     m insert "${arg}"
     sleep 2
     m next
+    m play
     m repeat yes
+    m consume yes
     notify "$(stat)"
 elif [[ $cmd = "playpls" ]]; then
     m clear
@@ -65,6 +69,7 @@ elif [[ $cmd = "playpls" ]]; then
     sleep 2
     m play
     m repeat yes
+    m consume yes
     notify "$(stat)"
 else
     m "${cmd}" "${arg}"
