@@ -125,7 +125,7 @@ def update():
             link = re.findall(r'.{1,400}', link) # TODO: wat?
             link = "\n".join(link)
 
-            to_send = "%s - %s\n%s" % (alias, feed.entries[0].title, link)
+            to_send = "%s - %s - %s" % (alias, feed.entries[0].title, link)
             if to_send == MEMORY[ident][alias]['last_published']:
                 continue
             else:
