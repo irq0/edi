@@ -49,9 +49,11 @@ def add_rss(src, user, alias, url):
     if not MEMORY.has_key(ident):
         MEMORY[ident] = dict()
 
-    if (MEMORY[ident].has_key(alias) or
-       url in [v['url'] for v in MEMORY[ident].values()]):
+    if MEMORY[ident].has_key(alias):
         to_send = "%s? I already track that for you.." % (alias)
+        publish(src, user, to_send)
+    elif url in [v['url'] for v in MEMORY[ident].values()]:
+        to_send = "I already track that url for you.."
         publish(src, user, to_send)
     else:
         MEMORY[ident][alias] = { 'src'           : src,
