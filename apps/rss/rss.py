@@ -44,6 +44,7 @@ def add_rss(src, user, alias, url):
     if not rss_check(url):
         to_send = "That url doesn't seem to be a valid RSS feed."
         publish(src, user, to_send)
+        return
 
     if not MEMORY.has_key(ident):
         MEMORY[ident] = dict()
