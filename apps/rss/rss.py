@@ -70,7 +70,9 @@ def del_rss(src, user, alias):
     if in_channel: ident = src
     else: ident = user
 
-    if MEMORY[ident].has_key(alias):
+    if not MEMORY.has_key(ident):
+        to_send = "I don't even know you."
+    elif MEMORY[ident].has_key(alias):
         MEMORY[ident].pop(alias)
         write_memory()
         to_send = "I won't track %s anymore." % (alias)
