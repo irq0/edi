@@ -165,13 +165,13 @@ class MQ(Thread):
         dest= dest.encode("utf-8")
 
         lines = msg.split("\n")
-        send_at_a_time = 120
+        send_at_a_time = 400
 
         # if we have multi-line content assume that each line doesn't hit the IRC server's limit
         if len(lines) > 1:
             send_at_a_time = None
         else:
-            send_at_a_time = 120
+            send_at_a_time = 400
 
         for line in lines:
             log.debug("SEND: dest=%r line=%r", dest, line)
