@@ -112,8 +112,8 @@ def update():
     for ident in MEMORY.keys():
         for alias in MEMORY[ident].keys():
             feed = rss_check(MEMORY[ident][alias]['url'])
-            src = rss_check(MEMORY[ident][alias]['src'])
-            user = rss_check(MEMORY[ident][alias]['user'])
+            src = MEMORY[ident][alias]['src']
+            user = MEMORY[ident][alias]['user']
 
             if not feed:
                 to_send = "Uh.. I couldn't get %s for you." % (alias)
