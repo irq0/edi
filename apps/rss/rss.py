@@ -149,7 +149,7 @@ class FeedUpdater(Thread):
 
 with edi.Manager(name="RSS", descr="RSS feed client.") as e:
 
-    @edi.edi_cmd(e, "sub",
+    @edi.edi_cmd(e, "rss-sub",
                  args="TEXT",
                  descr="Track RSS feed")
     def add_rss_recv(**args):
@@ -159,7 +159,7 @@ with edi.Manager(name="RSS", descr="RSS feed client.") as e:
             to_send = "Try it like this: !sub <alias> <url>"
             publish(args["src"], args["user"], to_send)
 
-    @edi.edi_cmd(e, "unsub",
+    @edi.edi_cmd(e, "rss-unsub",
                  args="TEXT",
                  descr="Un-Track RSS feed")
     def del_rss_recv(**args):
@@ -169,7 +169,7 @@ with edi.Manager(name="RSS", descr="RSS feed client.") as e:
             to_send = "Try it like this: !unsub <alias>"
             publish(args["src"], args["user"], to_send)
 
-    @edi.edi_cmd(e, "list",
+    @edi.edi_cmd(e, "rss-list",
                  args="TEXT",
                  descr="List tracked RSS feeds")
     def list_rss_recv(**args):
