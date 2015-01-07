@@ -170,7 +170,7 @@ with edi.Manager(name="RSS", descr="RSS feed client.") as e:
             publish(args["src"], args["user"], to_send)
 
     @edi.edi_cmd(e, "rss-list",
-                 args="TEXT",
+                 args="NONE",
                  descr="List tracked RSS feeds")
     def list_rss_recv(**args):
         list_rss(args["src"], args["user"])
