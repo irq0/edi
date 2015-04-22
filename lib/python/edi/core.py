@@ -17,8 +17,6 @@ import re
 import os
 from functools import wraps
 
-import emit
-
 from threading import Thread
 
 __author__  = "Marcel Lauhoff"
@@ -70,7 +68,7 @@ def wrap_callback(f):
 def wrap_unpack_json(f):
     @wraps(f)
     def wrapper(msg):
-            f(**json.loads(msg.body))
+        f(**json.loads(msg.body.decode("utf-8")))
 
     return wrapper
 
@@ -171,7 +169,7 @@ class Manager(object):
     def _make_queue_name(self, suffix):
         return "pyedi-{}__{}__{}".format(
             self.metadata["instance"],
-            re.sub(r"[^\w]", "", self.metadata["app"]),
+            re.sub(r"[^\w]", "", str(self.metadata["app"])),
             suffix)
 
     def register_inspect_command(self):
