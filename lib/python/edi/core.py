@@ -104,6 +104,9 @@ class Manager(object):
         "instance" : binascii.b2a_hex(os.urandom(5)),
     }
 
+    chan = None
+    conn = None
+
     def __init__(self, name=None, descr=None, amqp_server=(os.getenv("AMQP_SERVER") or "localhost")):
         self.amqp_server = amqp_server
         if name:
@@ -132,8 +135,10 @@ class Manager(object):
         except:
             log.error("Error in canceling consumers")
 
-        self.chan.close()
-        self.conn.close()
+        if self.chan is not None:
+            self.chan.close()
+        if self.conn is not None:
+            self.conn.close()
 
     def run(self):
         log.info("Waiting for messages")
