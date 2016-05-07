@@ -4,3 +4,12 @@ This daemon forwards the DMX data to an Art-Net slave via UDP.
 
 See [this document](http://www.artisticlicence.com/WebSiteMaster/User%20Guides/art-net.pdf) for
 more information about Art-Net. Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd
+
+Art-Net slave:
+- Arduino Mega with Ethernet shield (original shield with WhizNet chip, not ENC28J60)
+- MAX485 breakout board for DMX (universe 0 or 145):
+  - connections to Arduino: GND-GND, VCC-5V, DI-TX1 (18), RO-RX1 (19), DE-22, RE-open
+  - A and B are connected to DMX.
+- LED stripes (WS2812):
+  - pin 52 is universe 10, 11, and 12 (510 LEDs)
+  - pin 53 is universe 20, 21, and 22 (510 LEDs)
