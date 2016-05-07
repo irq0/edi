@@ -13,3 +13,11 @@ Art-Net slave:
 - LED stripes (WS2812):
   - pin 52 is universe 10, 11, and 12 (510 LEDs)
   - pin 53 is universe 20, 21, and 22 (510 LEDs)
+
+
+Control Art-Net with other software:
+
+- Disable edi: `echo -n off | amqp-publish -e act_dmx -r dmx.lamp.subraum.control`
+- Configure your app for unicast and set IP 172.31.65.70
+- Have fun!
+- Enable edi: `echo -n on | amqp-publish -e act_dmx -r dmx.lamp.subraum.control`
