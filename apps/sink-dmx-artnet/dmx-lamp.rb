@@ -17,7 +17,7 @@ def config
 	$program_path = './programs/'
 	$channel_write_interval = 0.01
 	$debug = false
-	$lamps = [2, 6, 10, 14, 20]
+	$lamps = [2, 6, 10, 14, 18]
 	$default_colors = ["backgroundA","backgroundB","backgroundB","backgroundB","backgroundB"]
 	$server = "172.31.65.70"
 end  #/config
