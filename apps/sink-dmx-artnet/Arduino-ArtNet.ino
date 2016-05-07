@@ -53,6 +53,11 @@ void setup()
   ledstripe2.begin();
   ledstripe2.setPixelColor(0, ledstripe2.Color(100, 200, 50));
   ledstripe2.show();
+
+  for (int i=8;i<=13;i++) {
+    pinMode(i, OUTPUT);
+    digitalWrite(i, HIGH);
+  }
   
   Serial.println(F("done"));
 
@@ -106,6 +111,12 @@ void loop()
       case 145: // AuroraDMX App
         for (int i=0;i<512 && i < artnet.getLength();i++) {
           DMXSerial.write(i, artnet.getDmxFrame()[i]);
+        }
+        if (artnet.getLength() > 27) {
+          for (int i=0;i<6;i++) {
+            pinMode(8+i, OUTPUT);
+            analogWrite(8+i, 255-artnet.getDmxFrame()[22+i]);
+          }
         }
         break;
       case 10: setFromDmx(ledstripe1, 0*LEDS_PER_UNIVERSE, LEDS_STRIPE1); break;

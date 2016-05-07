@@ -13,6 +13,9 @@ Art-Net slave:
 - LED stripes (WS2812):
   - pin 52 is universe 10, 11, and 12 (510 LEDs)
   - pin 53 is universe 20, 21, and 22 (510 LEDs)
+- RGB channels (with RGB amplifiers)
+  - R,G,B is 8, 9, 10 (DMX channel 22 to 24)
+  - R,G,B is 11, 12, 13 (DMX channel 25 to 27)
 
 
 Control Art-Net with other software:
