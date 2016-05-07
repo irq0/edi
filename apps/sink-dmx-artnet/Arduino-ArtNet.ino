@@ -33,8 +33,8 @@ byte mac[] = {0x04, 0xE9, 0xE5, 0x00, 0x69, 0xEC};
 // 90-A2-DA-00-7B-62
 
 
-Adafruit_NeoPixel ledstripe1 = Adafruit_NeoPixel(LEDS_STRIPE1, 52, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel ledstripe2 = Adafruit_NeoPixel(LEDS_STRIPE2, 53, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel ledstripe1 = Adafruit_NeoPixel(LEDS_STRIPE1, 4, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel ledstripe2 = Adafruit_NeoPixel(LEDS_STRIPE2, 5, NEO_GRB + NEO_KHZ800);
 
 void setup()
 {
@@ -51,6 +51,7 @@ void setup()
   ledstripe1.begin();
   ledstripe1.show();
   ledstripe2.begin();
+  ledstripe2.setPixelColor(0, ledstripe2.Color(100, 200, 50));
   ledstripe2.show();
   
   Serial.println(F("done"));
@@ -73,7 +74,9 @@ void setFromDmx(Adafruit_NeoPixel& ledstripe, int offset, int ledstripeLength) {
       artnet.getDmxFrame()[i+1], artnet.getDmxFrame()[i+2]);
       ledstripe.setPixelColor(i/3+offset, c);
   }
+  Serial.print("sending data to LED stripe...\t");
   ledstripe.show();
+  Serial.println("done");
 }
 
 void loop()
