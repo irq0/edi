@@ -72,9 +72,10 @@ class DmxControl
       advanceprograms
       @sema.synchronize {
         #TODO make sure the string is not unicode
-        msg = "Art-Net\0\0\x50\0\0\0\0\0\0\0\x00" + "\0"*@maxchannel
-        msg[17] = (@maxchannel&0xff).chr
-        msg[16] = ((@maxchannel>>8)&0xff).chr
+        cnt = @maxchannel + 1
+        msg = "Art-Net\0\0\x50\0\0\0\0\0\0\0\x00" + "\0"*def
+        msg[17] = (def&0xff).chr
+        msg[16] = ((def>>8)&0xff).chr
         @channels.each_pair do |channel, value|
           msg[18+channel] = (value.to_i&0xff).chr
         end
