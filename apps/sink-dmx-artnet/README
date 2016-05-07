@@ -1,1 +1,6 @@
 dmx listener an rabbitmq fürs edi
+
+This daemon forwards the DMX data to an Art-Net slave via UDP.
+
+See [this document](http://www.artisticlicence.com/WebSiteMaster/User%20Guides/art-net.pdf) for
+more information about Art-Net. Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd

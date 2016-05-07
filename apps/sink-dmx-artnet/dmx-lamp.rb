@@ -4,10 +4,12 @@
 #TODO Farbprogramme
 #TODO testen, ob enabled/disabled state auch regelmäßig aufs dmx geschrieben werden muss
 
-#key dmx.lamp.subraum.control, body ~= (on|off)
+#key dmx.lamp.subraum.control, body ~= (on|off)    # not supported
 #key dmx.lamp.subraum.0, body ~= (\d,\d,\d|html-farbe|programmname)
 
-#Lampenids: 8, 24, 96
+# ArtNet
+# see http://www.artisticlicence.com/WebSiteMaster/User%20Guides/art-net.pdf
+# Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd
 
 #config
 def config
@@ -15,35 +17,24 @@ def config
 	$program_path = './programs/'
 	$channel_write_interval = 0.01
 	$debug = false
-	$lamps = [8, 24, 96, 192]
-  $default_colors = ["backgroundA","backgroundB","backgroundB","backgroundB"]
+	$lamps = [2, 6, 10, 14, 20]
+	$default_colors = ["backgroundA","backgroundB","backgroundB","backgroundB","backgroundB"]
+	$server = "172.31.65.70"
 end  #/config
 
 require "bunny"
-require "serialport"
+require "socket"
 require "thread"
 require "json"
 
-class SerialDummy
-  def initialize(dev, bauds)
-    puts "Opened #{dev}@#{bauds}"
-  end
-  def write(s)
-    puts "Serial write: #{s}"
-  end
-end
-
 class DmxControl
   def initialize
-    if $debug then
-      @serial = SerialDummy.new("/dev/dmx", 38400)
-    else
-      @serial = SerialPort.new("/dev/dmx", 38400)
-    end
+    @socket = UDPSocket.new
     @sema = Mutex.new #semaphore die @serial schützt
     @channels = {}
     @programs = {}
     @enabled = true
+    @maxchannel = 0
   end
 
   def on
@@ -52,19 +43,20 @@ class DmxControl
         setprogram(lampid, default)
       }
       @enabled = true
-      @serial.write('B0')
     }
   end
 
   def off
     @sema.synchronize {
       @enabled = false
-      @serial.write('B1')
     }
   end
 
   def setchannel(channel, value)
     @channels[channel] = value
+    if channel > @maxchannel then
+      @maxchannel = channel
+    end
   end
 
   def setprogram(channel, color)
@@ -79,9 +71,14 @@ class DmxControl
       next unless @enabled
       advanceprograms
       @sema.synchronize {
+        #TODO make sure the string is not unicode
+        msg = "Art-Net\0\0\x50\0\0\0\0\0\0\0\x00" + "\0"*@maxchannel
+        msg[17] = (@maxchannel&0xff).chr
+        msg[16] = ((@maxchannel>>8)&0xff).chr
         @channels.each_pair do |channel, value|
-          @serial.write(sprintf("C%03dL%03d", channel, value))
+          msg[18+channel] = (value.to_i&0xff).chr
         end
+        @socket.send(msg, 0, $server, 6454)
       }
     end
   end
